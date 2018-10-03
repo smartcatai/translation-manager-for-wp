@@ -1,0 +1,167 @@
+/*
+ * Попап
+ */
+#smartcat-modal-window table,
+#smartcat-modal-window form {
+	width: 100%;
+}
+
+#smartcat-modal-window table {
+	border-collapse: collapse;
+}
+
+#smartcat-modal-window form > div:first-child {
+	max-height: 600px;
+	overflow-y: scroll;
+}
+
+#smartcat-modal-window select {
+	padding: 2px;
+	line-height: 28px;
+	height: 28px;
+	max-width: 200px;
+}
+
+#smartcat-modal-window form input[type="submit"] {
+	display: block;
+}
+
+#smartcat-modal-window table tr td:first-child {
+	width: 50%;
+}
+
+#smartcat-modal-window table thead tr td {
+	font-weight: bold;
+	border-bottom: 1px solid #aaa;
+}
+
+/*
+ * Добавление языков
+ */
+
+#smartcat-modal-window .sc-select-language-block {
+	margin: 15px 0;
+}
+
+#smartcat-modal-window .sc-select-language-block > div {
+	font-size: 13px;
+}
+
+#smartcat-modal-window .add-language:hover,
+#smartcat-modal-window .remove-language:hover {
+	cursor: pointer;
+}
+
+#smartcat-modal-window .remove-language,
+#smartcat-modal-window .add-language {
+	font-weight: bold;
+	text-align: center;
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+	vertical-align: middle;
+	margin-left: 15px;
+}
+
+#smartcat-modal-window .remove-language {
+	background-color: red;
+	color: white;
+}
+
+#smartcat-modal-window .remove-language:after,
+#smartcat-modal-window .add-language:after {
+	vertical-align: 50%;
+	font-size: 20px;
+	line-height: 20px;
+}
+
+#smartcat-modal-window .remove-language:after {
+	content: '-';
+}
+
+#smartcat-modal-window .add-language:after {
+	content: '+';
+}
+
+#smartcat-modal-window .add-language {
+	background-color: green;
+	color: white;
+}
+
+#smartcat-modal-window .smartcat-source-language-error,
+#smartcat-modal-window .smartcat-target-language-error {
+	background: #fff;
+	-webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+	margin: 5px 15px 2px;
+	padding: 1px 12px;
+	border-left: 4px solid #fffc28;
+}
+
+#smartcat-modal-window .smartcat-source-language-error {
+	display: none;
+}
+
+/*
+ * Анимации
+ */
+
+.shake-shake-baby {
+	animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+	transform: translate3d(0, 0, 0);
+	backface-visibility: hidden;
+	perspective: 1000px;
+}
+
+@keyframes shake {
+	10%, 90% {
+		transform: translate3d(-1px, 0, 0);
+	}
+
+	20%, 80% {
+		transform: translate3d(2px, 0, 0);
+	}
+
+	30%, 50%, 70% {
+		transform: translate3d(-4px, 0, 0);
+	}
+
+	40%, 60% {
+		transform: translate3d(4px, 0, 0);
+	}
+}
+
+/*
+ * Страница статистики
+ */
+
+.smartcat-connector table {
+	width: 100%;
+}
+
+.smartcat-connector table thead tr td {
+	font-weight: bold;
+	border-bottom: 1px solid #aaa;
+	background-color: white;
+}
+
+.smartcat-connector table tr:nth-child(even) {
+	background-color: white;
+}
+
+.smartcat-connector table tr:nth-child(odd) {
+	background-color: #fafafa;
+}
+
+.smartcat-connector .pagination {
+	margin: 20px 0;
+}
+
+.smartcat-connector .pagination span:first-child {
+	font-weight: bold;
+	display: inline-block;
+	padding-right: 5px;
+}

@@ -1,0 +1,102 @@
+services:
+  core.db:
+    class: SmartCAT\WP\DB\DB
+    tags: [installable]
+
+  core.options:
+    class: SmartCAT\WP\WP\Options
+    arguments:
+      - "%plugin.table.prefix%"
+    tags: [installable]
+
+  core.cron.send:
+    class: SmartCAT\WP\Cron\SendToSmartCAT
+    tags: [installable, cron]
+
+  core.cron.clear:
+    class: SmartCAT\WP\Cron\ClearDeletedProject
+    tags: [installable, cron]
+
+  core.queue.callback:
+    class: SmartCAT\WP\Queue\Callback
+    tags: [queue]
+
+  core.queue.statistic:
+    class: SmartCAT\WP\Queue\Statistic
+    tags: [queue]
+
+  core.queue.publication:
+    class: SmartCAT\WP\Queue\Publication
+    tags: [queue]
+
+  core.queue.post:
+    class: SmartCAT\WP\Queue\CreatePost
+    tags: [queue]
+
+  core.admin.columns:
+    class: SmartCAT\WP\Admin\Columns
+    tags: [hook]
+
+  core.admin.settings:
+    class: SmartCAT\WP\Admin\Settings
+    tags: [initable]
+
+  core.admin.statistics:
+    class: SmartCAT\WP\Admin\Statistics
+    tags: [initable]
+
+  core.admin.frontend:
+    class: SmartCAT\WP\Admin\Frontend
+    tags: [hook]
+
+  core.admin.ajax:
+    class: SmartCAT\WP\Admin\Ajax
+    tags: [hook]
+
+  core.admin.statistics_ajax:
+    class: SmartCAT\WP\Admin\StatisticsAjax
+    arguments:
+      - "%plugin.table.prefix%"
+    tags: [hook]
+
+  core.notice:
+    class: SmartCAT\WP\WP\Notice
+    tags: [initable]
+
+  callback.handler.smartcat:
+    class: SmartCAT\WP\Handler\SmartCATCallbackHandler
+    tags: [installable, hook]
+
+  entity.repository.task:
+    class: SmartCAT\WP\DB\Repository\TaskRepository
+    arguments:
+      - "%plugin.table.prefix%"
+    tags: [repositories]
+
+  entity.repository.statistic:
+    class: SmartCAT\WP\DB\Repository\StatisticRepository
+    arguments:
+      - "%plugin.table.prefix%"
+    tags: [repositories]
+
+  entity.repository.error:
+    class: SmartCAT\WP\DB\Repository\ErrorRepository
+    arguments:
+      - "%plugin.table.prefix%"
+    tags: [repositories]
+
+  smartcat:
+    class: SmartCAT\WP\Helpers\SmartCAT
+    arguments:
+      - "%smartcat.api.login%"
+      - "%smartcat.api.password%"
+      - "%smartcat.api.server%"
+
+  cryptographer:
+      class: \SmartCAT\WP\Helpers\Cryptographer
+
+  language.converter:
+      class: \SmartCAT\WP\Helpers\Language\LanguageConverter
+
+  utils:
+      class: \SmartCAT\WP\Helpers\Utils

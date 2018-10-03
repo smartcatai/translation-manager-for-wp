@@ -1,0 +1,4 @@
+parameters:
+  config.files:
+    - "parameters.yml"
+    - "services.yml"

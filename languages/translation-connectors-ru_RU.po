@@ -1,0 +1,830 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-08-11 09:31+0300\n"
+"PO-Revision-Date: 2017-08-14 09:31+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: views/progress.php:32
+msgid "Pages"
+msgstr "Страницы"
+
+#: views/progress.php:64
+msgid "Statistics is empty"
+msgstr "Статистика пуста"
+
+#: inc/smartcat/Admin/Settings.php:20 inc/smartcat/Admin/Settings.php:21
+msgid "Translation connector"
+msgstr ""
+
+#: inc/smartcat/Admin/Settings.php:24 inc/smartcat/Admin/Settings.php:25
+msgid "Settings"
+msgstr "Настройки"
+
+#: inc/smartcat/Admin/Settings.php:28 inc/smartcat/Admin/Settings.php:29
+msgid "Translation progress"
+msgstr "Процесс перевода"
+
+#: inc/smartcat/Admin/Settings.php:54
+msgid "Required settings"
+msgstr "Обязательные настройки"
+
+#: inc/smartcat/Admin/Settings.php:61
+msgid "Additional settings"
+msgstr "Дополнительные настройки"
+
+#: inc/smartcat/Admin/Settings.php:69
+msgid "API server"
+msgstr "Сервер API"
+
+#: inc/smartcat/Admin/Settings.php:77
+msgid "Europe"
+msgstr "Европа"
+
+#: inc/smartcat/Admin/Settings.php:78
+msgid "USA"
+msgstr "США"
+
+#: inc/smartcat/Admin/Settings.php:79
+msgid "Asia"
+msgstr "Азия"
+
+#: inc/smartcat/Admin/Settings.php:86
+msgid "API login"
+msgstr "Имя пользователя API"
+
+#: inc/smartcat/Admin/Settings.php:95
+msgid "API password"
+msgstr "Пароль API"
+
+#: inc/smartcat/Admin/Settings.php:108
+msgid "Workflow stages"
+msgstr "Этапы рабочего процесса"
+
+#: inc/smartcat/Admin/Settings.php:116
+msgid "Translation"
+msgstr "Перевод"
+
+#: inc/smartcat/Admin/Settings.php:117
+msgid "Editing"
+msgstr "Редактирование"
+
+#: inc/smartcat/Admin/Settings.php:118
+msgid "Proofreading"
+msgstr "Корректура"
+
+#: inc/smartcat/Admin/Settings.php:119
+msgid "Postediting"
+msgstr "Постредактирование"
+
+#: inc/smartcat/Admin/Settings.php:144
+msgid "You haven't got vendors"
+msgstr "Нет поставщиков"
+
+#: inc/smartcat/Admin/Settings.php:146
+msgid "Please, choose your vendor"
+msgstr "Выберите поставщика"
+
+#: inc/smartcat/Admin/Settings.php:149 inc/smartcat/Admin/Settings.php:152
+msgid "Please, insert you API login and password"
+msgstr "Вставьте имя пользователя и пароль API"
+
+#: inc/smartcat/Admin/Settings.php:157
+msgid "Vendor ID"
+msgstr "ИД поставщика"
+
+#: inc/smartcat/Admin/Columns.php:21 inc/smartcat/Admin/Frontend.php:63
+msgid "Submit for translation"
+msgstr "Отправить на перевод"
+
+#: inc/smartcat/Admin/Columns.php:32
+msgid "Posts have been sent for translation"
+msgstr "Публикации отправлены на перевод"
+
+#: inc/smartcat/Admin/Columns.php:36
+msgid "Posts have not been sent for translation"
+msgstr "Публикации не отправлены на перевод"
+
+#: inc/smartcat/Admin/Frontend.php:14
+msgid "Send for translation"
+msgstr "Отправить на перевод"
+
+#: inc/smartcat/Admin/Frontend.php:15 inc/smartcat/Admin/StatisticsTable.php:12
+msgid "Title"
+msgstr "Название"
+
+#: inc/smartcat/Admin/Frontend.php:16
+msgid "Author"
+msgstr "Автор"
+
+#: inc/smartcat/Admin/Frontend.php:17 inc/smartcat/Admin/StatisticsTable.php:17
+msgid "Status"
+msgstr "Состояние"
+
+#: inc/smartcat/Admin/Frontend.php:18 inc/smartcat/Admin/StatisticsTable.php:13
+msgid "Source language"
+msgstr "Исходный язык"
+
+#: inc/smartcat/Admin/Frontend.php:19 inc/smartcat/Admin/StatisticsTable.php:14
+msgid "Target language"
+msgstr "Язык перевода"
+
+#: inc/smartcat/Admin/Frontend.php:42
+msgid "Translation into one or more languages is impossible"
+msgstr "Перевод на один или несколько языков невозможен"
+
+#: inc/smartcat/Admin/Frontend.php:43
+msgid "Languages are not supported"
+msgstr "Языки не поддерживаются"
+
+#: inc/smartcat/Admin/Frontend.php:50
+msgid "Choose language"
+msgstr "Выберите язык"
+
+#: inc/smartcat/Admin/Frontend.php:98
+msgid "won't be translated. Source language is not supported"
+msgstr "не будет переведен. Исходный язык не поддерживается"
+
+#: inc/smartcat/Admin/Frontend.php:100
+msgid "Please, choose posts or pages for translation"
+msgstr "Выберите публикации или страницы для перевода"
+
+#: inc/smartcat/Admin/Frontend.php:102
+msgid "Workflow stages are not selected"
+msgstr "Не выбраны этапы рабочего процесса"
+
+#: inc/smartcat/Admin/StatisticsAjax.php:27
+#: inc/smartcat/Admin/StatisticsAjax.php:70 inc/smartcat/Admin/Ajax.php:25
+#: inc/smartcat/Admin/Ajax.php:104
+msgid "Access denied"
+msgstr "Доступ запрещен"
+
+#: inc/smartcat/Admin/StatisticsTable.php:15
+msgid "Words count"
+msgstr "Количество слов"
+
+#: inc/smartcat/Admin/StatisticsTable.php:98
+msgid "Submitted"
+msgstr "Отправлено"
+
+#: inc/smartcat/Admin/StatisticsTable.php:101
+msgid "In progress"
+msgstr "Выполняется"
+
+#: inc/smartcat/Admin/StatisticsTable.php:103
+msgid "Completed"
+msgstr "Завершено"
+
+#: inc/smartcat/Admin/Ajax.php:42 inc/smartcat/Admin/Ajax.php:44
+msgid "Login and password are required"
+msgstr "Требуется имя пользователя и пароль"
+
+#: inc/smartcat/Admin/Ajax.php:68
+msgid "Invalid username or password"
+msgstr "Недопустимое имя пользователя или пароль"
+
+#: inc/smartcat/Admin/Ajax.php:84
+msgid "Problem with deleting of previous callback"
+msgstr "Не удалось удалить предыдущий обратный вызов"
+
+#: inc/smartcat/Admin/Ajax.php:94
+msgid "Problem with setting of new callback"
+msgstr "Не удалось задать новый обратный вызов"
+
+#: inc/smartcat/Admin/Ajax.php:114
+msgid "Target languages are empty"
+msgstr "Не выбраны языки перевода"
+
+#: inc/smartcat/Admin/Ajax.php:190
+msgid "Not all stats was created"
+msgstr "Создана не вся статистика"
+
+#: inc/smartcat/Admin/Ajax.php:194
+msgid "Task was not created"
+msgstr "Задача не создана"
+
+#: inc/smartcat/Handler/SmartCATCallbackHandler.php:77
+msgid "Sorry, you are not allowed to do that."
+msgstr "Это запрещено."
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:25
+msgid "Afrikaans"
+msgstr "Африкаанс"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:26
+msgid "Amharic"
+msgstr "Амхарский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:27
+msgid "Arabic"
+msgstr "Арабский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:28
+msgid "Algerian Arabic"
+msgstr "Арабский (Алжир)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:29
+msgid "Moroccan Arabic"
+msgstr "Арабский (Марокко)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:30
+msgid "Assamese"
+msgstr "Ассамский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:31
+msgid "Azerbaijani"
+msgstr "Азербайджанский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:32
+msgid "Azerbaijani (Turkey)"
+msgstr "Азербайджанский (Турция)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:33
+msgid "South Azerbaijani"
+msgstr "Азербайджанский (южный)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:34
+msgid "Bashkir"
+msgstr "Башкирский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:35
+msgid "Belarusian"
+msgstr "Белорусский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:36
+msgid "Bulgarian"
+msgstr "Болгарский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:37
+msgid "Bengali"
+msgstr "Бенгальский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:38
+msgid "Tibetan"
+msgstr "Тибетский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:39
+msgid "Bosnian"
+msgstr "Боснийский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:40
+msgid "Catalan (Balear)"
+msgstr "Каталанский (балеарский)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:41
+msgid "Catalan"
+msgstr "Каталанский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:42
+msgid "Czech"
+msgstr "Чешский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:43
+msgid "Danish"
+msgstr "Датский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:44
+msgid "German (Switzerland)"
+msgstr "Немецкий (Швейцария)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:45
+msgid "German"
+msgstr "Немецкий"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:46
+msgid "Greek"
+msgstr "Греческий"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:47
+msgid "English (Canada)"
+msgstr "Английский (Канада)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:48
+msgid "English (New Zealand)"
+msgstr "Английский (Новая Зеландия)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:49
+msgid "English (South Africa)"
+msgstr "Английский (ЮАР)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:50
+msgid "English (Australia)"
+msgstr "Английский (Австралия)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:51
+msgid "English (UK)"
+msgstr "Английский (Великобритания)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:52
+msgid "English"
+msgstr "Английский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:53
+msgid "Esperanto"
+msgstr "Эсперанто"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:54
+msgid "Spanish (Chile)"
+msgstr "Испанский (Чили)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:55
+msgid "Spanish (Colombia)"
+msgstr "Испанский (Колумбия)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:56
+msgid "Spanish (Guatemala)"
+msgstr "Испанский (Гватемала)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:57
+msgid "Spanish (Peru)"
+msgstr "Испанский (Перу)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:58
+msgid "Spanish (Puerto Rico)"
+msgstr "Испанский (Пуэрто-Рико)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:59
+msgid "Spanish (Venezuela)"
+msgstr "Испанский (Венесуэла)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:60
+msgid "Spanish (Argentina)"
+msgstr "Испанский (Аргентина)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:61
+msgid "Spanish (Spain)"
+msgstr "Испанский (Испания)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:62
+msgid "Spanish (Mexico)"
+msgstr "Испанский (Мексика)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:63
+msgid "Estonian"
+msgstr "Эстонский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:64
+msgid "Basque"
+msgstr "Баскский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:65
+msgid "Finnish"
+msgstr "Финский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:66
+msgid "French (Belgium)"
+msgstr "Французский (Бельгия)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:67
+msgid "French (Canada)"
+msgstr "Французский (Канада)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:68
+msgid "French (France)"
+msgstr "Французский (Франция)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:69
+msgid "Irish"
+msgstr "Ирландский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:70
+msgid "Galician"
+msgstr "Галисийский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:71
+msgid "Guaraní"
+msgstr "Гуарани"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:72
+msgid "Gujarati"
+msgstr "Гуджарати"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:73
+msgid "Hebrew"
+msgstr "Иврит"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:74
+msgid "Hindi"
+msgstr "Хинди"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:75
+msgid "Croatian"
+msgstr "Хорватский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:76
+msgid "Hungarian"
+msgstr "Венгерский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:77
+msgid "Armenian"
+msgstr "Армянский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:78
+msgid "Indonesian"
+msgstr "Индонезийский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:79
+msgid "Icelandic"
+msgstr "Исландский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:80
+msgid "Italian"
+msgstr "Итальянский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:81
+msgid "Japanese"
+msgstr "Японский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:82
+msgid "Javanese"
+msgstr "Яванский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:83
+msgid "Georgian"
+msgstr "Грузинский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:84
+msgid "Kazakh"
+msgstr "Казахский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:85
+msgid "Khmer"
+msgstr "Кхмерский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:86
+msgid "Kannada"
+msgstr "Каннада"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:87
+msgid "Korean"
+msgstr "Корейский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:88
+msgid "Kurdish (Sorani)"
+msgstr "Курдский (сорани)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:89
+msgid "Kirghiz"
+msgstr "Киргизский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:90
+msgid "Luxembourgish"
+msgstr "Люксембургский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:91
+msgid "Lao"
+msgstr "Лаосский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:92
+msgid "Lithuanian"
+msgstr "Литовский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:93
+msgid "Latvian"
+msgstr "Латышский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:94
+msgid "Malagasy"
+msgstr "Малагасийский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:95
+msgid "Macedonian"
+msgstr "Македонский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:96
+msgid "Malayalam"
+msgstr "Малаялам"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:97
+msgid "Mongolian"
+msgstr "Монгольский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:98
+msgid "Marathi"
+msgstr "Маратхи"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:99
+msgid "Malay"
+msgstr "Малайский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:100
+msgid "Myanmar (Burmese)"
+msgstr "Мьянманский (бирманский)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:101
+msgid "Norwegian (Bokmål)"
+msgstr "Норвежский (букмол)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:102
+msgid "Nepali"
+msgstr "Непальский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:103
+msgid "Dutch (Belgium)"
+msgstr "Нидерландский (Бельгия)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:104
+msgid "Dutch"
+msgstr "Нидерландский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:105
+msgid "Norwegian (Nynorsk)"
+msgstr "Норвежский (нюнорск)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:106
+msgid "Ossetic"
+msgstr "Осетинский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:107
+msgid "Punjabi"
+msgstr "Пенджабский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:108
+msgid "Polish"
+msgstr "Польский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:109
+msgid "Pashto"
+msgstr "Пушту"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:110
+msgid "Portuguese (Brazil)"
+msgstr "Португальский (Бразилия)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:111
+msgid "Portuguese (Portugal)"
+msgstr "Португальский (Португалия)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:112
+msgid "Romanian"
+msgstr "Румынский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:113
+msgid "Russian"
+msgstr "Русский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:114
+msgid "Sanskrit"
+msgstr "Санскрит"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:115
+msgid "Sakha"
+msgstr "Якутский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:116
+msgid "Sinhala"
+msgstr "Сингальский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:117
+msgid "Slovak"
+msgstr "Словацкий"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:118
+msgid "Slovenian"
+msgstr "Словенский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:119
+msgid "Somali"
+msgstr "Сомалийский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:120
+msgid "Albanian"
+msgstr "Албанский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:121
+msgid "Serbian"
+msgstr "Сербский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:122
+msgid "Swedish"
+msgstr "Шведский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:123
+msgid "Swahili"
+msgstr "Суахили"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:124
+msgid "Tamil"
+msgstr "Тамильский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:125
+msgid "Tamil (Sri Lanka)"
+msgstr "Тамильский (Шри-Ланка)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:126
+msgid "Telugu"
+msgstr "Телугу"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:127
+msgid "Tajik"
+msgstr "Таджикский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:128
+msgid "Thai"
+msgstr "Тайский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:129
+msgid "Tigrinya"
+msgstr "Тигринья"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:130
+msgid "Turkmen"
+msgstr "Туркменский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:131
+msgid "Tagalog"
+msgstr "Тагалог"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:132
+msgid "Turkish"
+msgstr "Турецкий"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:133
+msgid "Tatar"
+msgstr "Татарский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:134
+msgid "Uighur"
+msgstr "Уйгурский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:135
+msgid "Ukrainian"
+msgstr "Украинский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:136
+msgid "Urdu"
+msgstr "Урду"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:137
+msgid "Uzbek"
+msgstr "Узбекский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:138
+msgid "Vietnamese"
+msgstr "Вьетнамский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:139
+msgid "Chinese (China)"
+msgstr "Китайский (КНР)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:140
+msgid "Chinese (Hong Kong)"
+msgstr "Китайский (Гонконг)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:141
+msgid "Chinese (Taiwan)"
+msgstr "Китайский (Тайвань)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:142
+msgid "Akan"
+msgstr "Аканский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:143
+msgid "Balochi Southern"
+msgstr "Белуджский (южный)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:144
+msgid "Cebuano"
+msgstr "Себуанский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:145
+msgid "Corsican"
+msgstr "Корсиканский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:146
+msgid "Persian (Afghanistan)"
+msgstr "Фарси (Афганистан)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:147
+msgid "Persian"
+msgstr "Фарси"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:148
+msgid "Fulah"
+msgstr "Фула"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:149
+msgid "Swiss German"
+msgstr "Немецкий (Швейцария)"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:150
+msgid "Hazaragi"
+msgstr "Хазара"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:151
+msgid "Kabyle"
+msgstr "Кабильский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:152
+msgid "Kinyarwanda"
+msgstr "Киньяруанда"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:153
+msgid "Limburgish"
+msgstr "Лимбургский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:154
+msgid "Lingala"
+msgstr "Лингала"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:155
+msgid "Montenegrin"
+msgstr "Черногорский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:156
+msgid "Occitan"
+msgstr "Окситанский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:157
+msgid "Oriya"
+msgstr "Ория"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:158
+msgid "Rohingya"
+msgstr "Рохинджа"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:159
+msgid "Rusyn"
+msgstr "Русинский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:160
+msgid "Sindhi"
+msgstr "Синдхи"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:161
+msgid "Sardinian"
+msgstr "Сардинский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:162
+msgid "Sundanese"
+msgstr "Суданский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:163
+msgid "Silesian"
+msgstr "Силезский"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:164
+msgid "Yoruba"
+msgstr "Йоруба"
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:179
+msgid "Not found sc lang by wp_code = "
+msgstr "Не найден язык sc по wp_code = "
+
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:193
+#: inc/smartcat/Helpers/Language/LanguageConverter.php:201
+msgid "Not found wp lang by sc_code = "
+msgstr "Не найден язык wp по sc_code = "
+
+#: inc/smartcat/Cron/ClearDeletedProject.php:18
+msgid "Once Daily"
+msgstr "Один раз в день"
+
+#: inc/smartcat/Cron/SendToSmartCAT.php:28
+msgid "Every 5 minutes"
+msgstr "Каждые 5 минут"
+
+#: inc/smartcat/Connector.php:81 inc/smartcat/Connector.php:145
+msgid "You need to activate the plugin Polylang"
+msgstr "Необходимо включить подключаемый модуль Polylang"
+
+#: inc/smartcat/Connector.php:150
+msgid "You must enter API login and password"
+msgstr "Необходимо ввести имя пользователя и пароль API"
+
+#: inc/vendor/a5hleyrich/wp-background-processing/classes/wp-background-process.php:422
+#, php-format
+msgid "Every %d Minutes"
+msgstr "Каждые %d мин."
+
+msgid "The article has already been translated to all languages"
+msgstr "Статья уже переведена на все доступные языки"
+
+msgid "Translation into %s languages is not supported"
+msgstr "Перевод на %s языки не поддерживается"
+
+msgid "Translation into %s language is not supported"
+msgstr "Перевод на %s язык не поддерживается"
+
+msgid "Refresh statistics"
+msgstr "Обновить статистику"
+
+msgid "Go to translation"
+msgstr "К переводу"
+
+msgid "Edit post"
+msgstr "Редактировать запись"
+
+msgid "Selected posts or pages have already been translated"
+msgstr "Выбранные страницы или записи уже переведены на все доступные языки"
