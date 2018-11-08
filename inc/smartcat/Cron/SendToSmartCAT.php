@@ -55,13 +55,10 @@ class SendToSmartCAT extends CronAbstract {
 		$tasks           = $task_repository->get_new_task();
 		$workflow_stages = $options->get( 'smartcat_workflow_stages' );
 		$vendor_id       = $options->get( 'smartcat_vendor_id' );
-		$project_id      = $options->get( 'smartcat_api_project' );
+		$project_id      = $options->get( 'smartcat_api_project_id' );
 
 		/** @var LanguageConverter $converter */
 		$converter = $container->get( 'language.converter' );
-
-		$pluginName = get_plugin_data( SMARTCAT_PLUGIN_FILE )['Name'];
-		//$dir        = wp_upload_dir() . DIRECTORY_SEPARATOR . $pluginName . DIRECTORY_SEPARATOR;
 
 		foreach ( $tasks as $task ) {
 			$post = get_post( $task->get_post_id() );
@@ -71,6 +68,8 @@ class SendToSmartCAT extends CronAbstract {
 			$file      = fopen( "smartcat://id_{$task->get_post_id()}", "r+" );
 			fwrite( $file, $file_body );
 			rewind( $file );
+
+			$task_name = $post->post_title;
 
 			if ( ! empty( $project_id ) ) {
 				$bilingualFileImportSettings = new BilingualFileImportSettingsModel();
@@ -83,8 +82,6 @@ class SendToSmartCAT extends CronAbstract {
 				$documentModel->attachFile( $file, $sc::filter_chars( $file_name ) );
 
 				try {
-					$task_name = $post->post_title;
-
 					$document = $sc->getProjectManager()->projectAddDocument( [
 						'documentModel' => [ $documentModel ],
 						'projectId'     => $project_id
@@ -105,12 +102,7 @@ class SendToSmartCAT extends CronAbstract {
 					Logger::error( (string) "Send to translate {$task_name}", $message );
 				}
 
-				/*$test = var_export($document,true);
-				error_log($test);*/
-
 			} else {
-				$task_name = $post->post_title;
-
 				$project_model = new CreateProjectWithFilesModel();
 				$project_model->setName( $sc::filter_chars( $task_name ) );
 				$project_model->setSourceLanguage( $converter->get_sc_code_by_wp( $task->get_source_language() )->get_sc_code() );
