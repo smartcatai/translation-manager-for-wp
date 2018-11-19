@@ -10,6 +10,8 @@ namespace SmartCAT\WP\Cron;
 
 use Http\Client\Common\Exception\ClientErrorException;
 use Psr\Container\ContainerInterface;
+use SmartCAT\API\Model\BilingualFileImportSettingsModel;
+use SmartCAT\API\Model\CreateDocumentPropertyWithFilesModel;
 use SmartCAT\API\Model\CreateProjectWithFilesModel;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
@@ -53,12 +55,10 @@ class SendToSmartCAT extends CronAbstract {
 		$tasks           = $task_repository->get_new_task();
 		$workflow_stages = $options->get( 'smartcat_workflow_stages' );
 		$vendor_id       = $options->get( 'smartcat_vendor_id' );
+		$project_id      = $options->get( 'smartcat_api_project_id' );
 
 		/** @var LanguageConverter $converter */
 		$converter = $container->get( 'language.converter' );
-
-		//$pluginName = get_plugin_data( SMARTCAT_PLUGIN_FILE )['Name'];
-		//$dir        = wp_upload_dir() . DIRECTORY_SEPARATOR . $pluginName . DIRECTORY_SEPARATOR;
 
 		foreach ( $tasks as $task ) {
 			$post = get_post( $task->get_post_id() );
@@ -71,40 +71,73 @@ class SendToSmartCAT extends CronAbstract {
 
 			$task_name = $post->post_title;
 
-			$project_model = new CreateProjectWithFilesModel();
-			$project_model->setName( $sc::filter_chars( $task_name ) );
-			$project_model->setSourceLanguage( $converter->get_sc_code_by_wp( $task->get_source_language() )->get_sc_code() );
-			$project_model->setTargetLanguages( array_map( function ( $wp_code ) use ( $converter ) {
-				return $converter->get_sc_code_by_wp( $wp_code )->get_sc_code();
-			}, $task->get_target_languages() ) );
-			$project_model->setWorkflowStages( $workflow_stages );
+			if ( ! empty( $project_id ) ) {
+				$bilingualFileImportSettings = new BilingualFileImportSettingsModel();
+				$bilingualFileImportSettings
+					->setConfirmMode( 'none' )
+					->setLockMode( 'none' )
+					->setTargetSubstitutionMode( 'all' );
+				$documentModel = new CreateDocumentPropertyWithFilesModel();
+				$documentModel->setBilingualFileImportSettings( $bilingualFileImportSettings );
+				$documentModel->attachFile( $file, $sc::filter_chars( $file_name ) );
 
-			if ( $vendor_id ) {
-				$project_model->setAssignToVendor( true );
-				$project_model->setVendorAccountId( $vendor_id );
+				try {
+					$document = $sc->getProjectManager()->projectAddDocument( [
+						'documentModel' => [ $documentModel ],
+						'projectId'     => $project_id
+					] );
+
+					$task->set_status( 'created' );
+					$task->set_project_id( $project_id );
+					$task_repository->update( $task );
+
+					$statistic_repository->link_to_smartcat_document( $task, $document[0] );
+
+				} catch ( \Exception $e ) {
+					if ( $e instanceof ClientErrorException ) {
+						$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
+					} else {
+						$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
+					}
+					Logger::error( (string) "Send to translate {$task_name}", $message );
+				}
+
 			} else {
-				$project_model->setAssignToVendor( false );
-			}
+				$project_model = new CreateProjectWithFilesModel();
+				$project_model->setName( $sc::filter_chars( $task_name ) );
+				$project_model->setSourceLanguage( $converter->get_sc_code_by_wp( $task->get_source_language() )->get_sc_code() );
+				$project_model->setTargetLanguages( array_map( function ( $wp_code ) use ( $converter ) {
+					return $converter->get_sc_code_by_wp( $wp_code )->get_sc_code();
+				}, $task->get_target_languages() ) );
+				$project_model->setWorkflowStages( $workflow_stages );
 
-			$project_model->attacheFile( $file, $sc::filter_chars( $file_name ) );
-
-			try {
-				$smartcat_project = $sc->getProjectManager()->projectCreateProjectWithFiles( $project_model );
-
-				$task->set_status( 'created' );
-				$task->set_project_id( $smartcat_project->getId() );
-				$task_repository->update( $task );
-
-				foreach ( $smartcat_project->getDocuments() as $document ) {
-					$statistic_repository->link_to_smartcat_document( $task, $document );
-				}
-			} catch ( \Exception $e ) {
-				if ( $e instanceof ClientErrorException ) {
-					$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
+				if ( $vendor_id ) {
+					$project_model->setAssignToVendor( true );
+					$project_model->setVendorAccountId( $vendor_id );
 				} else {
-					$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
+					$project_model->setAssignToVendor( false );
 				}
-				Logger::error( "Send to translate $task_name", $message );
+
+				$project_model->attacheFile( $file, $sc::filter_chars( $file_name ) );
+
+				try {
+					$smartcat_project = $sc->getProjectManager()->projectCreateProjectWithFiles( $project_model );
+
+					$task->set_status( 'created' );
+					$task->set_project_id( $smartcat_project->getId() );
+					$task_repository->update( $task );
+
+					foreach ( $smartcat_project->getDocuments() as $document ) {
+						$statistic_repository->link_to_smartcat_document( $task, $document );
+					}
+				} catch ( \Exception $e ) {
+					if ( $e instanceof ClientErrorException ) {
+						$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
+					} else {
+						$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
+					}
+					Logger::error( "Send to translate $task_name", $message );
+				}
 			}
 		}
 	}

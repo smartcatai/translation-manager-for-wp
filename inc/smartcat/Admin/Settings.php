@@ -45,6 +45,7 @@ final class Settings implements InitInterface {
 		$server          = $prefix . 'smartcat_api_server';
 		$login           = $prefix . 'smartcat_api_login';
 		$password        = $prefix . 'smartcat_api_password';
+		$project_id      = $prefix . 'smartcat_api_project_id';
 		$workflow_stages = $prefix . 'smartcat_workflow_stages';
 		$vendor_id       = $prefix . 'smartcat_vendor_id';
 
@@ -52,6 +53,7 @@ final class Settings implements InitInterface {
 		register_setting( 'smartcat', $server, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $login, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $password, [ 'type' => 'string' ] );
+		register_setting( 'smartcat', $project_id, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $workflow_stages, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $vendor_id, [ 'type' => 'string' ] );
 
@@ -126,6 +128,15 @@ final class Settings implements InitInterface {
 					'Postediting'  => __( 'Postediting', 'translation-connectors' )
 				]
 			]
+		);
+
+		add_settings_field(
+			$project_id,
+			__( 'Project id', 'translation-connectors' ),
+			[ self::class, 'input_text_callback' ],
+			'smartcat',
+			'smartcat_additional',
+			[ 'label_for' => $project_id, 'option_name' => $project_id ]
 		);
 
 		$select_array = [];
