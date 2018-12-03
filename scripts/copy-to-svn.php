@@ -77,18 +77,18 @@ function fileReplace( $search, $replace, $file ) {
 
 //Получаем версию из readme.txt
 $readme = file_get_contents( __DIR__ . '/../readme.txt' );
-$re     = '/Stable tag\:(\s+)(.+)[\r|]\n/';
-preg_match_all( $re, $readme, $matches, PREG_SET_ORDER, 0 );
-$readmeVersion = $matches[0][2] ?? 'readme';
+$re     = '/Stable tag:\s*(\d+\.\d+\.\d+)\s*\n/';
+preg_match( $re, $readme, $matches );
+$readmeVersion = $matches[1] ?? 'readme';
 
 //Получаем версию из translation-connectors.php
 $plugin = file_get_contents( __DIR__ . '/../translation-connectors.php' );
-$re     = '/Version\:(\s+)(.+)[\r|]\n/';;
-preg_match_all( $re, $plugin, $matches, PREG_SET_ORDER, 0 );
-$pluginVersion = $matches[0][2] ?? 'plugin';
+$re     = '/Version:\s*(\d+\.\d+\.\d+)\s*\n/';
+preg_match( $re, $plugin, $matches );
+$pluginVersion = $matches[1] ?? 'plugin';
 
 if ( $readmeVersion !== $pluginVersion ) {
-	die ( 'Версия плагина в readme.txt и translation-connectors.php не совпадают' );
+	die ( "Версия плагина в readme.txt $readmeVersion и translation-connectors.php $pluginVersion не совпадают" );
 }
 
 $version = $readmeVersion;
@@ -154,7 +154,7 @@ $rmDirs = [
 ];
 
 chdir( __DIR__ . "/.." );
-exec('composer update --no-dev');
+//exec('composer update --no-dev');
 
 if ( ! file_exists( __DIR__ . "/../../$resDir/trunk" ) ) {
 	mkdir( __DIR__ . "/../../$resDir/trunk", 0777, true );

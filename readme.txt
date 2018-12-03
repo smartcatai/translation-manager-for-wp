@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 4.8.1
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl
-Stable tag: 1.0.7
+Stable tag: 1.0.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -44,6 +44,12 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 1. Translation Connectors Settings.
 
 == Changelog ==
+
+= 1.0.9 (2018-12-03) =
+* Renaming module strings
+
+= 1.0.8 (2018-11-23) =
+* Set Project ID input
 
 = 1.0.7 (2017-11-27) =
 * Bug fix
