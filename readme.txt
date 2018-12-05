@@ -9,11 +9,11 @@ Stable tag: 1.0.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Translation Connectors offers the easiest way to translate your Wordpress pages and posts into any language in a few clicks.
+Smartcat Translation Manager offers the easiest way to translate your Wordpress pages and posts into any language in a few clicks.
 
 == Description ==
 
-We’ve developed this plugin for those who create great content and want to share it with the whole world. Translation Connectors helps you connect with a global audience by effortlessly translating pages and posts into other languages.
+We’ve developed this plugin for those who create great content and want to share it with the whole world. Smartcat Translation Manager helps you connect with a global audience by effortlessly translating pages and posts into other languages.
 
 == How it works ==
 
@@ -25,11 +25,11 @@ We’ve developed this plugin for those who create great content and want to sha
 
 Please note! For this plugin to work, you need to install the Polylang plugin first.
 
-1. Install the Translation Connectors plugin manually with an FTP client by navigating to '/wp-content/plugins/translation-connectors/', or automatically through the upload feature in the WordPress dashboard.
+1. Install the Smartcat Translation Manager plugin manually with an FTP client by navigating to '/wp-content/plugins/translation-connectors/', or automatically through the upload feature in the WordPress dashboard.
 2. Install and then activate [Polylang plugin](https://wordpress.org/plugins/polylang/) on the “Plugins” page.
-3. Activate the Translation Connectors plugin.
+3. Activate the Smartcat Translation Manager plugin.
 4. Sign up to [Smartcat](https://www.smartcat.ai), go to the [API page](https://smartcat.ai/ApiAccess/Credentials) and generate an API key.
-5. Back in Wordpress, go to the plugin’s settings page (Settings→Translation Connectors) and enter your API credentials.
+5. Back in Wordpress, go to the plugin’s settings page (Settings→Smartcat Translation Manager) and enter your API credentials.
 
 You’re all set! The world is waiting for your content, so go ahead and translate it in a simple and quick way.
 
@@ -45,9 +45,10 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 
 == Changelog ==
 
-= 1.0.9 (2018-12-05) =
+= 1.0.9 (2018-12-03) =
 * Fix bugs
 * Add debug mode
+* Renaming module strings
 
 = 1.0.8 (2018-11-23) =
 * Set Project ID input
