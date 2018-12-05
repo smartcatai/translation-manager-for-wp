@@ -141,4 +141,18 @@ class TaskRepository extends RepositoryAbstract {
 
 		return $result;
 	}
+
+    /**
+     * @param array $criterias
+     *
+     * @return Task|null
+     */
+    public function get_one_by_id( $id ) {
+        $table_name = $this->get_table_name();
+        $wpdb       = $this->get_wp_db();
+
+        $row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table_name WHERE id=%d", $id ) );
+
+        return $row ? $this->to_entity( $row ) : null;
+    }
 }

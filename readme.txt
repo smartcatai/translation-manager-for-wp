@@ -18,18 +18,18 @@ We’ve developed this plugin for those who create great content and want to sha
 == How it works ==
 
 1. Select one or several posts.
-1. Send them to the translation service by clicking the “Send to translation” button or choosing the appropriate bulk action.
-1. Once the translation is completed, a new draft will appear containing the translated text.
+2. Send them to the translation service by clicking the “Send to translation” button or choosing the appropriate bulk action.
+3. Once the translation is completed, a new draft will appear containing the translated text.
 
 == Installation ==
 
 Please note! For this plugin to work, you need to install the Polylang plugin first.
 
 1. Install the Translation Connectors plugin manually with an FTP client by navigating to '/wp-content/plugins/translation-connectors/', or automatically through the upload feature in the WordPress dashboard.
-1. Install and then activate [Polylang plugin](https://wordpress.org/plugins/polylang/) on the “Plugins” page.
-1. Activate the Translation Connectors plugin.
-1. Sign up to [Smartcat](https://www.smartcat.ai), go to the [API page](https://smartcat.ai/ApiAccess/Credentials) and generate an API key.
-1. Back in Wordpress, go to the plugin’s settings page (Settings→Translation Connectors) and enter your API credentials.
+2. Install and then activate [Polylang plugin](https://wordpress.org/plugins/polylang/) on the “Plugins” page.
+3. Activate the Translation Connectors plugin.
+4. Sign up to [Smartcat](https://www.smartcat.ai), go to the [API page](https://smartcat.ai/ApiAccess/Credentials) and generate an API key.
+5. Back in Wordpress, go to the plugin’s settings page (Settings→Translation Connectors) and enter your API credentials.
 
 You’re all set! The world is waiting for your content, so go ahead and translate it in a simple and quick way.
 
@@ -45,8 +45,9 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 
 == Changelog ==
 
-= 1.0.9 (2018-12-03) =
-* Renaming module strings
+= 1.0.9 (2018-12-05) =
+* Fix bugs
+* Add debug mode
 
 = 1.0.8 (2018-11-23) =
 * Set Project ID input

@@ -78,10 +78,42 @@ class StatisticRepository extends RepositoryAbstract {
 	 * @return Statistics[]
 	 */
 	public function get_sended( array $documents = [] ) {
+		return $this->get_by_status( 'sended',  $documents );
+	}
+
+	/**
+	 * Возращает список постов ожидающих экспорта
+	 *
+	 * @param array $documents = [] - если передан параметр то из списка исключаются все докумениты не попавшие в массив
+	 *
+	 * @return Statistics[]
+	 */
+	public function get_export( array $documents = [] ) {
+		return $this->get_by_status( 'export',  $documents );
+	}
+
+	/**
+	 * Возращает список новых постов
+	 *
+	 * @param array $documents = [] - если передан параметр то из списка исключаются все докумениты не попавшие в массив
+	 *
+	 * @return Statistics[]
+	 */
+	public function get_new( array $documents = [] ) {
+		return $this->get_by_status( 'new',  $documents );
+	}
+
+    /**
+     * @param $status
+     * @param array $documents
+     * @return array
+     */
+    private function get_by_status($status, array $documents = [] ) {
 		$table_name = $this->get_table_name();
 		$wpdb       = $this->get_wp_db();
 
-		$query = "SELECT * FROM $table_name WHERE status='sended'";
+		$query = /** @lang MySQL */
+            "SELECT * FROM $table_name WHERE status='$status'";
 
 		$documents_count = count( $documents );
 		if ( $documents_count > 0 ) {

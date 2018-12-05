@@ -27,4 +27,13 @@ class SmartCAT extends \SmartCAT\API\SmartCAT {
 	public static function filter_chars( $s ) {
 		return str_replace( [ '*', '|', '\\', ':', '"', '<', '>', '?', '/' ], '_', $s );
 	}
+	
+	public static function debug($message) {
+	    if (constant('SMARTCAT_DEBUG_ENABLED') === true) {
+	        $date = (new \DateTime('now'))->format('[Y-m-d H:i:s]');
+	        if (constant('SMARTCAT_DEBUG_LOG')) {
+	            file_put_contents(constant('SMARTCAT_DEBUG_LOG'), "{$date} {$message}" . PHP_EOL, FILE_APPEND);
+	        }
+	    }
+	}
 }

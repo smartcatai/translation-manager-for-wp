@@ -44,6 +44,8 @@ class Statistic extends QueueAbstract {
 
 			} catch ( ClientErrorException $e ) {
 				Logger::error( "Document $item, update statistic", "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
+			} catch (\Exception $e) {
+			    Logger::error( "Document $item, update statistic","Message: {$e->getMessage()}" );
 			}
 		}
 

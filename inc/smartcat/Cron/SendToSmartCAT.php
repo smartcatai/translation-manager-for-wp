@@ -37,6 +37,9 @@ class SendToSmartCAT extends CronAbstract {
 		if ( ! SmartCAT::is_active() ) {
 			return;
 		}
+		
+		SmartCAT::debug("Sending to SmartCat started");
+		
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
 
@@ -56,6 +59,9 @@ class SendToSmartCAT extends CronAbstract {
 		$workflow_stages = $options->get( 'smartcat_workflow_stages' );
 		$vendor_id       = $options->get( 'smartcat_vendor_id' );
 		$project_id      = $options->get( 'smartcat_api_project_id' );
+
+        $count = count($tasks);
+        SmartCAT::debug("Finded $count tasks to send");
 
 		/** @var LanguageConverter $converter */
 		$converter = $container->get( 'language.converter' );
@@ -82,6 +88,7 @@ class SendToSmartCAT extends CronAbstract {
 				$documentModel->attachFile( $file, $sc::filter_chars( $file_name ) );
 
 				try {
+				    SmartCAT::debug("Sending '{$task_name}'");
 					$document = $sc->getProjectManager()->projectAddDocument( [
 						'documentModel' => [ $documentModel ],
 						'projectId'     => $project_id
@@ -92,7 +99,7 @@ class SendToSmartCAT extends CronAbstract {
 					$task_repository->update( $task );
 
 					$statistic_repository->link_to_smartcat_document( $task, $document[0] );
-
+					SmartCAT::debug("Sended '{$task_name}'");
 				} catch ( \Exception $e ) {
 					if ( $e instanceof ClientErrorException ) {
 						$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
@@ -103,6 +110,7 @@ class SendToSmartCAT extends CronAbstract {
 				}
 
 			} else {
+			    SmartCAT::debug("Creating '{$task_name}'");
 				$project_model = new CreateProjectWithFilesModel();
 				$project_model->setName( $sc::filter_chars( $task_name ) );
 				$project_model->setSourceLanguage( $converter->get_sc_code_by_wp( $task->get_source_language() )->get_sc_code() );
@@ -130,6 +138,7 @@ class SendToSmartCAT extends CronAbstract {
 					foreach ( $smartcat_project->getDocuments() as $document ) {
 						$statistic_repository->link_to_smartcat_document( $task, $document );
 					}
+					SmartCAT::debug("Created '{$task_name}'");
 				} catch ( \Exception $e ) {
 					if ( $e instanceof ClientErrorException ) {
 						$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";

@@ -80,6 +80,8 @@ class Publication extends QueueAbstract {
 					return $item;
 				}
 			}
+		} catch (\Exception $e) {
+			Logger::error( "Document {$item}, publication translate","Message: {$e->getMessage()}" );
 		}
 
 		return false;

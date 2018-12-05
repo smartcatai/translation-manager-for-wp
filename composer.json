@@ -24,7 +24,8 @@
     "a5hleyrich/wp-background-processing": "^1.0",
     "smartcat/smartcat-api": "^1.7.0",
     "symfony/config": "^3.3",
-    "symfony/dependency-injection": "^3.3"
+    "symfony/dependency-injection": "^3.3",
+    "php-http/socket-client": "dev-master"
   },
   "autoload": {
     "psr-4": {

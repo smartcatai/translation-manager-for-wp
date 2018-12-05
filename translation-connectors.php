@@ -18,12 +18,15 @@
 
 //нужно для подключения JS в админке (иначе придется завязываться на относительные пути и огребать)
 define('SMARTCAT_PLUGIN_FILE', __FILE__);
-define('SMARTCAT_PLUGIN_NAME', basename(__DIR__));
+define('SMARTCAT_PLUGIN_NAME', 'translation-connectors');
 
 define(
 	'SMARTCAT_PLUGIN_DIR',
 	realpath( pathinfo( __FILE__, PATHINFO_DIRNAME ) ) . DIRECTORY_SEPARATOR
 );
+
+define('SMARTCAT_DEBUG_LOG', SMARTCAT_PLUGIN_DIR . 'debug.log');
+define('SMARTCAT_DEBUG_ENABLED', false);
 
 require_once SMARTCAT_PLUGIN_DIR . 'inc/autoload.php';
 require_once SMARTCAT_PLUGIN_DIR . 'inc/vendor/a5hleyrich/wp-background-processing/classes/wp-async-request.php';

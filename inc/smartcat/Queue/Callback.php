@@ -33,6 +33,7 @@ class Callback extends QueueAbstract {
 
 		try {
 			if ( $statistics ) {
+			    SmartCAT::debug("Quene '{$statistics->get_document_id()}'");
 				$document = $sc->getDocumentManager()->documentGet( [ 'documentId' => $statistics->get_document_id() ] );
 				$stages   = $document->getWorkflowStages();
 				$progress = 0;
@@ -53,11 +54,14 @@ class Callback extends QueueAbstract {
 		} catch ( ClientErrorException $e ) {
 			if ( $e->getResponse()->getStatusCode() == 404 ) {
 				$statistic_repository->delete( $statistics );
+				SmartCAT::debug("Deleted '{$statistics->get_document_id()}'");
 			} else {
-				throw $e;
+				Logger::error( "Document update statistic",
+				"API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
 			}
+		} catch (\Exception $e) {
+		    Logger::error( "Document update statistic", "Error: {$e->getMessage()}" );
 		}
-
 	}
 
 	protected $action = 'smartcat_callback_async';
@@ -100,6 +104,8 @@ class Callback extends QueueAbstract {
 			Logger::error( "Document $item, update statistic",
 				"API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
 
+		} catch (\Exception $e) {
+		    Logger::error( "Document $item, update statistic", "Error: {$e->getMessage()}" );
 		}
 
 		return false;

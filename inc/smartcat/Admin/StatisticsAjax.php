@@ -34,9 +34,9 @@ final class StatisticsAjax implements HookInterface {
 		/** @var Options $options */
 		$options = $container->get( 'core.options' );
 		$queue   = null;
-
+        
 		if ( ! $options->get( 'statistic_queue_active' ) ) {
-
+        
 			/** @var StatisticRepository $statistic_repository */
 			$statistic_repository = $container->get( 'entity.repository.statistic' );
 			$statistics           = $statistic_repository->get_sended();
@@ -50,7 +50,6 @@ final class StatisticsAjax implements HookInterface {
 						$statistic_repository->persist( $statistic );
 					}
 
-					//var_dump( $statistic->getDocumentID() );
 					$queue->push_to_queue( $statistic->get_document_id() );
 				}
 				$statistic_repository->flush();

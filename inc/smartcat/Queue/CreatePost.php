@@ -154,8 +154,9 @@ class CreatePost extends QueueAbstract {
 			Logger::error( "Document {$item['documentID']}, download translate",
 				"API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
 		} catch (\Exception $e) {
-			Logger::error( "Document {$item['documentID']}, download translate",
-				"Message: {$e->getMessage()}" );
+            $statistics->set_status( 'sended' );
+            $statistic_repository->update( $statistics );
+			Logger::error( "Document {$item['documentID']}, download translate","Message: {$e->getMessage()}" );
 		}
 
 		return false;

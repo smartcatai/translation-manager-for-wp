@@ -19,6 +19,8 @@ class Logger {
 
 		/** @var ErrorRepository $repository */
 		$repository = $container->get('entity.repository.error');
+		
+		SmartCAT::debug("[{$type}] {$message}");
 
 		$error = new Error();
 		$error->set_date(new \DateTime())
