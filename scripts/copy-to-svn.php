@@ -7,6 +7,12 @@
 // */
 //
 
+$resDir = '/home/medic84/Documents/Work/translation-connectors';
+
+if (!is_dir("$resDir/trunk") || !is_dir("$resDir/tags")) {
+    die("SVN dir not found");
+}
+
 function rrmdir( $path, $t = "1" ) {
 	$rtrn = "1";
 	if ( file_exists( $path ) && is_dir( $path ) ) {
@@ -111,8 +117,7 @@ if ( !$find ) {
 
 $message = readline( "Введите описание коммита: " );
 
-$resDir = 'translation-connectors-svn';
-rcopy( __DIR__ . '/../assets', __DIR__ . "/../../$resDir/assets" );
+rcopy( __DIR__ . '/../assets', "$resDir/assets" );
 
 $copyDirs = [
 	'css',
@@ -156,30 +161,30 @@ $rmDirs = [
 chdir( __DIR__ . "/.." );
 //exec('composer update --no-dev');
 
-if ( ! file_exists( __DIR__ . "/../../$resDir/trunk" ) ) {
-	mkdir( __DIR__ . "/../../$resDir/trunk", 0777, true );
+if ( ! file_exists( "$resDir/trunk" ) ) {
+	mkdir( "$resDir/trunk", 0777, true );
 }
 
-chdir( __DIR__ . "/../../$resDir" );
+chdir( "$resDir" );
 
 foreach ( $copyFiles as $file ) {
-	copy( __DIR__ . "/../$file", __DIR__ . "/../../$resDir/trunk/$file" );
+	copy( __DIR__ . "/../$file", "$resDir/trunk/$file" );
 }
 
 foreach ( $copyDirs as $dir ) {
-	rcopy( __DIR__ . "/../$dir", __DIR__ . "/../../$resDir/trunk/$dir" );
+	rcopy( __DIR__ . "/../$dir", "$resDir/trunk/$dir" );
 }
 
 foreach ( $rmDirs as $dir ) {
-	exec( "svn rm " . __DIR__ . "/../../$resDir/trunk/$dir");
-	rrmdir( __DIR__ . "/../../$resDir/trunk/$dir" );
+	exec( "svn rm " . "$resDir/trunk/$dir");
+	rrmdir( "$resDir/trunk/$dir" );
 }
 
 
 exec( "svn commit -m \"$message\"" );
 
-if ( ! file_exists( __DIR__ . "/../../$resDir/tags/$version" ) ) {
-	mkdir( __DIR__ . "/../../$resDir/tags/$version", 0777, true );
+if ( ! file_exists( "$resDir/tags/$version" ) ) {
+	mkdir( "$resDir/tags/$version", 0777, true );
 }
 
 exec( "svn --force --depth infinity add ." );

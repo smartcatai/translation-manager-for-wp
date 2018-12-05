@@ -18,7 +18,7 @@
     "vendor-dir": "inc/vendor"
   },
   "require": {
-    "php": ">=7.0",
+    "php": "7.0.*",
     "ext-dom": "*",
     "ext-openssl": "*",
     "a5hleyrich/wp-background-processing": "^1.0",
