@@ -58,6 +58,8 @@ class CreatePost extends QueueAbstract {
 			return false;
 		}
 
+        SmartCAT::debug("CreatePost '{$statistics->get_document_id()}'");
+
 		try {
 			$result = $sc->getDocumentExportManager()->documentExportDownloadExportResult( $item['taskID'] );
 			if ( 204 == $result->getStatusCode() ) {
@@ -136,6 +138,7 @@ class CreatePost extends QueueAbstract {
 				}
 				$statistics->set_status( 'completed' );
 				$statistic_repository->update( $statistics );
+                SmartCAT::debug("End CreatePost '{$statistics->get_document_id()}'");
 			}
 		} catch ( ClientErrorException $e ) {
 			if ( 404 == $e->getResponse()->getStatusCode() ) {

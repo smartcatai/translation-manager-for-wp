@@ -51,6 +51,7 @@ class Callback extends QueueAbstract {
 					$queue->push_to_queue( $item );
 				}
 			}
+            SmartCAT::debug("End Quene '{$statistics->get_document_id()}'");
 		} catch ( ClientErrorException $e ) {
 			if ( $e->getResponse()->getStatusCode() == 404 ) {
 				$statistic_repository->delete( $statistics );

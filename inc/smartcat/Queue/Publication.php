@@ -49,8 +49,10 @@ class Publication extends QueueAbstract {
 		$sc = $container->get( 'smartcat' );
 
 		$statistics = $statistic_repository->get_one_by( [ 'documentID' => $item ] );
+        SmartCAT::debug("Publication '{$statistics->get_document_id()}'");
 		try {
 			if ( $statistics && $statistics->get_status() == 'sended' ) {
+                SmartCAT::debug("Export '{$statistics->get_document_id()}'");
 				$task = $sc->getDocumentExportManager()->documentExportRequestExport( [ 'documentIds' => [ $statistics->get_document_id() ] ] );
 				if ( $task->getId() ) {
 					$statistics->set_status( 'export' )
@@ -64,6 +66,7 @@ class Publication extends QueueAbstract {
 					] );
 				}
 			}
+            SmartCAT::debug("End publication '{$statistics->get_document_id()}'");
 		} catch ( ClientErrorException $e ) {
 			$status_code = $e->getResponse()->getStatusCode();
 			if ( $status_code == 404 ) {
