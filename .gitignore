@@ -1,4 +1,4 @@
 inc/vendor
 .vscode/
 .idea/
-composer.lock
+.DS_Store

@@ -7,7 +7,7 @@
 // */
 //
 
-$resDir = '/home/medic84/Documents/Work/translation-connectors';
+$resDir = __DIR__ . '/../../translation-connectors-svn';
 
 if (!is_dir("$resDir/trunk") || !is_dir("$resDir/tags")) {
     die("SVN dir not found");
