@@ -888,16 +888,16 @@
         },
         {
             "name": "php-http/multipart-stream-builder",
-            "version": "0.1.6",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/multipart-stream-builder.git",
-                "reference": "74d5ac517778ae87a065c6f4076316c35b58a777"
+                "reference": "1fa3c623fc813a43b39494b2a1612174e36e0fb0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/multipart-stream-builder/zipball/74d5ac517778ae87a065c6f4076316c35b58a777",
-                "reference": "74d5ac517778ae87a065c6f4076316c35b58a777",
+                "url": "https://api.github.com/repos/php-http/multipart-stream-builder/zipball/1fa3c623fc813a43b39494b2a1612174e36e0fb0",
+                "reference": "1fa3c623fc813a43b39494b2a1612174e36e0fb0",
                 "shasum": ""
             },
             "require": {
@@ -914,7 +914,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.2-dev"
+                    "dev-master": "0.3-dev"
                 }
             },
             "autoload": {
@@ -941,7 +941,7 @@
                 "multipart stream",
                 "stream"
             ],
-            "time": "2017-02-16T08:52:59+00:00"
+            "time": "2017-05-21T17:45:25+00:00"
         },
         {
             "name": "php-http/plugins",
@@ -1304,16 +1304,16 @@
         },
         {
             "name": "smartcat/smartcat-api",
-            "version": "1.7.0",
+            "version": "1.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartcatai/SmartCAT-API.git",
-                "reference": "1f1209ea5948ecb0d01a723d20919bf7107be859"
+                "reference": "a88ca632ba05ecb9b440be51ded603df51320457"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartcatai/SmartCAT-API/zipball/1f1209ea5948ecb0d01a723d20919bf7107be859",
-                "reference": "1f1209ea5948ecb0d01a723d20919bf7107be859",
+                "url": "https://api.github.com/repos/smartcatai/SmartCAT-API/zipball/a88ca632ba05ecb9b440be51ded603df51320457",
+                "reference": "a88ca632ba05ecb9b440be51ded603df51320457",
                 "shasum": ""
             },
             "require": {
@@ -1321,9 +1321,9 @@
                 "jane/open-api": "^1.2",
                 "php": ">=5.6",
                 "php-http/message": "^1.0",
-                "php-http/multipart-stream-builder": "^0.1.2",
+                "php-http/multipart-stream-builder": "^1.0",
                 "php-http/plugins": "^1.0.1",
-                "php-http/socket-client": "^1.0"
+                "php-http/socket-client": "^1.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^5.5"
@@ -1336,7 +1336,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL v3"
+                "GPL-3.0-or-later"
             ],
             "authors": [
                 {
@@ -1351,7 +1351,7 @@
                 "php",
                 "smartcat"
             ],
-            "time": "2017-09-13T13:39:54+00:00"
+            "time": "2018-12-06T11:40:22+00:00"
         },
         {
             "name": "symfony/config",
