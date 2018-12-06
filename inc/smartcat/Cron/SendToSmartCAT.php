@@ -121,7 +121,7 @@ class SendToSmartCAT extends CronAbstract {
 
 				if ( $vendor_id ) {
 					$project_model->setAssignToVendor( true );
-					$project_model->setVendorAccountId( [$vendor_id] );
+					$project_model->setVendorAccountIds( [$vendor_id] );
 				} else {
 					$project_model->setAssignToVendor( false );
 				}

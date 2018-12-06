@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 4.8.1
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -44,6 +44,9 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 1. Translation Connectors Settings.
 
 == Changelog ==
+
+= 1.0.10 (2018-12-06) =
+* Fix vendor field
 
 = 1.0.9 (2018-12-03) =
 * Fix bugs

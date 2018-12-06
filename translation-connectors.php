@@ -7,7 +7,7 @@
  * Plugin Name:       translation-connectors
  * Plugin URI:        https://www.smartcat.ai/api/
  * Description:       WordPress integration to translation connectors.
- * Version:           1.0.9
+ * Version:           1.0.10
  * Author:            Smartcat
  * Author URI:        https://www.smartcat.ai
  * License:           GPL-3.0
