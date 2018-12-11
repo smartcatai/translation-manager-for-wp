@@ -39,7 +39,10 @@ class Publication extends QueueAbstract {
 
 			return $item;
 		}
-		/** @var ContainerInterface $container */
+
+        SmartCAT::debug("[Publication] Start queue '{$item}'");
+
+        /** @var ContainerInterface $container */
 		$container = Connector::get_container();
 
 		/** @var StatisticRepository $statistic_repository */
@@ -49,10 +52,9 @@ class Publication extends QueueAbstract {
 		$sc = $container->get( 'smartcat' );
 
 		$statistics = $statistic_repository->get_one_by( [ 'documentID' => $item ] );
-        SmartCAT::debug("Publication '{$statistics->get_document_id()}'");
 		try {
 			if ( $statistics && $statistics->get_status() == 'sended' ) {
-                SmartCAT::debug("Export '{$statistics->get_document_id()}'");
+                SmartCAT::debug("[Publication] Export '{$item}'");
 				$task = $sc->getDocumentExportManager()->documentExportRequestExport( [ 'documentIds' => [ $statistics->get_document_id() ] ] );
 				if ( $task->getId() ) {
 					$statistics->set_status( 'export' )
@@ -60,34 +62,38 @@ class Publication extends QueueAbstract {
 					$statistic_repository->update( $statistics );
 					/** @var CreatePost $queue */
 					$queue = $container->get( 'core.queue.post' );
-					$queue->push_to_queue( [
+                    SmartCAT::debug("[Publication] Pushing to CreatePost '{$item}'");
+                    $queue->push_to_queue( [
 						'documentID' => $statistics->get_document_id(),
 						'taskID'     => $task->getId()
 					] );
-				}
+                    SmartCAT::debug("[Publication] Pushed to CreatePost '{$item}'");
+                }
 			}
-            SmartCAT::debug("End publication '{$statistics->get_document_id()}'");
 		} catch ( ClientErrorException $e ) {
 			$status_code = $e->getResponse()->getStatusCode();
 			if ( $status_code == 404 ) {
 				$statistic_repository->delete( $statistics );
+                SmartCAT::debug("[Publication] Deleted '{$item}'");
 			} else {
 				if ( $statistics->get_error_count() < 360 ) {
 					$statistics->inc_error_count();
 					$statistic_repository->update( $statistics );
 					sleep( 10 );
 
-					Logger::error( "Document $item, start download translate",
-						"API error code: {$status_code}. API error message: {$e->getResponse()->getBody()->getContents()}" );
-
-					return $item;
+                    SmartCAT::debug("[Publication] new {$statistics->get_error_count()} try of '{$item}'");
+                    return $item;
 				}
-			}
-		} catch (\Exception $e) {
+                Logger::error( "Document $item, start download translate",
+                    "API error code: {$status_code}. API error message: {$e->getResponse()->getBody()->getContents()}" );
+            }
+		} catch (\Throwable $e) {
 			Logger::error( "Document {$item}, publication translate","Message: {$e->getMessage()}" );
 		}
 
-		return false;
+        SmartCAT::debug("[Publication] End queue '{$item}'");
+
+        return false;
 	}
 
 	/**

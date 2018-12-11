@@ -15,7 +15,6 @@ use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 
-
 /** Обработка очереди "Обработка callback’a" */
 class Callback extends QueueAbstract {
 
@@ -33,7 +32,7 @@ class Callback extends QueueAbstract {
 
 		try {
 			if ( $statistics ) {
-			    SmartCAT::debug("Quene '{$statistics->get_document_id()}'");
+			    SmartCAT::debug("[Callback] Queue update_statistic '{$statistics->get_document_id()}'");
 				$document = $sc->getDocumentManager()->documentGet( [ 'documentId' => $statistics->get_document_id() ] );
 				$stages   = $document->getWorkflowStages();
 				$progress = 0;
@@ -49,18 +48,19 @@ class Callback extends QueueAbstract {
 					/** @var Publication $queue */
 					$queue = $container->get( 'core.queue.publication' );
 					$queue->push_to_queue( $item );
-				}
+                    SmartCAT::debug("[Callback] Pushed to publication '{$statistics->get_document_id()}'");
+                }
 			}
-            SmartCAT::debug("End Quene '{$statistics->get_document_id()}'");
+            SmartCAT::debug("[Callback] End Queue update_statistic '{$statistics->get_document_id()}'");
 		} catch ( ClientErrorException $e ) {
 			if ( $e->getResponse()->getStatusCode() == 404 ) {
 				$statistic_repository->delete( $statistics );
-				SmartCAT::debug("Deleted '{$statistics->get_document_id()}'");
+				SmartCAT::debug("[Callback] Deleted '{$statistics->get_document_id()}'");
 			} else {
 				Logger::error( "Document update statistic",
 				"API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
 			}
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 		    Logger::error( "Document update statistic", "Error: {$e->getMessage()}" );
 		}
 	}
@@ -100,12 +100,13 @@ class Callback extends QueueAbstract {
 				$statistic_repository->update( $statistics );
 				sleep( 10 );
 
-				return $item;
+                SmartCAT::debug("[Callback] new {$statistics->get_error_count()} try '{$statistics->get_document_id()}'");
+                return $item;
 			}
 			Logger::error( "Document $item, update statistic",
 				"API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
 
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 		    Logger::error( "Document $item, update statistic", "Error: {$e->getMessage()}" );
 		}
 

@@ -40,7 +40,10 @@ class CreatePost extends QueueAbstract {
 
 			return $item;
 		}
-		/** @var ContainerInterface $container */
+
+        SmartCAT::debug("[CreatePost] Start queue '{$item['documentID']}'");
+
+        /** @var ContainerInterface $container */
 		$container = Connector::get_container();
 
 		/** @var StatisticRepository $statistic_repository */
@@ -58,16 +61,16 @@ class CreatePost extends QueueAbstract {
 			return false;
 		}
 
-        SmartCAT::debug("CreatePost '{$statistics->get_document_id()}'");
-
 		try {
 			$result = $sc->getDocumentExportManager()->documentExportDownloadExportResult( $item['taskID'] );
 			if ( 204 == $result->getStatusCode() ) {
 				sleep( 1 );
 
-				return $item;
+                SmartCAT::debug("[CreatePost] Export not done yet '{$item['documentID']}'");
+                return $item;
 			} elseif ( 200 == $result->getStatusCode() ) {
-				$response_body = $result->getBody()->getContents();
+                SmartCAT::debug("[CreatePost] Download document '{$item['documentID']}'");
+                $response_body = $result->getBody()->getContents();
 				$html          = new \DOMDocument();
 				$html->loadHTML( $response_body );
 				$title    = $html->getElementsByTagName( 'title' )->item( 0 )->nodeValue;
@@ -77,7 +80,8 @@ class CreatePost extends QueueAbstract {
 					$body .= $child->ownerDocument->saveXML( $child );
 				}
 
-				$post           = get_post( $statistics->get_post_id() );
+                SmartCAT::debug("[CreatePost] Generate new post '{$item['documentID']}'");
+                $post           = get_post( $statistics->get_post_id() );
 				$thumbnail_id   = get_post_meta( $statistics->get_post_id(), '_thumbnail_id', true );
 				$target_post_id = wp_insert_post( [
 					'post_title'     => $title,
@@ -138,31 +142,35 @@ class CreatePost extends QueueAbstract {
 				}
 				$statistics->set_status( 'completed' );
 				$statistic_repository->update( $statistics );
-                SmartCAT::debug("End CreatePost '{$statistics->get_document_id()}'");
-			}
+                SmartCAT::debug("[CreatePost] Generated post for '{$item['documentID']}'");
+            }
 		} catch ( ClientErrorException $e ) {
 			if ( 404 == $e->getResponse()->getStatusCode() ) {
 				$statistics->set_status( 'sended' );
 				$statistic_repository->update( $statistics );
 				/** @var Publication $queue */
 				$queue = $container->get( 'core.queue.publication' );
-				$queue->push_to_queue( $item['documentID'] )->save()->dispatch();
+                SmartCAT::debug("[CreatePost] Pushed to publication '{$item['documentID']}'");
+                $queue->push_to_queue( $item['documentID'] )->save()->dispatch();
 			} else if ( $statistics->get_error_count() < 360 ) {
 				$statistics->inc_error_count();
 				$statistic_repository->update( $statistics );
 				sleep( 10 );
 
-				return $item;
+                SmartCAT::debug("[CreatePost] new {$statistics->get_error_count()} try of '{$item['documentID']}'");
+                return $item;
 			}
 			Logger::error( "Document {$item['documentID']}, download translate",
 				"API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
             $statistics->set_status( 'sended' );
             $statistic_repository->update( $statistics );
 			Logger::error( "Document {$item['documentID']}, download translate","Message: {$e->getMessage()}" );
 		}
 
-		return false;
+        SmartCAT::debug("[CreatePost] End queue '{$item['documentID']}'");
+
+        return false;
 	}
 
 	/**
