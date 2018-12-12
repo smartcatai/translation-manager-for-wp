@@ -20,8 +20,8 @@ final class Settings implements InitInterface {
 		//add_management_page('Test Manage', 'Test Manage', 'edit_pages', 'testmanage', 'mt_manage_page'); // для добавления в меню "Управление"
 
 		add_menu_page(
-			__( 'Smartcat Translation Manager', 'translation-connectors' ),
-			__( 'Smartcat Translation Manager', 'translation-connectors' ),
+			__( 'Localization', 'translation-connectors' ),
+			__( 'Localization', 'translation-connectors' ),
 			'edit_pages',
 			'sc-settings',
 			[ self::class, 'render_settings_page' ],
@@ -32,8 +32,8 @@ final class Settings implements InitInterface {
 			__( 'Settings', 'translation-connectors' ),
 			'edit_pages',
 			'sc-settings', [ self::class, 'render_settings_page' ] );
-		add_submenu_page( 'sc-settings', __( 'Translation progress', 'translation-connectors' ),
-			__( 'Translation progress', 'translation-connectors' ),
+		add_submenu_page( 'sc-settings', __( 'Dashboard', 'translation-connectors' ),
+			__( 'Dashboard', 'translation-connectors' ),
 			'edit_pages',
 			'sc-translation-progress', [ self::class, 'render_progress_page' ] );
 	}

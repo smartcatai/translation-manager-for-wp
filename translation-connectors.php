@@ -4,7 +4,7 @@
  * @link              https://www.smartcat.ai
  * @package           translation-connectors
  * @wordpress-plugin
- * Plugin Name:       translation-connectors
+ * Plugin Name:       Smartcat Translation Manager
  * Plugin URI:        https://www.smartcat.ai/api/
  * Description:       WordPress integration to translation connectors.
  * Version:           1.0.11
