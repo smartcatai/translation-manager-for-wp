@@ -5,6 +5,7 @@ namespace SmartCAT\WP;
 
 use SmartCAT\WP\Cron\CronInterface;
 use SmartCAT\WP\DB\Repository\TaskRepository;
+use SmartCAT\WP\Helpers\Language\LanguageConverter;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Queue\QueueAbstract;
 use SmartCAT\WP\WP\HookInterface;
@@ -160,5 +161,31 @@ class Connector {
 
 		return is_plugin_active( 'polylang/polylang.php' ) || is_plugin_active( 'polylang-pro/polylang.php' ) ;
 	}
+
+	public function post_update_hook($postId, $postBefore, $postAfter)
+    {
+        $defaultLanguage = pll_default_language();
+
+        if (pll_get_post_language($postId, 'locale') != $defaultLanguage) {
+        	return;
+        }
+
+        if ($postBefore->post_content == $postAfter->post_content
+            && $postBefore->post_title == $postAfter->post_title) {
+        	return;
+        }
+
+        $postsTranslations = pll_get_post_translations($postId);
+
+	    $container = self::get_container();
+
+	    /** @var LanguageConverter $languages_converter */
+	    $languages_converter = $container->get( 'language.converter' );
+
+        foreach ($postsTranslations as $slug => $postTranslationId) {
+			$language = $languages_converter->get_sc_code_by_wp($slug);
+			$language->get_sc_code();
+        }
+    }
 }
 

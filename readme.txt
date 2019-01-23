@@ -45,6 +45,9 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 
 == Changelog ==
 
+= 1.0.11 (2018-12-12) =
+* Renaming module
+
 = 1.0.10 (2018-12-06) =
 * Fix vendor field
 
