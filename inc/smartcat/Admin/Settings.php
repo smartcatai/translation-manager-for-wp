@@ -48,6 +48,7 @@ final class Settings implements InitInterface {
 		$project_id      = $prefix . 'smartcat_api_project_id';
 		$workflow_stages = $prefix . 'smartcat_workflow_stages';
 		$vendor_id       = $prefix . 'smartcat_vendor_id';
+		$auto_send_on_update = $prefix . 'smartcat_auto_send_on_update';
 
 		//общая регистрация параметров
 		register_setting( 'smartcat', $server, [ 'type' => 'string' ] );
@@ -56,6 +57,7 @@ final class Settings implements InitInterface {
 		register_setting( 'smartcat', $project_id, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $workflow_stages, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $vendor_id, [ 'type' => 'string' ] );
+		register_setting( 'smartcat', $auto_send_on_update, [ 'type' => 'bool' ] );
 
 		//секции
 		add_settings_section(
@@ -137,6 +139,17 @@ final class Settings implements InitInterface {
 			'smartcat',
 			'smartcat_additional',
 			[ 'label_for' => $project_id, 'option_name' => $project_id ]
+		);
+
+		add_settings_field(
+			$auto_send_on_update,
+			__( 'Auto send posts on update', 'translation-connectors' ),
+			[ self::class, 'input_checkbox_callback' ],
+			'smartcat',
+			'smartcat_additional',
+			[ 'label_for' => $auto_send_on_update, 'option_name' => $auto_send_on_update, 'checkboxes_list' => [
+				1 => ''
+			] ]
 		);
 
 		$select_array = [];

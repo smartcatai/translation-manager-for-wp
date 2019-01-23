@@ -103,7 +103,7 @@ class CreatePost extends QueueAbstract {
 
 				/** @var LanguageConverter $converter */
 				$converter = $container->get( 'language.converter' );
-				$slug_list = $converter->get_polylang_slugs_to_locales();
+				$slug_list = $converter->get_polylang_locales_to_slugs();
 
 				if ( isset( $slug_list[ $statistics->get_target_language() ] ) ) {
 					/** @noinspection PhpUndefinedFunctionInspection */

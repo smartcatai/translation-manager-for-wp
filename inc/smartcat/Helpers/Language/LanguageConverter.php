@@ -344,9 +344,20 @@ final class LanguageConverter {
 		/** @noinspection PhpUndefinedFunctionInspection */
 		$pll_slug = pll_languages_list( [ 'fields' => 'slug' ] );
 		/** @noinspection PhpUndefinedFunctionInspection */
-		$pll_locales = pll_languages_list( [ 'fields' => 'locale' ] );
+		$pll_locale = pll_languages_list( [ 'fields' => 'locale' ] );
 
-		$result = array_combine( $pll_locales, $pll_slug );
+		$result = array_combine( $pll_slug, $pll_locale );
+
+		return $result;
+	}
+
+	public function get_polylang_locales_to_slugs() {
+		/** @noinspection PhpUndefinedFunctionInspection */
+		$pll_slug = pll_languages_list( [ 'fields' => 'slug' ] );
+		/** @noinspection PhpUndefinedFunctionInspection */
+		$pll_locale = pll_languages_list( [ 'fields' => 'locale' ] );
+
+		$result = array_combine( $pll_locale, $pll_slug );
 
 		return $result;
 	}

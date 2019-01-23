@@ -50,6 +50,18 @@ class TaskRepository extends RepositoryAbstract {
 		return $this->prepare_result( $results );
 	}
 
+	/**
+	 * @param $post_id int
+	 *
+	 * @return bool
+	 */
+	public function task_new_post_id_exists($post_id) {
+		$table_name = $this->get_table_name();
+		$results = $this->get_wp_db()->get_results("SELECT * FROM $table_name WHERE status='new' AND postID=$post_id");
+
+		return (count($this->prepare_result( $results )) > 0);
+	}
+
 	public function add( Task $task ) {
 		$table_name = $this->get_table_name();
 		$wpdb       = $this->get_wp_db();

@@ -7,7 +7,7 @@
  * Plugin Name:       Smartcat Translation Manager
  * Plugin URI:        https://www.smartcat.ai/api/
  * Description:       WordPress integration to translation connectors.
- * Version:           1.0.11
+ * Version:           1.0.12
  * Author:            Smartcat
  * Author URI:        https://www.smartcat.ai
  * License:           GPL-3.0
@@ -32,7 +32,6 @@ require_once SMARTCAT_PLUGIN_DIR . 'inc/autoload.php';
 require_once SMARTCAT_PLUGIN_DIR . 'inc/vendor/a5hleyrich/wp-background-processing/classes/wp-async-request.php';
 require_once SMARTCAT_PLUGIN_DIR . 'inc/vendor/a5hleyrich/wp-background-processing/classes/wp-background-process.php';
 
-
 use SmartCAT\WP\Admin\Settings;
 
 stream_wrapper_register("smartcat", "SmartCAT\WP\VariableStream");
@@ -47,6 +46,7 @@ add_action( 'init', [ $connector, 'plugin_init' ] );
 add_action( 'admin_notices', [ $connector, 'plugin_admin_notice' ], 0 );
 add_action( 'admin_menu', [ Settings::class, 'add_admin_menu' ] );
 add_action( 'admin_init', [ Settings::class, 'make_settings_page' ] );
+add_action( 'post_updated', [ $connector, 'post_update_hook' ], 10, 3 );
 register_activation_hook( __FILE__, [ $connector, 'plugin_activate' ] );
 register_deactivation_hook( __FILE__, [ $connector, 'plugin_deactivate' ] );
 

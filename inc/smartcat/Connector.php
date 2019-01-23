@@ -2,8 +2,10 @@
 
 namespace SmartCAT\WP;
 
-
+use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\Cron\CronInterface;
+use SmartCAT\WP\DB\Entity\Task;
+use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
 use SmartCAT\WP\Helpers\SmartCAT;
@@ -162,30 +164,87 @@ class Connector {
 		return is_plugin_active( 'polylang/polylang.php' ) || is_plugin_active( 'polylang-pro/polylang.php' ) ;
 	}
 
-	public function post_update_hook($postId, $postBefore, $postAfter)
-    {
-        $defaultLanguage = pll_default_language();
-
-        if (pll_get_post_language($postId, 'locale') != $defaultLanguage) {
-        	return;
-        }
-
-        if ($postBefore->post_content == $postAfter->post_content
-            && $postBefore->post_title == $postAfter->post_title) {
-        	return;
-        }
-
-        $postsTranslations = pll_get_post_translations($postId);
-
+	public function post_update_hook($post_id, $post_before, $post_after) {
 	    $container = self::get_container();
+		/** @var Options $options */
+		$options = $container->get('core.options');
 
-	    /** @var LanguageConverter $languages_converter */
+		if (!$options->get("smartcat_auto_send_on_update")) {
+			return;
+		}
+
+    	/** @var LanguageConverter $languages_converter */
 	    $languages_converter = $container->get( 'language.converter' );
 
-        foreach ($postsTranslations as $slug => $postTranslationId) {
-			$language = $languages_converter->get_sc_code_by_wp($slug);
-			$language->get_sc_code();
+	    try {
+		    $default_language = $languages_converter->get_sc_code_by_wp( pll_default_language('locale') )->get_sc_code();
+		    $post_language = $languages_converter->get_sc_code_by_wp( pll_get_post_language($post_id, 'locale') )->get_sc_code();
+	    } catch (\Throwable $e) {
+	    	return;
+	    }
+
+        if ( $post_language != $default_language ) {
+        	return;
         }
+
+        if ( $post_before->post_content == $post_after->post_content
+             && $post_before->post_title == $post_after->post_title) {
+        	return;
+        }
+
+        $languages_list = $languages_converter->get_polylang_slugs_to_locales();
+		$posts_translations = pll_get_post_translations( $post_id );
+
+	    $post_target_languages = array_map(function ( $key ) use ( $languages_converter, $languages_list ) {
+		    try {
+			    $result = $languages_converter->get_sc_code_by_wp( $languages_list[$key] )->get_sc_code();
+		    } catch (\Throwable $e) {
+		    	return null;
+		    }
+	    	return $result;
+	    }, array_keys( $posts_translations ) );
+
+		$post_target_languages = array_filter($post_target_languages, function ($value) {
+			return !is_null($value);
+		});
+
+		if (empty($post_target_languages)) {
+			return;
+		}
+
+	    /** @var TaskRepository $task_repository */
+	    $task_repository = $container->get( 'entity.repository.task' );
+	    /** @var StatisticRepository $statistics_repository */
+	    $statistics_repository = $container->get( 'entity.repository.statistic' );
+
+	    // На случай если сохраняются часто, а крон еще не прошел и не отправил предыдущие
+	    if ( $task_repository->task_new_post_id_exists($post_id) ) {
+	    	return;
+	    }
+
+	    $task = new Task();
+	    $task->set_post_id( $post_id )
+	         ->set_source_language( $default_language )
+	         ->set_target_languages( $post_target_languages )
+	         ->set_status( 'new' )
+	         ->set_project_id( null );
+	    $task_id = $task_repository->add( $task );
+
+	    $stat = new Statistics();
+	    $stat->set_task_id( $task_id )
+	         ->set_post_id( $post_id )
+	         ->set_source_language( $default_language )
+	         ->set_progress( 0 )
+	         ->set_words_count( null )
+	         ->set_target_post_id( null )
+	         ->set_document_id( null )
+	         ->set_status( 'new' );
+
+	    foreach ( $post_target_languages as $target_language ) {
+		    $new_stat = clone $stat;
+		    $new_stat->set_target_language( $target_language );
+		    $statistics_repository->add( $new_stat );
+	    }
     }
 }
 
