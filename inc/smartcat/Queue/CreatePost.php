@@ -77,7 +77,7 @@ class CreatePost extends QueueAbstract {
 				$body     = '';
 				$children = $html->getElementsByTagName( 'body' )->item( 0 )->childNodes;
 				foreach ( $children as $child ) {
-					$body .= $child->ownerDocument->saveXML( $child );
+					$body .= $child->ownerDocument->saveHTML( $child );
 				}
 
                 SmartCAT::debug("[CreatePost] Generate new post '{$item['documentID']}'");
