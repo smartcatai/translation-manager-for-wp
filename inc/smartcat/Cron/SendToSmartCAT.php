@@ -13,6 +13,7 @@ use Psr\Container\ContainerInterface;
 use SmartCAT\API\Model\BilingualFileImportSettingsModel;
 use SmartCAT\API\Model\CreateDocumentPropertyWithFilesModel;
 use SmartCAT\API\Model\CreateProjectWithFilesModel;
+use SmartCAT\API\Model\ProjectChangesModel;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
@@ -94,6 +95,16 @@ class SendToSmartCAT extends CronAbstract {
 						'projectId'     => $project_id
 					] );
 
+					$sc_project = $sc->getProjectManager()->projectGet( $project_id );
+					$updateModel = (new ProjectChangesModel())
+						->setName($sc_project->getName())
+						->setDescription($sc_project->getDescription())
+						->setExternalTag('source:WPPL');
+
+					if ($sc_project->getExternalTag() != 'source:WPPL') {
+						$sc->getProjectManager()->projectUpdateProject( $project_id, $updateModel );
+					}
+
 					$task->set_status( 'created' );
 					$task->set_project_id( $project_id );
 					$task_repository->update( $task );
@@ -126,7 +137,7 @@ class SendToSmartCAT extends CronAbstract {
 					$project_model->setAssignToVendor( false );
 				}
 
-				$project_model->setExternalTag('source:Wordpress');
+				$project_model->setExternalTag('source:WPPL');
 				$project_model->attacheFile( $file, $sc::filter_chars( $file_name ) );
 
 				try {

@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 4.8.1
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl
-Stable tag: 1.0.12
+Stable tag: 1.0.13
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,8 +45,11 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 
 == Changelog ==
 
-= 1.0.12 (2019-01-23) =
+= 1.0.13 (2019-01-23) =
 * Auto send on post update
+
+= 1.0.12 (2019-01-25) =
+* Add external tag
 
 = 1.0.11 (2018-12-12) =
 * Renaming module
