@@ -126,6 +126,7 @@ class SendToSmartCAT extends CronAbstract {
 					$project_model->setAssignToVendor( false );
 				}
 
+				$project_model->setExternalTag('source:Wordpress');
 				$project_model->attacheFile( $file, $sc::filter_chars( $file_name ) );
 
 				try {
