@@ -143,6 +143,7 @@ class SendToSmartCAT extends CronAbstract {
 				try {
 					$smartcat_project = $sc->getProjectManager()->projectCreateProjectWithFiles( $project_model );
 
+					$project_id = $smartcat_project->getId();
 					$task->set_status( 'created' );
 					$task->set_project_id( $smartcat_project->getId() );
 					$task_repository->update( $task );
