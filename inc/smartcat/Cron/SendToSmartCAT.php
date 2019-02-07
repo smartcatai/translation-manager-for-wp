@@ -68,9 +68,10 @@ class SendToSmartCAT extends CronAbstract {
 		$converter = $container->get( 'language.converter' );
 
 		foreach ( $tasks as $task ) {
-			$post = wpautop( get_post( $task->get_post_id() ) );
+			$post = get_post( $task->get_post_id() );
 
-			$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post->post_content}</body></html>";
+			$post_content = wpautop( $post->post_content );
+			$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post_content}</body></html>";
 			$file_name = "{$post->post_title}.html";
 			$file      = fopen( "smartcat://id_{$task->get_post_id()}", "r+" );
 			fwrite( $file, $file_body );
