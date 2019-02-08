@@ -68,7 +68,7 @@ class SendToSmartCAT extends CronAbstract {
 		$converter = $container->get( 'language.converter' );
 
 		foreach ( $tasks as $task ) {
-			$post = get_post( $task->get_post_id(), OBJECT, 'display' );
+			$post = get_post( $task->get_post_id() );
 
 			$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post->post_content}</body></html>";
 			$file_name = "{$post->post_title}.html";

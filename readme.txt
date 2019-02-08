@@ -2,7 +2,7 @@
 Contributors: arybnikov, dkhapenkov
 Tags: translation, localization, localisation, translate, multilingual, internationalization, internationalisation, automation, international, language
 Requires at least: 4.8
-Tested up to: 4.8.1
+Tested up to: 5.0.3
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl
 Stable tag: 1.0.13
@@ -46,7 +46,7 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 == Changelog ==
 
 = 1.0.13 (2019-01-23) =
-* Auto send on post update
+* Fix tested version
 
 = 1.0.12 (2019-01-25) =
 * Add external tag
