@@ -17,6 +17,7 @@ class StatisticsTable extends \WP_List_Table {
 			'wordsCount' => __( 'Words count', 'translation-connectors' ),
 			//'progress'   => __( 'Progress', 'translation-connectors' ),
 			'status'     => __( 'Status', 'translation-connectors' ),
+			'smartcat_project'     => __( 'Smartcat project', 'translation-connectors' ),
 			'editPost'   => __( 'Edit post', 'translation-connectors' )
 		];
 
@@ -104,31 +105,29 @@ class StatisticsTable extends \WP_List_Table {
 				return $words_count;
 			/*case 'progress':
 				return $item->getProgress();*/
+			case 'smartcat_project':
+				$status = $item->get_status();
+
+				$message = 'project';
+
+				if (in_array($status, ['sended', 'export', 'completed']) && ! empty( $item->get_document_id())) {
+					$document_id = $item->get_document_id();
+					$url         = $utils->get_url_to_smartcat_by_document_id( $document_id );
+					$message     = "<a href='{$url}' target='_blank'>{$message}</a>";
+
+					return $message;
+				}
+
+				return 'None';
 			case 'status':
 				switch ( $item->get_status() ) {
 					case 'new':
 						return __( 'Submitted', 'translation-connectors' );
 					case 'sended':
 					case 'export':
-						$message = __( 'In progress', 'translation-connectors' );
-
-						if ( ! empty( $item->get_document_id() ) ) {
-							$document_id = $item->get_document_id();
-							$url         = $utils->get_url_to_smartcat_by_document_id( $document_id );
-							$message     = "<a href='{$url}' target='_blank'>{$message}</a>";
-						}
-
-						return $message;
+						return __( 'In progress', 'translation-connectors' );
 					case 'completed':
-						$message = __( 'Completed', 'translation-connectors' );
-
-						if ( ! empty( $item->get_document_id() ) ) {
-							$document_id = $item->get_document_id();
-							$url         = $utils->get_url_to_smartcat_by_document_id( $document_id );
-							$message     = "<a href='{$url}' target='_blank'>{$message}</a>";
-						}
-
-						return $message;
+						return __( 'Completed', 'translation-connectors' );
 					default:
 						return $item->get_status();
 				}
