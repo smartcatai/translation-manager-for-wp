@@ -76,11 +76,7 @@ class StatisticsTable extends \WP_List_Table {
 
 				return $title;
 			case 'sourceLang':
-				/** @noinspection PhpUndefinedFunctionInspection */
-				$pll_locales = pll_languages_list( [ 'fields' => 'locale' ] );
-				/** @noinspection PhpUndefinedFunctionInspection */
-				$pll_names = pll_languages_list( [ 'fields' => 'name' ] );
-				$languages = array_combine( $pll_locales, $pll_names );
+				$languages = $utils->get_pll_languages();
 
 				$source_language = isset( $languages[ $item->get_source_language() ] )
 					? $languages[ $item->get_source_language() ]
@@ -88,11 +84,7 @@ class StatisticsTable extends \WP_List_Table {
 
 				return $source_language;
 			case 'targetLang':
-				/** @noinspection PhpUndefinedFunctionInspection */
-				$pll_locales = pll_languages_list( [ 'fields' => 'locale' ] );
-				/** @noinspection PhpUndefinedFunctionInspection */
-				$pll_names = pll_languages_list( [ 'fields' => 'name' ] );
-				$languages = array_combine( $pll_locales, $pll_names );
+				$languages = $utils->get_pll_languages();
 
 				$target_language = isset( $languages[ $item->get_target_language() ] )
 					? $languages[ $item->get_target_language() ]
@@ -108,7 +100,7 @@ class StatisticsTable extends \WP_List_Table {
 			case 'smartcat_project':
 				$status = $item->get_status();
 
-				$message = 'project';
+				$message = $item;
 
 				if (in_array($status, ['sended', 'export', 'completed']) && ! empty( $item->get_document_id())) {
 					$document_id = $item->get_document_id();
