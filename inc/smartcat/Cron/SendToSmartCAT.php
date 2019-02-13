@@ -70,8 +70,14 @@ class SendToSmartCAT extends CronAbstract {
 		foreach ( $tasks as $task ) {
 			$post = get_post( $task->get_post_id() );
 
-			$post_content = wpautop( $post->post_content );
-			$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post_content}</body></html>";
+			$post_body = $post->post_content;
+
+			// Ох уж этот Gutenberg....
+			if (function_exists('has_blocks') && !has_blocks($task->get_post_id())) {
+				$post_body = wpautop($post_body);
+			}
+
+			$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post_body}</body></html>";
 			$file_name = "{$post->post_title}.html";
 			$file      = fopen( "smartcat://id_{$task->get_post_id()}", "r+" );
 			fwrite( $file, $file_body );
