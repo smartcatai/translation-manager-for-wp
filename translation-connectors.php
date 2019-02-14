@@ -42,11 +42,16 @@ $plugin_data = get_file_data( __FILE__, [ 'Version' => 'Version' ] );
 SmartCAT\WP\Connector::$plugin_version = $plugin_data['Version'];
 
 add_action( 'plugins_loaded', [ $connector, 'plugin_load' ], 99 );
-add_action( 'init', [ $connector, 'plugin_init' ] );
-add_action( 'admin_notices', [ $connector, 'plugin_admin_notice' ], 0 );
-add_action( 'admin_menu', [ Settings::class, 'add_admin_menu' ] );
-add_action( 'admin_init', [ Settings::class, 'make_settings_page' ] );
-add_action( 'post_updated', [ $connector, 'post_update_hook' ], 10, 3 );
-register_activation_hook( __FILE__, [ $connector, 'plugin_activate' ] );
-register_deactivation_hook( __FILE__, [ $connector, 'plugin_deactivate' ] );
 
+if (!$connector::check_dependency()) {
+	deactivate_plugins(plugin_basename( __FILE__ ), false);
+	die( __( 'You need to activate the plugin Polylang' , 'translation-connectors' ) );
+} else {
+	add_action( 'init', [ $connector, 'plugin_init' ] );
+	add_action( 'admin_notices', [ $connector, 'plugin_admin_notice' ], 0 );
+	add_action( 'admin_menu', [ Settings::class, 'add_admin_menu' ] );
+	add_action( 'admin_init', [ Settings::class, 'make_settings_page' ] );
+	add_action( 'post_updated', [ $connector, 'post_update_hook' ], 10, 3 );
+	register_activation_hook( __FILE__, [ $connector, 'plugin_activate' ] );
+	register_deactivation_hook( __FILE__, [ $connector, 'plugin_deactivate' ] );
+}
