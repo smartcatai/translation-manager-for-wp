@@ -100,7 +100,7 @@ class StatisticsTable extends \WP_List_Table {
 			case 'smartcat_project':
 				$status = $item->get_status();
 
-				$message = $item;
+				$message = 'document';
 
 				if (in_array($status, ['sended', 'export', 'completed']) && ! empty( $item->get_document_id())) {
 					$document_id = $item->get_document_id();
