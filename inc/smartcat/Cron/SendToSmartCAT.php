@@ -126,27 +126,21 @@ class SendToSmartCAT extends CronAbstract {
 				$project_model->setName( $sc::filter_chars( $task_name ) );
 				try {
 					$project_model->setSourceLanguage( $converter->get_sc_code_by_wp( $task->get_source_language() )->get_sc_code() );
-				} catch (\Throwable $e) {
-					$task->set_status('failed');
-					$task_repository->update( $task );
-					continue;
-				}
-				$project_model->setTargetLanguages( array_map( function ( $wp_code ) use ( $converter ) {
-					return $converter->get_sc_code_by_wp( $wp_code )->get_sc_code();
-				}, $task->get_target_languages() ) );
-				$project_model->setWorkflowStages( $workflow_stages );
+					$project_model->setTargetLanguages( array_map( function ( $wp_code ) use ( $converter ) {
+						return $converter->get_sc_code_by_wp( $wp_code )->get_sc_code();
+					}, $task->get_target_languages() ) );
+					$project_model->setWorkflowStages( $workflow_stages );
 
-				if ( $vendor_id ) {
-					$project_model->setAssignToVendor( true );
-					$project_model->setVendorAccountIds( [$vendor_id] );
-				} else {
-					$project_model->setAssignToVendor( false );
-				}
+					if ( $vendor_id ) {
+						$project_model->setAssignToVendor( true );
+						$project_model->setVendorAccountIds( [$vendor_id] );
+					} else {
+						$project_model->setAssignToVendor( false );
+					}
 
-				$project_model->setExternalTag('source:WPPL');
-				$project_model->attacheFile( $file, $sc::filter_chars( $file_name ) );
+					$project_model->setExternalTag('source:WPPL');
+					$project_model->attacheFile( $file, $sc::filter_chars( $file_name ) );
 
-				try {
 					$smartcat_project = $sc->getProjectManager()->projectCreateProjectWithFiles( $project_model );
 
 					$task->set_status( 'created' );
@@ -157,13 +151,16 @@ class SendToSmartCAT extends CronAbstract {
 						$statistic_repository->link_to_smartcat_document( $task, $document );
 					}
 					SmartCAT::debug("Created '{$task_name}'");
-				} catch ( \Exception $e ) {
+				} catch (\Throwable $e) {
 					if ( $e instanceof ClientErrorException ) {
 						$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
 					} else {
 						$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
 					}
 					Logger::error( "Send to translate $task_name", $message );
+					$task->set_status('failed');
+					$task_repository->update($task);
+					$statistic_repository->mark_failed_by_task_id($task->get_id());
 				}
 			}
 		}
