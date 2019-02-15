@@ -130,7 +130,7 @@ class StatisticsTable extends \WP_List_Table {
 
 						return $message;
 					default:
-						return $item->get_status();
+						return ucfirst($item->get_status());
 				}
 			case 'editPost':
 				$message = '-';

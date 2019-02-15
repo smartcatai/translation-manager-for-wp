@@ -124,7 +124,13 @@ class SendToSmartCAT extends CronAbstract {
 			    SmartCAT::debug("Creating '{$task_name}'");
 				$project_model = new CreateProjectWithFilesModel();
 				$project_model->setName( $sc::filter_chars( $task_name ) );
-				$project_model->setSourceLanguage( $converter->get_sc_code_by_wp( $task->get_source_language() )->get_sc_code() );
+				try {
+					$project_model->setSourceLanguage( $converter->get_sc_code_by_wp( $task->get_source_language() )->get_sc_code() );
+				} catch (\Throwable $e) {
+					$task->set_status('failed');
+					$task_repository->update( $task );
+					continue;
+				}
 				$project_model->setTargetLanguages( array_map( function ( $wp_code ) use ( $converter ) {
 					return $converter->get_sc_code_by_wp( $wp_code )->get_sc_code();
 				}, $task->get_target_languages() ) );
