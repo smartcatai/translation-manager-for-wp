@@ -406,7 +406,9 @@ jQuery( function ( $ ) {
 	}
 	
 	$('.refresh_stat_button').each(function () {
-		$(this).onclick = refreshTranslation($(this).data('bind'))
+		$(this).on('click', function () {
+			refreshTranslation($(this).data('bind'));
+		});
 	});
 
 	//проверяем на существование, что мы точно на странице статистики
