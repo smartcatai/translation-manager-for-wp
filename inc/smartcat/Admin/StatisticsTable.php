@@ -17,7 +17,8 @@ class StatisticsTable extends \WP_List_Table {
 			'wordsCount' => __( 'Words count', 'translation-connectors' ),
 			//'progress'   => __( 'Progress', 'translation-connectors' ),
 			'status'     => __( 'Status', 'translation-connectors' ),
-			'editPost'   => __( 'Edit post', 'translation-connectors' )
+			'editPost'   => __( 'Edit post', 'translation-connectors' ),
+			'refresh'    => __( 'Refresh translation', 'translation-connectors' ),
 		];
 
 		return $columns;
@@ -139,6 +140,14 @@ class StatisticsTable extends \WP_List_Table {
 					$post_id = $item->get_target_post_id();
 					$url     = $utils->get_url_to_post_by_post_id( $post_id );
 					$message = "<a href='{$url}' target='_blank'>" . __( 'Edit post', 'translation-connectors' ) . "</a>";
+				}
+
+				return $message;
+			case 'refresh':
+				$message = '-';
+
+				if ( ! empty( $item->get_target_post_id() ) ) {
+					$message = "<a href='#' target='_blank' onclick='refreshTranslation({$item->get_id()})'>" . __( 'Refresh', 'translation-connectors' ) . "</a>";
 				}
 
 				return $message;

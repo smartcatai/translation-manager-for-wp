@@ -386,6 +386,25 @@ jQuery( function ( $ ) {
 		} );
 	}
 
+	function refreshTranslation( id ) {
+		$.ajax( {
+			type: "POST",
+			url: ajaxurl,
+			data: {
+				stat_id: id,
+				action: SmartcatFrontend.smartcat_table_prefix + 'refresh_translation'
+			},
+			success: function ( responseText ) {
+				cl( 'SUCCESS' );
+				var responseJSON = JSON.parse( responseText );
+				cl( responseJSON );
+			},
+			error: function ( responseObject ) {
+				cl( 'ERROR' );
+			}
+		} );
+	}
+
 	//проверяем на существование, что мы точно на странице статистики
 	if ( refreshStatButton.length ) {
 		isStatWasStarted = refreshStatButton.is( ':disabled' );

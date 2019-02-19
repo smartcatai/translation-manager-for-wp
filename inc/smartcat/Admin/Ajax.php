@@ -133,7 +133,7 @@ final class Ajax implements HookInterface {
 	 *
 	 * @throws \Exception
 	 */
-	public function refresh_translation( $statistic ) {
+	public function refresh_translation() {
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
@@ -146,10 +146,19 @@ final class Ajax implements HookInterface {
 		/** @var StatisticRepository $statistic_repository */
 		$statistic_repository = $container->get('entity.repository.statistic');
 
-		$statistic->set_status('inProgress');
-		$statistic_repository->update($statistic);
+		if (!empty($_POST['stat_id']) && intval($_POST['stat_id'])) {
+			$statistic = $statistic_repository->get_one_by(['id' => intval($_POST['stat_id'])]);
+			if ($statistic->get_target_post_id()) {
+				$statistic->set_status('inProgress');
+				$statistic_repository->update($statistic);
 
-		$ajax_response->send_success( 'ok', $data );
+				$ajax_response->send_success( 'ok', $data );
+			}
+
+			wp_die();
+		}
+		
+		$ajax_response->send_error( 'nok', $data );
 
 		wp_die();
 	}
