@@ -28,6 +28,11 @@ define(
 define('SMARTCAT_DEBUG_LOG', SMARTCAT_PLUGIN_DIR . 'debug.log');
 define('SMARTCAT_DEBUG_ENABLED', false);
 
+if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
+	deactivate_plugins(plugin_basename( __FILE__ ), false);
+	die( __( 'You PHP version is incompatible. Plugin works only on PHP 7.0 or higher.' , 'translation-connectors' ) );
+}
+
 require_once SMARTCAT_PLUGIN_DIR . 'inc/autoload.php';
 require_once SMARTCAT_PLUGIN_DIR . 'inc/vendor/a5hleyrich/wp-background-processing/classes/wp-async-request.php';
 require_once SMARTCAT_PLUGIN_DIR . 'inc/vendor/a5hleyrich/wp-background-processing/classes/wp-background-process.php';
