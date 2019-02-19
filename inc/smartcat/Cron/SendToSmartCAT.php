@@ -73,7 +73,7 @@ class SendToSmartCAT extends CronAbstract {
 			$post_body = $post->post_content;
 
 			// Ох уж этот Gutenberg....
-			if (function_exists('has_blocks') && !has_blocks($task->get_post_id())) {
+			if (!function_exists('has_blocks') || !has_blocks($task->get_post_id())) {
 				$post_body = wpautop($post_body);
 			}
 
