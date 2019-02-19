@@ -30,7 +30,7 @@ define('SMARTCAT_DEBUG_ENABLED', true);
 
 require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
+if (version_compare(PHP_VERSION, '7.0.0') <= 0) {
 	deactivate_plugins(plugin_basename( __FILE__ ), false);
 	die( __( 'You PHP version is incompatible. Plugin works only on PHP 7.0 or higher.' , 'translation-connectors' ) );
 }
