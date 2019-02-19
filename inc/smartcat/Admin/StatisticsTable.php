@@ -147,7 +147,7 @@ class StatisticsTable extends \WP_List_Table {
 				$message = '-';
 
 				if ( ! empty( $item->get_target_post_id() ) ) {
-					$message = "<a href='#' target='_blank' onclick='refreshTranslation({$item->get_id()})'>" . __( 'Refresh', 'translation-connectors' ) . "</a>";
+					$message = "<a href='#'  class='refresh_stat_button' data-bind='{$item->get_id()}'>" . __( 'Refresh', 'translation-connectors' ) . "</a>";
 				}
 
 				return $message;

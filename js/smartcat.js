@@ -404,6 +404,10 @@ jQuery( function ( $ ) {
 			}
 		} );
 	}
+	
+	$('.refresh_stat_button').each(function () {
+		$(this).onclick = refreshTranslation($(this).getAttribute('data-bind'))
+	});
 
 	//проверяем на существование, что мы точно на странице статистики
 	if ( refreshStatButton.length ) {
