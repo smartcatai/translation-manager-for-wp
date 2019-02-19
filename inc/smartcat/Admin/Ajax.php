@@ -128,6 +128,32 @@ final class Ajax implements HookInterface {
 		wp_die();
 	}
 
+	/**
+	 * @param Statistics $statistic
+	 *
+	 * @throws \Exception
+	 */
+	public function refresh_translation( $statistic ) {
+		$ajax_response = new AjaxResponse();
+		if ( ! current_user_can( 'publish_posts' ) ) {
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
+			wp_die();
+		}
+
+		$data = [ 'isActive' => SmartCAT::is_active() ];
+		$container = self::get_container();
+
+		/** @var StatisticRepository $statistic_repository */
+		$statistic_repository = $container->get('entity.repository.statistic');
+
+		$statistic->set_status('inProgress');
+		$statistic_repository->update($statistic);
+
+		$ajax_response->send_success( 'ok', $data );
+
+		wp_die();
+	}
+
 	static public function send_to_smartcat() {
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
@@ -242,6 +268,7 @@ final class Ajax implements HookInterface {
 
 			add_action( "wp_ajax_{$prefix}validate_settings", [ self::class, 'validate_settings' ] );
 			add_action( "wp_ajax_{$prefix}send_to_smartcat", [ self::class, 'send_to_smartcat' ] );
+			add_action( "wp_ajax_{$prefix}refresh_translation", [ self::class, 'refresh_translation' ] );
 		}
 	}
 
