@@ -146,7 +146,7 @@ class StatisticsTable extends \WP_List_Table {
 			case 'refresh':
 				$message = '-';
 
-				if ( ! empty( $item->get_target_post_id() ) ) {
+				if ( ! empty( $item->get_target_post_id() && $item->get_status() == 'completed') ) {
 					$message = "<a href='#'  class='refresh_stat_button' data-bind='{$item->get_id()}'>" . __( 'Refresh', 'translation-connectors' ) . "</a>";
 				}
 

@@ -408,6 +408,7 @@ jQuery( function ( $ ) {
 	$('.refresh_stat_button').each(function () {
 		$(this).on('click', function () {
 			refreshTranslation($(this).data('bind'));
+			location.reload();
 		});
 	});
 

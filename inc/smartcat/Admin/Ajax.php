@@ -149,7 +149,7 @@ final class Ajax implements HookInterface {
 		if (!empty($_POST['stat_id']) && intval($_POST['stat_id'])) {
 			$statistic = $statistic_repository->get_one_by(['id' => intval($_POST['stat_id'])]);
 			if ($statistic->get_target_post_id()) {
-				$statistic->set_status('inProgress');
+				$statistic->set_status('sended');
 				$statistic_repository->update($statistic);
 
 				$ajax_response->send_success( 'ok', $data );
@@ -157,7 +157,7 @@ final class Ajax implements HookInterface {
 
 			wp_die();
 		}
-		
+
 		$ajax_response->send_error( 'nok', $data );
 
 		wp_die();
