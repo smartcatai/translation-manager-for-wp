@@ -34,7 +34,7 @@ if (version_compare(PHP_VERSION, '7.0.0') < 0) {
 	deactivate_plugins(plugin_basename( __FILE__ ), false);
 	wp_die(
 		__( 'You PHP version is incompatible. Plugin works only on PHP 7.0 or higher.' , 'translation-connectors' ),
-		__( 'Smartcat Translation Manager expected an error' , 'translation-connectors' ),
+		__( 'Smartcat Translation Manager Error' , 'translation-connectors' ),
 		['back_link' => true]
 	);
 }
@@ -58,7 +58,7 @@ if (!$connector::check_dependency()) {
 	deactivate_plugins(plugin_basename( __FILE__ ), false);
 	wp_die(
 		__( 'You need to activate the plugin Polylang' , 'translation-connectors' ),
-		__( 'Smartcat Translation Manager expected an error' , 'translation-connectors' ),
+		__( 'Smartcat Translation Manager Error' , 'translation-connectors' ),
 		['back_link' => true]
 	);
 } else {
