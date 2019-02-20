@@ -110,7 +110,7 @@ class StatisticsTable extends \WP_List_Table {
 					return $message;
 				}
 
-				return 'None';
+				return '-';
 			case 'status':
 				switch ( $item->get_status() ) {
 					case 'new':
