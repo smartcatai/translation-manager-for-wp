@@ -30,9 +30,13 @@ define('SMARTCAT_DEBUG_ENABLED', true);
 
 require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-if (version_compare(PHP_VERSION, '7.0.0') <= 0) {
+if (version_compare(PHP_VERSION, '7.0.0') < 0) {
 	deactivate_plugins(plugin_basename( __FILE__ ), false);
-	die( __( 'You PHP version is incompatible. Plugin works only on PHP 7.0 or higher.' , 'translation-connectors' ) );
+	wp_die(
+		__( 'You PHP version is incompatible. Plugin works only on PHP 7.0 or higher.' , 'translation-connectors' ),
+		__( 'Smartcat Translation Manager expected an error' , 'translation-connectors' ),
+		['back_link' => true]
+	);
 }
 
 require_once SMARTCAT_PLUGIN_DIR . 'inc/autoload.php';
@@ -52,7 +56,11 @@ add_action( 'plugins_loaded', [ $connector, 'plugin_load' ], 99 );
 
 if (!$connector::check_dependency()) {
 	deactivate_plugins(plugin_basename( __FILE__ ), false);
-	die( __( 'You need to activate the plugin Polylang' , 'translation-connectors' ) );
+	wp_die(
+		__( 'You need to activate the plugin Polylang' , 'translation-connectors' ),
+		__( 'Smartcat Translation Manager expected an error' , 'translation-connectors' ),
+		['back_link' => true]
+	);
 } else {
 	add_action( 'init', [ $connector, 'plugin_init' ] );
 	add_action( 'admin_notices', [ $connector, 'plugin_admin_notice' ], 0 );
