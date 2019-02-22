@@ -173,6 +173,9 @@ class Connector {
 			return;
 		}
 
+		// Disable feature
+		return;
+
     	/** @var LanguageConverter $languages_converter */
 	    $languages_converter = $container->get( 'language.converter' );
 

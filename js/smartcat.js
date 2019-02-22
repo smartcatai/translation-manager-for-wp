@@ -386,6 +386,32 @@ jQuery( function ( $ ) {
 		} );
 	}
 
+	function refreshTranslation( id ) {
+		$.ajax( {
+			type: "POST",
+			url: ajaxurl,
+			data: {
+				stat_id: id,
+				action: SmartcatFrontend.smartcat_table_prefix + 'refresh_translation'
+			},
+			success: function ( responseText ) {
+				cl( 'SUCCESS' );
+				var responseJSON = JSON.parse( responseText );
+				cl( responseJSON );
+			},
+			error: function ( responseObject ) {
+				cl( 'ERROR' );
+			}
+		} );
+	}
+	
+	$('.refresh_stat_button').each(function () {
+		$(this).on('click', function () {
+			refreshTranslation($(this).data('bind'));
+			location.reload();
+		});
+	});
+
 	//проверяем на существование, что мы точно на странице статистики
 	if ( refreshStatButton.length ) {
 		isStatWasStarted = refreshStatButton.is( ':disabled' );
@@ -410,6 +436,31 @@ jQuery( function ( $ ) {
 		//если статистика была запущена уже в первый запуск
 		if ( isStatWasStarted ) {
 			intervalTimer = setInterval( checkStatistics, 5000 );
+		}
+
+		let timerStarted = false;
+
+		if ( !isStatWasStarted ) {
+			pageIntervalReload = setInterval( function () {
+				if ( isStatWasStarted ) {
+					event.preventDefault();
+					return false;
+				}
+
+				if (timerStarted) {
+					timerStarted = true;
+					return false;
+				}
+
+				isStatWasStarted = true;
+				var $this = $( this );
+				$this.prop( 'disabled', true );
+
+				updateStatistics();
+
+				event.preventDefault();
+				location.reload()
+			}, 1000 * 300 );
 		}
 	}
 

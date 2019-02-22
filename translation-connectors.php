@@ -26,7 +26,7 @@ define(
 );
 
 define('SMARTCAT_DEBUG_LOG', SMARTCAT_PLUGIN_DIR . 'debug.log');
-define('SMARTCAT_DEBUG_ENABLED', false);
+define('SMARTCAT_DEBUG_ENABLED', true);
 
 require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
