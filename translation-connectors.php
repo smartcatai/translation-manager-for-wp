@@ -57,7 +57,7 @@ add_action( 'plugins_loaded', [ $connector, 'plugin_load' ], 99 );
 if (!$connector::check_dependency()) {
 	deactivate_plugins(plugin_basename( __FILE__ ), false);
 	wp_die(
-		__( 'You need to activate the plugin Polylang' , 'translation-connectors' ),
+		__( 'You need to activate the Polylang plugin in order to use Smartcat Translation Manager' , 'translation-connectors' ),
 		__( 'Smartcat Translation Manager Error' , 'translation-connectors' ),
 		['back_link' => true]
 	);
