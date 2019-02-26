@@ -7,7 +7,7 @@
  * Plugin Name:       Smartcat Translation Manager
  * Plugin URI:        https://www.smartcat.ai/api/
  * Description:       WordPress integration to translation connectors.
- * Version:           1.0.13
+ * Version:           1.1.0
  * Author:            Smartcat
  * Author URI:        https://www.smartcat.ai
  * License:           GPL-3.0
@@ -27,6 +27,17 @@ define(
 
 define('SMARTCAT_DEBUG_LOG', SMARTCAT_PLUGIN_DIR . 'debug.log');
 define('SMARTCAT_DEBUG_ENABLED', true);
+
+require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+if (version_compare(PHP_VERSION, '7.0.0') < 0) {
+	deactivate_plugins(plugin_basename( __FILE__ ), false);
+	wp_die(
+		__( 'You PHP version is incompatible. Plugin works only on PHP 7.0 or higher.' , 'translation-connectors' ),
+		__( 'Smartcat Translation Manager Error' , 'translation-connectors' ),
+		['back_link' => true]
+	);
+}
 
 require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
