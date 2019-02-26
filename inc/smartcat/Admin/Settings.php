@@ -141,7 +141,8 @@ final class Settings implements InitInterface {
 			[ 'label_for' => $project_id, 'option_name' => $project_id ]
 		);
 
-		add_settings_field(
+		// Disable feature
+		/* add_settings_field(
 			$auto_send_on_update,
 			__( 'Auto send posts on update', 'translation-connectors' ),
 			[ self::class, 'input_checkbox_callback' ],
@@ -150,7 +151,7 @@ final class Settings implements InitInterface {
 			[ 'label_for' => $auto_send_on_update, 'option_name' => $auto_send_on_update, 'checkboxes_list' => [
 				1 => ''
 			] ]
-		);
+		); */
 
 		$select_array = [];
 		if ( SmartCAT::is_active() ) {
