@@ -126,8 +126,7 @@ final class Settings implements InitInterface {
 				'checkboxes_list' => [
 					'Translation'  => __( 'Translation', 'translation-connectors' ),
 					'Editing'      => __( 'Editing', 'translation-connectors' ),
-					'Proofreading' => __( 'Proofreading', 'translation-connectors' ),
-					'Postediting'  => __( 'Postediting', 'translation-connectors' )
+					'Proofreading' => __( 'Proofreading', 'translation-connectors' )
 				]
 			]
 		);
@@ -141,7 +140,8 @@ final class Settings implements InitInterface {
 			[ 'label_for' => $project_id, 'option_name' => $project_id ]
 		);
 
-		add_settings_field(
+		// Disable feature
+		/* add_settings_field(
 			$auto_send_on_update,
 			__( 'Auto send posts on update', 'translation-connectors' ),
 			[ self::class, 'input_checkbox_callback' ],
@@ -150,7 +150,7 @@ final class Settings implements InitInterface {
 			[ 'label_for' => $auto_send_on_update, 'option_name' => $auto_send_on_update, 'checkboxes_list' => [
 				1 => ''
 			] ]
-		);
+		); */
 
 		$select_array = [];
 		if ( SmartCAT::is_active() ) {
@@ -181,7 +181,7 @@ final class Settings implements InitInterface {
 			if ( ! count( $select_array ) ) {
 				//$select_array = [ __( 'You haven\'t got vendors', 'translation-connectors' ) ];
 			} else {
-				array_unshift( $select_array, __( 'Please, choose your vendor', 'translation-connectors' ) );
+				array_unshift( $select_array, __( 'Please select your vendor', 'translation-connectors' ) );
 				add_settings_field(
 					$vendor_id,
 					__( 'Vendor ID', 'translation-connectors' ),

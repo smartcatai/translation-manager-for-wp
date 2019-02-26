@@ -26,11 +26,11 @@ class Connector {
 	public function __construct() {
 		ignore_user_abort( true );
 		set_time_limit( 0 );
-		$this->init_cron();
-		$this->register_hooks();
-		/** @var TaskRepository $test */
-		$test = self::get_container()->get( 'entity.repository.task' );
-		$test->get_new_task();
+
+		if (self::check_dependency()) {
+			$this->init_cron();
+			$this->register_hooks();
+		}
 	}
 
 	private function init_cron() {
@@ -172,6 +172,9 @@ class Connector {
 		if (!$options->get("smartcat_auto_send_on_update")) {
 			return;
 		}
+
+		// Disable feature
+		return;
 
     	/** @var LanguageConverter $languages_converter */
 	    $languages_converter = $container->get( 'language.converter' );

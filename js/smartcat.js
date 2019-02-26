@@ -437,6 +437,31 @@ jQuery( function ( $ ) {
 		if ( isStatWasStarted ) {
 			intervalTimer = setInterval( checkStatistics, 5000 );
 		}
+
+		let timerStarted = false;
+
+		if ( !isStatWasStarted ) {
+			pageIntervalReload = setInterval( function () {
+				if ( isStatWasStarted ) {
+					event.preventDefault();
+					return false;
+				}
+
+				if (timerStarted) {
+					timerStarted = true;
+					return false;
+				}
+
+				isStatWasStarted = true;
+				var $this = $( this );
+				$this.prop( 'disabled', true );
+
+				updateStatistics();
+
+				event.preventDefault();
+				location.reload()
+			}, 1000 * 300 );
+		}
 	}
 
 } );

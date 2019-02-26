@@ -17,6 +17,7 @@ class StatisticsTable extends \WP_List_Table {
 			'wordsCount' => __( 'Words count', 'translation-connectors' ),
 			//'progress'   => __( 'Progress', 'translation-connectors' ),
 			'status'     => __( 'Status', 'translation-connectors' ),
+			'smartcat_project'     => __( 'Smartcat project', 'translation-connectors' ),
 			'editPost'   => __( 'Edit post', 'translation-connectors' ),
 			'refresh'    => __( 'Update translation', 'translation-connectors' ),
 		];
@@ -76,11 +77,7 @@ class StatisticsTable extends \WP_List_Table {
 
 				return $title;
 			case 'sourceLang':
-				/** @noinspection PhpUndefinedFunctionInspection */
-				$pll_locales = pll_languages_list( [ 'fields' => 'locale' ] );
-				/** @noinspection PhpUndefinedFunctionInspection */
-				$pll_names = pll_languages_list( [ 'fields' => 'name' ] );
-				$languages = array_combine( $pll_locales, $pll_names );
+				$languages = $utils->get_pll_languages();
 
 				$source_language = isset( $languages[ $item->get_source_language() ] )
 					? $languages[ $item->get_source_language() ]
@@ -88,11 +85,7 @@ class StatisticsTable extends \WP_List_Table {
 
 				return $source_language;
 			case 'targetLang':
-				/** @noinspection PhpUndefinedFunctionInspection */
-				$pll_locales = pll_languages_list( [ 'fields' => 'locale' ] );
-				/** @noinspection PhpUndefinedFunctionInspection */
-				$pll_names = pll_languages_list( [ 'fields' => 'name' ] );
-				$languages = array_combine( $pll_locales, $pll_names );
+				$languages = $utils->get_pll_languages();
 
 				$target_language = isset( $languages[ $item->get_target_language() ] )
 					? $languages[ $item->get_target_language() ]
@@ -105,33 +98,31 @@ class StatisticsTable extends \WP_List_Table {
 				return $words_count;
 			/*case 'progress':
 				return $item->getProgress();*/
+			case 'smartcat_project':
+				$status = $item->get_status();
+
+				$message = __('Go to Smartcat', 'translation-connectors');
+
+				if (in_array($status, ['sended', 'export', 'completed']) && ! empty( $item->get_document_id())) {
+					$document_id = $item->get_document_id();
+					$url         = $utils->get_url_to_smartcat_by_document_id( $document_id );
+					$message     = "<a href='{$url}' target='_blank'>{$message}</a>";
+
+					return $message;
+				}
+
+				return '-';
 			case 'status':
 				switch ( $item->get_status() ) {
 					case 'new':
 						return __( 'Submitted', 'translation-connectors' );
 					case 'sended':
 					case 'export':
-						$message = __( 'In progress', 'translation-connectors' );
-
-						if ( ! empty( $item->get_document_id() ) ) {
-							$document_id = $item->get_document_id();
-							$url         = $utils->get_url_to_smartcat_by_document_id( $document_id );
-							$message     = "<a href='{$url}' target='_blank'>{$message}</a>";
-						}
-
-						return $message;
+						return __( 'In progress', 'translation-connectors' );
 					case 'completed':
-						$message = __( 'Completed', 'translation-connectors' );
-
-						if ( ! empty( $item->get_document_id() ) ) {
-							$document_id = $item->get_document_id();
-							$url         = $utils->get_url_to_smartcat_by_document_id( $document_id );
-							$message     = "<a href='{$url}' target='_blank'>{$message}</a>";
-						}
-
-						return $message;
+						return __( 'Completed', 'translation-connectors' );
 					default:
-						return $item->get_status();
+						return ucfirst($item->get_status());
 				}
 			case 'editPost':
 				$message = '-';

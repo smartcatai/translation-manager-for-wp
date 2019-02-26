@@ -200,6 +200,20 @@ class StatisticRepository extends RepositoryAbstract {
 		return false;
 	}
 
+	public function mark_failed_by_task_id( $task_id )
+	{
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+
+		if ( ! is_null( $task_id ) && ! empty( $task_id ) && is_int( $task_id ) ) {
+			if ( $wpdb->update( $table_name, ['status' => 'failed'], [ 'taskId' => $task_id ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public function delete( Statistics $stat ) {
 		$table_name = $this->get_table_name();
 		$wpdb       = $this->get_wp_db();
