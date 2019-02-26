@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 5.0.3
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl
-Stable tag: 1.0.13
+Stable tag: 1.1.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -44,6 +44,13 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 1. Translation Connectors Settings.
 
 == Changelog ==
+
+= 1.1.0 (2019-02-26) =
+* A new "Smartcat project" column in the Localization Dashboard with a link leading to the translation project in Smartcat.
+* A new feature for translation update that allows you to automatically update completed translation if any changes were made with that project in Smartcat.
+* Autoupdate of the Dashboard page.
+* Compatibility with Wordpress 5.0.3.
+* General bug fixes.
 
 = 1.0.13 (2019-01-23) =
 * Fix tested version
