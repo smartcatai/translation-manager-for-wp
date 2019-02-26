@@ -18,7 +18,7 @@ class StatisticsTable extends \WP_List_Table {
 			//'progress'   => __( 'Progress', 'translation-connectors' ),
 			'status'     => __( 'Status', 'translation-connectors' ),
 			'editPost'   => __( 'Edit post', 'translation-connectors' ),
-			'refresh'    => __( 'Refresh translation', 'translation-connectors' ),
+			'refresh'    => __( 'Update translation', 'translation-connectors' ),
 		];
 
 		return $columns;
@@ -147,7 +147,7 @@ class StatisticsTable extends \WP_List_Table {
 				$message = '-';
 
 				if ( ! empty( $item->get_target_post_id() && $item->get_status() == 'completed') ) {
-					$message = "<a href='#'  class='refresh_stat_button' data-bind='{$item->get_id()}'>" . __( 'Refresh', 'translation-connectors' ) . "</a>";
+					$message = "<a href='#'  class='refresh_stat_button' data-bind='{$item->get_id()}'>" . __( 'Check updates', 'translation-connectors' ) . "</a>";
 				}
 
 				return $message;
