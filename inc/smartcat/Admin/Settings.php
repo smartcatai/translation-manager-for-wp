@@ -126,8 +126,7 @@ final class Settings implements InitInterface {
 				'checkboxes_list' => [
 					'Translation'  => __( 'Translation', 'translation-connectors' ),
 					'Editing'      => __( 'Editing', 'translation-connectors' ),
-					'Proofreading' => __( 'Proofreading', 'translation-connectors' ),
-					'Postediting'  => __( 'Postediting', 'translation-connectors' )
+					'Proofreading' => __( 'Proofreading', 'translation-connectors' )
 				]
 			]
 		);
@@ -182,7 +181,7 @@ final class Settings implements InitInterface {
 			if ( ! count( $select_array ) ) {
 				//$select_array = [ __( 'You haven\'t got vendors', 'translation-connectors' ) ];
 			} else {
-				array_unshift( $select_array, __( 'Please, choose your vendor', 'translation-connectors' ) );
+				array_unshift( $select_array, __( 'Please select your vendor', 'translation-connectors' ) );
 				add_settings_field(
 					$vendor_id,
 					__( 'Vendor ID', 'translation-connectors' ),
