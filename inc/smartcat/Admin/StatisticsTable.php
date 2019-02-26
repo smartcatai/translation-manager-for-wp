@@ -27,6 +27,7 @@ class StatisticsTable extends \WP_List_Table {
 
 	public function display() {
 		$this->prepare_items();
+		spawn_cron();
 		parent::display();
 	}
 
