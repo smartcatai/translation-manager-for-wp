@@ -8,19 +8,21 @@
 		</div>
 	<?php } ?>
 
-    <form method="post" action="options.php">
-        <?php wp_nonce_field( 'update-options' ); ?>
-        <table class="form-table">
+	<div class="form-wrap">
+		<form method="post" action="options.php">
+			<?php wp_nonce_field( 'update-options' ); ?>
+			<table class="form-table">
 
-            <?php
-                settings_fields( 'smartcat' );
+				<?php
+				settings_fields( 'smartcat' );
 				do_settings_sections( 'smartcat' );
 				?>
-        </table>
+			</table>
 
-        <p class="submit">
-            <input type="submit" class="button-primary" value="<?php echo __( 'Save Changes' ) ?>"/>
-        </p>
-        
+			<p class="submit">
+				<input type="submit" class="button-primary" value="<?php echo __( 'Save Changes' ) ?>"/>
+			</p>
+
 		</form>
+	</div>
 </div>

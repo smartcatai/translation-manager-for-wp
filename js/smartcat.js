@@ -398,6 +398,7 @@ jQuery( function ( $ ) {
 				cl( 'SUCCESS' );
 				var responseJSON = JSON.parse( responseText );
 				cl( responseJSON );
+				return responseJSON;
 			},
 			error: function ( responseObject ) {
 				cl( 'ERROR' );
@@ -407,8 +408,11 @@ jQuery( function ( $ ) {
 	
 	$('.refresh_stat_button').each(function () {
 		$(this).on('click', function () {
-			refreshTranslation($(this).data('bind'));
-			location.reload();
+			var response = refreshTranslation($(this).data('bind'));
+			$(this).closest("tr").children(".column-status").html( response.statistic.status );
+			$(this).closest("tr").children(".column-editPost").html( "-" );
+			$(this).parent().html( "-" );
+			//location.reload();
 		});
 	});
 

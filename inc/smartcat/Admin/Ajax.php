@@ -152,6 +152,10 @@ final class Ajax implements HookInterface {
 				$statistic->set_status('sended');
 				$statistic_repository->update($statistic);
 
+				$data["statistic"] = [
+					'status' => __( 'In progress', 'translation-connectors' )
+				];
+
 				$ajax_response->send_success( 'ok', $data );
 			}
 
