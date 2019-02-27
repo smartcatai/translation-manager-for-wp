@@ -19,7 +19,7 @@ $from     = $limit * ( $page - 1 );
 
 ?>
 <div class="smartcat-connector wrap">
-	<h1><?php echo esc_html( $GLOBALS['title'] ); ?></h1>
+	<h1 class="wp-heading-inline"><?php echo esc_html( $GLOBALS['title'] ); ?></h1>
 	<?php
 	$container = \SmartCAT\WP\Connector::get_container();
 
@@ -28,7 +28,7 @@ $from     = $limit * ( $page - 1 );
 	$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
 	$button_status              = $is_statistics_queue_active ? 'disabled="disabled"' : '';
 	?>
-	<input type="button"
+	<input type="button" class="page-title-action"
 	       id="smartcat-connector-refresh-statistics"
 	       value="<?php echo __( 'Refresh statistics', 'translation-connectors' ); ?>" <?php echo $button_status; ?>/>
 	<?php

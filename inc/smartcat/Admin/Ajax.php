@@ -267,6 +267,8 @@ final class Ajax implements HookInterface {
 			$ajax_response->send_error( 'Task was not created', $data );
 		}
 
+		spawn_cron();
+
 		wp_die();
 	}
 

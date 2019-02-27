@@ -305,7 +305,7 @@ jQuery( function ( $ ) {
 				cl( 'success' );
 				cl( responseText );
 				$this.parent().dialog( 'close' );
-				window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-translation-progress';
+				//window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-translation-progress';
 			},
 			error: function ( responseObject ) {
 				cl( 'error' );
