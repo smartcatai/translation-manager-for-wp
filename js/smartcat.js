@@ -373,9 +373,7 @@ jQuery( function ( $ ) {
 				cl( responseJSON );
 
 				if ( responseJSON.message === 'ok' ) {
-					if ( ! intervalTimer ) {
-						intervalTimer = setInterval( checkStatistics, 5000 );
-					}
+					checkStatistics();
 				}
 			},
 			error: function ( responseObject ) {
@@ -386,19 +384,21 @@ jQuery( function ( $ ) {
 		} );
 	}
 
-	function refreshTranslation( id ) {
+	function refreshTranslation( element ) {
 		$.ajax( {
 			type: "POST",
 			url: ajaxurl,
 			data: {
-				stat_id: id,
+				stat_id: element.data('bind'),
 				action: SmartcatFrontend.smartcat_table_prefix + 'refresh_translation'
 			},
 			success: function ( responseText ) {
-				cl( 'SUCCESS' );
 				var responseJSON = JSON.parse( responseText );
 				cl( responseJSON );
-				return responseJSON;
+				if (responseJSON.message == "ok") {
+					element.closest("tr").children(".column-status").html( responseJSON.data.statistic.status );
+					element.parent().html( "-" );
+				}
 			},
 			error: function ( responseObject ) {
 				cl( 'ERROR' );
@@ -408,14 +408,7 @@ jQuery( function ( $ ) {
 	
 	$('.refresh_stat_button').each(function () {
 		$(this).on('click', function () {
-			var response = refreshTranslation($(this).data('bind'));
-
-			if (response) {
-				$(this).closest("tr").children(".column-status").html( response.data.statistic.status );
-				$(this).closest("tr").children(".column-editPost").html( "-" );
-				$(this).parent().html( "-" );
-			}
-			
+			refreshTranslation($(this));
 			//location.reload();
 		});
 	});
