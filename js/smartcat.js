@@ -343,7 +343,7 @@ jQuery( function ( $ ) {
 					clearInterval( intervalTimer );
 					isStatWasStarted = false;
 					//refreshStatButton.prop('disabled', false);
-					window.location.reload();
+					//window.location.reload();
 				}
 			},
 			error: function ( responseObject ) {
@@ -429,6 +429,7 @@ jQuery( function ( $ ) {
 
 			updateStatistics();
 
+			location.reload();
 			event.preventDefault();
 			return false;
 		} );
@@ -438,17 +439,10 @@ jQuery( function ( $ ) {
 			intervalTimer = setInterval( checkStatistics, 5000 );
 		}
 
-		let timerStarted = false;
-
 		if ( !isStatWasStarted ) {
 			pageIntervalReload = setInterval( function () {
 				if ( isStatWasStarted ) {
 					event.preventDefault();
-					return false;
-				}
-
-				if (timerStarted) {
-					timerStarted = true;
 					return false;
 				}
 
@@ -458,8 +452,8 @@ jQuery( function ( $ ) {
 
 				updateStatistics();
 
+				location.reload();
 				event.preventDefault();
-				location.reload()
 			}, 1000 * 300 );
 		}
 	}
