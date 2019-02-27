@@ -31,6 +31,7 @@ $from     = $limit * ( $page - 1 );
 	<input type="button" class="page-title-action"
 	       id="smartcat-connector-refresh-statistics"
 	       value="<?php echo __( 'Refresh statistics', 'translation-connectors' ); ?>" <?php echo $button_status; ?>/>
+    <hr class="wp-header-end">
 	<?php
 
 	$statistics_result = $statistics_repository->get_statistics( $from, $limit );

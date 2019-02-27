@@ -26,9 +26,9 @@ use SmartCAT\WP\WP\Options;
 class SendToSmartCAT extends CronAbstract {
 
 	public function get_interval() {
-		$schedules['5m'] = [
-			'interval' => 300,
-			'display'  => __( 'Every 5 minutes', 'translation-connectors' ),
+		$schedules['1m'] = [
+			'interval' => 60,
+			'display'  => __( 'Every minute', 'translation-connectors' ),
 		];
 
 		return $schedules;
