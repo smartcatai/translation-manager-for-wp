@@ -409,9 +409,13 @@ jQuery( function ( $ ) {
 	$('.refresh_stat_button').each(function () {
 		$(this).on('click', function () {
 			var response = refreshTranslation($(this).data('bind'));
-			$(this).closest("tr").children(".column-status").html( response.statistic.status );
-			$(this).closest("tr").children(".column-editPost").html( "-" );
-			$(this).parent().html( "-" );
+
+			if (response) {
+				$(this).closest("tr").children(".column-status").html( response.data.statistic.status );
+				$(this).closest("tr").children(".column-editPost").html( "-" );
+				$(this).parent().html( "-" );
+			}
+			
 			//location.reload();
 		});
 	});
