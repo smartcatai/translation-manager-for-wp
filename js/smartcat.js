@@ -398,6 +398,7 @@ jQuery( function ( $ ) {
 				if (responseJSON.message == "ok") {
 					element.closest("tr").children(".column-status").html( responseJSON.data.statistic.status );
 					element.parent().html( "-" );
+					updateStatistics();
 				}
 			},
 			error: function ( responseObject ) {
