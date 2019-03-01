@@ -15,7 +15,6 @@ use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\WP\Options;
 
-
 /** Обработка очереди "Обновление статистики" */
 class Statistic extends QueueAbstract {
 	protected $action = 'smartcat_statistic_async';

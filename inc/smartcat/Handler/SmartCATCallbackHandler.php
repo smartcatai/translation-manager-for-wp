@@ -8,7 +8,7 @@
 
 namespace SmartCAT\WP\Handler;
 
-use SmartCAT\API\Model\CallbackPropertyModel;
+use SmartCat\Client\Model\CallbackPropertyModel;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\Helpers\SmartCAT;

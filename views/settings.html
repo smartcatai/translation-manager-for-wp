@@ -1,0 +1,22 @@
+<div class="smartcat-connector wrap">
+    <h1 class="wp-heading-inline">{{ title }}</h1>
+    <hr class="wp-header-end" />
+
+    {{# saved }}
+    <div id=”message” class="updated settings-error notice is-dismissible">
+        <p><strong>{{ message }}</strong></p>
+    </div>
+    {{/ saved }}
+
+    <div class="form-wrap">
+        <form method="post" action="options.php">
+            <table class="form-table">
+                {{# fields }}{{/ fields }}
+                {{# sections }}{{/ sections }}
+            </table>
+            <p class="submit">
+                <input type="submit" class="button-primary" value="{{ save_changes }}"/>
+            </p>
+        </form>
+    </div>
+</div>

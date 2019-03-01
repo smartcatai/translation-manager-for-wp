@@ -8,7 +8,6 @@
 
 namespace SmartCAT\WP\Queue;
 
-
 abstract class QueueAbstract extends \WP_Background_Process {
 
 }

@@ -2,10 +2,12 @@
 
 namespace SmartCAT\WP\Admin;
 
+use function Clue\StreamFilter\fun;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\Helpers\Cryptographer;
 use SmartCAT\WP\Helpers\SmartCAT;
+use SmartCAT\WP\Helpers\TemplateEngine;
 use SmartCAT\WP\WP\InitInterface;
 use SmartCAT\WP\WP\Options;
 
@@ -251,13 +253,70 @@ final class Settings implements InitInterface {
 	}
 
 	static function render_settings_page() {
-		/** @noinspection PhpIncludeInspection */
-		include SMARTCAT_PLUGIN_DIR . '/views/settings.php';
+		$container = self::get_container();
+		/** @var TemplateEngine $render */
+		$render = $container->get('templater');
+
+		echo $render->render('settings', [
+			'title' => $GLOBALS['title'],
+			'saved' => isset( $_GET['settings-updated'] ),
+			'message' => __( 'Settings saved.' ),
+			'fields' => function () use ($render) {
+				return $render->ob_to_string('settings_fields', 'smartcat');
+			},
+			'sections' => function () use ($render) {
+			    return $render->ob_to_string('do_settings_sections', 'smartcat');
+			},
+			'save_changes' => __( 'Save Changes' )
+		]);
 	}
 
 	static function render_progress_page() {
-		/** @noinspection PhpIncludeInspection */
-		include SMARTCAT_PLUGIN_DIR . '/views/progress.php';
+		$container = self::get_container();
+		/** @var TemplateEngine $render */
+		$render = $container->get('templater');
+		$statistics_repository = $container->get( 'entity.repository.statistic' );
+		$options = $container->get( 'core.options' );
+
+		$statistics_table = new \SmartCAT\WP\Admin\StatisticsTable();
+
+		$total_elements = $statistics_repository->get_count();
+		$limit = 100;
+		$max_page = ceil( $total_elements / $limit );
+		$page     = isset( $_GET['page-number'] ) ? abs( intval( $_GET['page-number'] ) ) : 1;
+		$page     = ( $page > $max_page ) ? $max_page : $page;
+		$page     = ( $page >= 1 ) ? $page : 1; //на всякий случай, хотя двумя строками выше это должно решаться
+		$from     = $limit * ( $page - 1 );
+		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
+
+		$statistics_result = $statistics_repository->get_statistics( $from, $limit );
+
+		$url = strtok( $_SERVER['REQUEST_URI'], '?' );
+		$paginator = '';
+
+		for ( $page_number = 1; $page_number <= $max_page; $page_number ++ ) {
+			if ( $page_number == $page ) {
+				$paginator .= "<span>{$page_number}</span>";
+			} else {
+				$paginator .= '<a href="' . esc_html( $url . '?page=sc-translation-progress&page-number=' . $page_number ) . '">' . $page_number . '</a>';
+			}
+		}
+
+		echo $render->render('dashboard', [
+			'title' => $GLOBALS['title'],
+			'button_status' => $is_statistics_queue_active ? 'disabled="disabled"' : false,
+			'statistic_result' => $statistics_result ? true : false,
+			'refresh_text' => __( 'Refresh statistics', 'translation-connectors' ),
+			'statistic_table' => function () use ($statistics_table, $render, $statistics_result) {
+				$table_with_data = $statistics_table->set_data( $statistics_result );
+				return 	$render->ob_to_string([$table_with_data, 'display']);
+			},
+			'pages_text' => __( 'Pages', 'translation-connectors' ),
+			'empty_message' => __( 'Statistics is empty', 'translation-connectors' ),
+			'paginator' => function () use ($paginator) {
+				return $paginator;
+			}
+		]);
 	}
 
 	public function plugin_init() {

@@ -8,7 +8,6 @@
 
 namespace SmartCAT\WP\Cron;
 
-
 use SmartCAT\WP\WP\PluginInterface;
 
 abstract class CronAbstract implements CronInterface, PluginInterface {
