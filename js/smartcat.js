@@ -305,7 +305,7 @@ jQuery( function ( $ ) {
 				cl( 'success' );
 				cl( responseText );
 				$this.parent().dialog( 'close' );
-				window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-translation-progress';
+				//window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-translation-progress';
 			},
 			error: function ( responseObject ) {
 				cl( 'error' );
@@ -343,7 +343,7 @@ jQuery( function ( $ ) {
 					clearInterval( intervalTimer );
 					isStatWasStarted = false;
 					//refreshStatButton.prop('disabled', false);
-					window.location.reload();
+					//window.location.reload();
 				}
 			},
 			error: function ( responseObject ) {
@@ -373,9 +373,7 @@ jQuery( function ( $ ) {
 				cl( responseJSON );
 
 				if ( responseJSON.message === 'ok' ) {
-					if ( ! intervalTimer ) {
-						intervalTimer = setInterval( checkStatistics, 5000 );
-					}
+					checkStatistics();
 				}
 			},
 			error: function ( responseObject ) {
@@ -386,18 +384,22 @@ jQuery( function ( $ ) {
 		} );
 	}
 
-	function refreshTranslation( id ) {
+	function refreshTranslation( element ) {
 		$.ajax( {
 			type: "POST",
 			url: ajaxurl,
 			data: {
-				stat_id: id,
+				stat_id: element.data('bind'),
 				action: SmartcatFrontend.smartcat_table_prefix + 'refresh_translation'
 			},
 			success: function ( responseText ) {
-				cl( 'SUCCESS' );
 				var responseJSON = JSON.parse( responseText );
 				cl( responseJSON );
+				if (responseJSON.message == "ok") {
+					element.closest("tr").children(".column-status").html( responseJSON.data.statistic.status );
+					element.parent().html( "-" );
+					updateStatistics();
+				}
 			},
 			error: function ( responseObject ) {
 				cl( 'ERROR' );
@@ -407,8 +409,8 @@ jQuery( function ( $ ) {
 	
 	$('.refresh_stat_button').each(function () {
 		$(this).on('click', function () {
-			refreshTranslation($(this).data('bind'));
-			location.reload();
+			refreshTranslation($(this));
+			//location.reload();
 		});
 	});
 
@@ -429,6 +431,7 @@ jQuery( function ( $ ) {
 
 			updateStatistics();
 
+			location.reload();
 			event.preventDefault();
 			return false;
 		} );
@@ -438,17 +441,10 @@ jQuery( function ( $ ) {
 			intervalTimer = setInterval( checkStatistics, 5000 );
 		}
 
-		let timerStarted = false;
-
 		if ( !isStatWasStarted ) {
 			pageIntervalReload = setInterval( function () {
 				if ( isStatWasStarted ) {
 					event.preventDefault();
-					return false;
-				}
-
-				if (timerStarted) {
-					timerStarted = true;
 					return false;
 				}
 
@@ -458,8 +454,8 @@ jQuery( function ( $ ) {
 
 				updateStatistics();
 
+				location.reload();
 				event.preventDefault();
-				location.reload()
 			}, 1000 * 300 );
 		}
 	}

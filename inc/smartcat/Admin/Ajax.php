@@ -152,6 +152,10 @@ final class Ajax implements HookInterface {
 				$statistic->set_status('sended');
 				$statistic_repository->update($statistic);
 
+				$data["statistic"] = [
+					'status' => __( 'In progress', 'translation-connectors' )
+				];
+
 				$ajax_response->send_success( 'ok', $data );
 			}
 
@@ -266,6 +270,8 @@ final class Ajax implements HookInterface {
 		} else {
 			$ajax_response->send_error( 'Task was not created', $data );
 		}
+
+		spawn_cron();
 
 		wp_die();
 	}
