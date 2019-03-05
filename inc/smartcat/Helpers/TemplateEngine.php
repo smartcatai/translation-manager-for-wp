@@ -18,7 +18,7 @@ class TemplateEngine extends \Mustache_Engine {
 			call_user_func_array($function, $args);
 			return ob_get_clean();
 		} catch (\Throwable $e) {
-			Logger::warning("Can't call user func to string");
+			Logger::warning("Can't call user func '{$function}' to string. {$e->getMessage()}");
 		}
 
 		return false;
