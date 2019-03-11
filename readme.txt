@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 5.0.3
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,6 +72,11 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 1. Translation Connectors Settings.
 
 == Changelog ==
+
+= 1.2.0 (2019-03-11) =
+* Bug fixes
+* Using Smartcat Client API v2
+* Adding template engine
 
 = 1.1.0 (2019-02-26) =
 * A new "Smartcat project" column in the Localization Dashboard with a link leading to the translation project in Smartcat.
