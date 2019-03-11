@@ -6,6 +6,7 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\Helpers\Cryptographer;
 use SmartCAT\WP\Helpers\SmartCAT;
+use SmartCAT\WP\Helpers\TemplateEngine;
 use SmartCAT\WP\WP\InitInterface;
 use SmartCAT\WP\WP\Options;
 
@@ -16,9 +17,6 @@ final class Settings implements InitInterface {
 	use DITrait;
 
 	static function add_admin_menu() {
-		//add_options_page('Test Options', 'Test Options', 'edit_pages', 'testoptions', 'mt_options_page'); // это для меню "Настройки"
-		//add_management_page('Test Manage', 'Test Manage', 'edit_pages', 'testmanage', 'mt_manage_page'); // для добавления в меню "Управление"
-
 		add_menu_page(
 			__( 'Localization', 'translation-connectors' ),
 			__( 'Localization', 'translation-connectors' ),
@@ -26,8 +24,8 @@ final class Settings implements InitInterface {
 			'sc-settings',
 			[ self::class, 'render_settings_page' ],
 			'dashicons-translation'
-		//plugins_url('/images/dashicon.png', SMARTCAT_PLUGIN_FILE)
 		);
+
 		add_submenu_page( 'sc-settings', __( 'Settings', 'translation-connectors' ),
 			__( 'Settings', 'translation-connectors' ),
 			'edit_pages',
@@ -63,14 +61,14 @@ final class Settings implements InitInterface {
 		add_settings_section(
 			'smartcat_required',
 			__( 'Required settings', 'translation-connectors' ),
-			[ self::class, 'dummy_callback' ],
+			[ FrontendCallbacks::class, 'dummy_callback' ],
 			'smartcat'
 		);
 
 		add_settings_section(
 			'smartcat_additional',
 			__( 'Additional settings', 'translation-connectors' ),
-			[ self::class, 'dummy_callback' ],
+			[ FrontendCallbacks::class, 'dummy_callback' ],
 			'smartcat'
 		);
 
@@ -78,7 +76,7 @@ final class Settings implements InitInterface {
 		add_settings_field(
 			$server,
 			__( 'API server', 'translation-connectors' ),
-			[ self::class, 'select_callback' ],
+			[ FrontendCallbacks::class, 'select_callback' ],
 			'smartcat',
 			'smartcat_required',
 			[
@@ -95,7 +93,7 @@ final class Settings implements InitInterface {
 		add_settings_field(
 			$login,
 			__( 'API login', 'translation-connectors' ),
-			[ self::class, 'input_text_callback' ],
+			[ FrontendCallbacks::class, 'input_text_callback' ],
 			'smartcat',
 			'smartcat_required',
 			[ 'label_for' => $login, 'option_name' => $login ]
@@ -104,7 +102,7 @@ final class Settings implements InitInterface {
 		add_settings_field(
 			$password,
 			__( 'API password', 'translation-connectors' ),
-			[ self::class, 'input_text_callback' ],
+			[ FrontendCallbacks::class, 'input_text_callback' ],
 			'smartcat',
 			'smartcat_required',
 			[
@@ -117,7 +115,7 @@ final class Settings implements InitInterface {
 		add_settings_field(
 			$workflow_stages,
 			__( 'Workflow stages', 'translation-connectors' ),
-			[ self::class, 'input_checkbox_callback' ],
+			[ FrontendCallbacks::class, 'input_checkbox_callback' ],
 			'smartcat',
 			'smartcat_additional',
 			[
@@ -134,7 +132,7 @@ final class Settings implements InitInterface {
 		add_settings_field(
 			$project_id,
 			__( 'Project id', 'translation-connectors' ),
-			[ self::class, 'input_text_callback' ],
+			[ FrontendCallbacks::class, 'input_text_callback' ],
 			'smartcat',
 			'smartcat_additional',
 			[ 'label_for' => $project_id, 'option_name' => $project_id ]
@@ -174,7 +172,6 @@ final class Settings implements InitInterface {
 					$options->set('smartcat_api_login', null);
 					$options->set('smartcat_api_password', null);
 					Connector::set_core_parameters();
-					//die( 'Invalid username or password' );
 				}
 			}
 
@@ -185,7 +182,7 @@ final class Settings implements InitInterface {
 				add_settings_field(
 					$vendor_id,
 					__( 'Vendor ID', 'translation-connectors' ),
-					[ self::class, 'select_callback' ],
+					[ FrontendCallbacks::class, 'select_callback' ],
 					'smartcat',
 					'smartcat_additional',
 					[
@@ -198,66 +195,82 @@ final class Settings implements InitInterface {
 		}
 	}
 
-	static function select_callback( $args ) {
-		$option = get_option( $args['option_name'] );
-		echo '<select id="' . esc_attr( $args['label_for'] ) . '" name="' . esc_attr( $args['option_name'] ) . '">';
-
-		foreach ( $args['select_options'] as $select_option_value => $select_option_name ) {
-			$escaped_select_option_value = esc_attr( $select_option_value );
-			$select_option_name          = __( $select_option_name,
-				'translation-connectors' ); //на всякий случай оборачиваю в локализацию
-			echo "<option value='{$escaped_select_option_value}' "
-			     . selected( $option, $select_option_value, false ) . ">{$select_option_name}</option>";
-		}
-
-		echo '</select>';
-	}
-
-	static function input_radio_callback( $args ) {
-		//на случай добавления радиобаттонов, пока не используется
-	}
-
-	static function input_checkbox_callback( $args ) {
-		$option_name = $args['option_name'];
-		$option      = get_option( $option_name );
-		if ( ! $option ) {
-			$option = [ 'Translation' ];
-		}
-		foreach ( $args['checkboxes_list'] as $checkbox_value => $checkbox_text ) {
-			$checkbox_text = __( $checkbox_text, 'translation-connectors' ); //на всякий случай оборачиваю в локализацию
-			echo '<label for="' . esc_attr( $checkbox_value ) . '"><input name="'
-			     . esc_attr( $option_name . '[]' )
-			     . '" type="checkbox" id="' . esc_attr( $checkbox_value ) . '" value="' . esc_attr( $checkbox_value ) . '" '
-			     . ( in_array( $checkbox_value, $option ) ? 'checked' : '' ) . '/>' . $checkbox_text . '</label>';
-		}
-	}
-
-	static function input_text_callback( $args ) {
-		$option_name = $args['option_name'];
-		$option      = get_option( $option_name );
-		$type        = isset( $args['type'] ) ? esc_attr( $args['type'] ) : 'text';
-
-		if ( $type == 'password' && ! empty( $option ) ) {
-			$option = '******';
-		}
-
-		echo '<input type="' . $type . '" id="' . esc_attr( $args['label_for'] )
-		     . '" name="' . esc_attr( $option_name )
-		     . '" value="' . esc_attr( $option ) . '"/>';
-	}
-
-	static function dummy_callback() {
-		//используется в качестве коллбэка для секций
-	}
-
 	static function render_settings_page() {
-		/** @noinspection PhpIncludeInspection */
-		include SMARTCAT_PLUGIN_DIR . '/views/settings.php';
+		$container = self::get_container();
+		/** @var TemplateEngine $render */
+		$render = $container->get('templater');
+
+		echo $render->render('settings', [
+			'title' => $GLOBALS['title'],
+			'saved' => isset( $_GET['settings-updated'] ),
+			'message' => __( 'Settings saved.' ),
+			'fields' => function () use ($render) {
+				return $render->ob_to_string('settings_fields', 'smartcat');
+			},
+			'sections' => function () use ($render) {
+			    return $render->ob_to_string('do_settings_sections', 'smartcat');
+			},
+			'save_changes' => __( 'Save Changes' )
+		]);
 	}
 
 	static function render_progress_page() {
-		/** @noinspection PhpIncludeInspection */
-		include SMARTCAT_PLUGIN_DIR . '/views/progress.php';
+		$container = self::get_container();
+		/** @var TemplateEngine $render */
+		$render = $container->get('templater');
+		$statistics_repository = $container->get( 'entity.repository.statistic' );
+		$options = $container->get( 'core.options' );
+
+		$limit = 100;
+
+		$statistics_table = new StatisticsTable();
+		$max_page = ceil( $statistics_repository->get_count() / $limit );
+		$page = self::get_page($max_page);
+		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
+		$statistics_result = $statistics_repository->get_statistics( $limit * ( $page - 1 ), $limit );
+
+		echo $render->render('dashboard', [
+			'title' => $GLOBALS['title'],
+			'button_status' => $is_statistics_queue_active ? 'disabled="disabled"' : false,
+			'statistic_result' => $statistics_result ? true : false,
+			'refresh_text' => __( 'Refresh statistics', 'translation-connectors' ),
+			'statistic_table' => function () use ($statistics_table, $render, $statistics_result) {
+				$table_with_data = $statistics_table->set_data( $statistics_result );
+				return 	$render->ob_to_string([$table_with_data, 'display']);
+			},
+			'pages_text' => __( 'Pages', 'translation-connectors' ),
+			'empty_message' => __( 'Statistics is empty', 'translation-connectors' ),
+			'paginator' => function () use ($max_page, $page) {
+				return self::get_paginator_code($max_page, $page);
+			}
+		]);
+	}
+
+	static private function get_paginator_code($max_page, $page)
+	{
+		$url = strtok( $_SERVER['REQUEST_URI'], '?' );
+
+		$paginator = '';
+
+		for ( $page_number = 1; $page_number <= $max_page; $page_number ++ ) {
+			if ( $page_number == $page ) {
+				$paginator .= "<span>{$page_number}</span>";
+			} else {
+				$full_url = esc_html( $url . '?page=sc-translation-progress&page-number=' . $page_number );
+				$paginator .= '<a href="' . $full_url . '">' . $page_number . '</a>';
+			}
+		}
+
+		return $paginator;
+	}
+
+	static private function get_page($max_page)
+	{
+		$page = isset( $_GET['page-number'] ) ? abs( intval( $_GET['page-number'] ) ) : 1;
+		$page = ( $page > $max_page ) ? $max_page : $page;
+		$page = ( $page >= 1 ) ? $page : 1;
+
+		return $page;
 	}
 
 	public function plugin_init() {

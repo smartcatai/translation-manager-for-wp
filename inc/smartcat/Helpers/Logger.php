@@ -8,7 +8,6 @@
 
 namespace SmartCAT\WP\Helpers;
 
-
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Error;
 use SmartCAT\WP\DB\Repository\ErrorRepository;

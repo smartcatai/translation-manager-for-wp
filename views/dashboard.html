@@ -1,0 +1,20 @@
+<div class="smartcat-connector wrap">
+    <h1 class="wp-heading-inline">{{ title }}</h1>
+    <input type="button" class="page-title-action"
+           id="smartcat-connector-refresh-statistics"
+           value="{{ refresh_text }}" {{ button_status }} />
+
+    <hr class="wp-header-end" />
+
+    {{# statistic_result }}
+        {{# statistic_table }}{{/ statistic_table }}
+        <div class="pagination">
+            <span class="title">{{ pages_text }}:</span>
+            {{# paginator }}{{/ paginator }}
+        </div>
+    {{/ statistic_result }}
+
+    {{^ statistic_result }}
+        <div> {{ empty_message }} </div>
+    {{/ statistic_result }}
+</div>

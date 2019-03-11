@@ -10,10 +10,10 @@ namespace SmartCAT\WP\Cron;
 
 use Http\Client\Common\Exception\ClientErrorException;
 use Psr\Container\ContainerInterface;
-use SmartCAT\API\Model\BilingualFileImportSettingsModel;
-use SmartCAT\API\Model\CreateDocumentPropertyWithFilesModel;
-use SmartCAT\API\Model\CreateProjectWithFilesModel;
-use SmartCAT\API\Model\ProjectChangesModel;
+use SmartCat\Client\Model\BilingualFileImportSettingsModel;
+use SmartCat\Client\Model\CreateDocumentPropertyWithFilesModel;
+use SmartCat\Client\Model\CreateProjectWithFilesModel;
+use SmartCat\Client\Model\ProjectChangesModel;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
@@ -26,9 +26,9 @@ use SmartCAT\WP\WP\Options;
 class SendToSmartCAT extends CronAbstract {
 
 	public function get_interval() {
-		$schedules['5m'] = [
-			'interval' => 300,
-			'display'  => __( 'Every 5 minutes', 'translation-connectors' ),
+		$schedules['1m'] = [
+			'interval' => 60,
+			'display'  => __( 'Every minute', 'translation-connectors' ),
 		];
 
 		return $schedules;

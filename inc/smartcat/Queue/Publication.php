@@ -15,7 +15,6 @@ use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 
-
 /** Обработка очереди "Публикация перевода" */
 class Publication extends QueueAbstract {
 	protected $action = 'smartcat_publication_async';

@@ -8,7 +8,6 @@
 
 namespace SmartCAT\WP\Cron;
 
-
 interface CronInterface {
 
 	/** Получение информации об интервале выполнения задачи */

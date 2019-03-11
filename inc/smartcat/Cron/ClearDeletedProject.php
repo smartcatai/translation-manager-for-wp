@@ -8,7 +8,6 @@
 
 namespace SmartCAT\WP\Cron;
 
-
 /** Отчистка удаленных проектов */
 class ClearDeletedProject extends CronAbstract {
 

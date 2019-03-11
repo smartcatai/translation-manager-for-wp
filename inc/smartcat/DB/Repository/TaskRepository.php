@@ -10,7 +10,6 @@ namespace SmartCAT\WP\DB\Repository;
 
 use SmartCAT\WP\DB\Entity\Task;
 
-
 /** Репозиторий таблицы обмена */
 class TaskRepository extends RepositoryAbstract {
 	const TABLE_NAME = 'tasks';

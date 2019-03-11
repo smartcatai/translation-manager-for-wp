@@ -8,7 +8,6 @@
 
 namespace SmartCAT\WP;
 
-
 class VariableStream {
 	private $position;
 	private $varname;

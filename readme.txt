@@ -1,6 +1,6 @@
 === Translation connectors ===
-Contributors: arybnikov, dkhapenkov
-Tags: translation, localization, localisation, translate, multilingual, internationalization, internationalisation, automation, international, language
+Contributors: arybnikov, dkhapenkov, medic84
+Tags: localization, translation, translators, language, multilingual, bilingual, i18n, l10n
 Requires at least: 4.8
 Tested up to: 5.0.3
 Requires PHP: 7.0
@@ -9,29 +9,57 @@ Stable tag: 1.1.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Smartcat Translation Manager offers the easiest way to translate your Wordpress pages and posts into any language in a few clicks.
+Smartcat Translation Manager offers the easiest way to translate your WordPress pages and posts into any language in a few clicks.
 
 == Description ==
 
-We’ve developed this plugin for those who create great content and want to share it with the whole world. Smartcat Translation Manager helps you connect with a global audience by effortlessly translating pages and posts into other languages.
+[Smartcat](https://www.smartcat.ai) connects linguists, companies, and agencies to streamline the translation of any content into any language, on demand. Our platform puts your translation process on autopilot, from content creation to payments.
 
-== How it works ==
+The extension works by linking your WordPress website to a Smartcat account and pushing the content for translation upon request. After the translation is done in Smartcat — either by yourself, your own volunteers, or hired vendors — it is automatically pulled back to WordPress.
 
-1. Select one or several posts.
-2. Send them to the translation service by clicking the “Send to translation” button or choosing the appropriate bulk action.
-3. Once the translation is completed, a new draft will appear containing the translated text.
+== Account & pricing ==
+
+You need to create a Smartcat account as one is not automatically created when installing the extension. To create an account please visit the signup page at [www.smartcat.ai](https://www.smartcat.ai). All translation features in Smartcat are free to use.
+
+== Features ==
+
+- Integrate your WordPress website to a specific Smartcat account
+- Choose the translation vendor
+- Automatically send new or updated content for translation
+- Choose translation workflow stages — translation, editing, proofreading, etc.
+- Send content to a specific Smartcat project
+- Send content for translation in batches
+
+== Benefits of Smartcat ==
+
+- No document re-formatting is required
+- Easy-to-use multilingual translation editor
+- Multi-stage translation process — e.g., translation, editing proofreading
+- Free collaboration with your own volunteers or coworkers
+- [Marketplace](https://www.smartcat.ai/marketplace/) of 250,000+ translators and 2,000+ agencies in 100+ language pairs
+- Track progress by language, document, or person
+- Automated payments to translation suppliers
+- Free support to optimize localization processes
 
 == Installation ==
 
 Please note! For this plugin to work, you need to install the Polylang plugin first.
 
-1. Install the Smartcat Translation Manager plugin manually with an FTP client by navigating to '/wp-content/plugins/translation-connectors/', or automatically through the upload feature in the WordPress dashboard.
-2. Install and then activate [Polylang plugin](https://wordpress.org/plugins/polylang/) on the “Plugins” page.
-3. Activate the Smartcat Translation Manager plugin.
-4. Sign up to [Smartcat](https://www.smartcat.ai), go to the [API page](https://smartcat.ai/ApiAccess/Credentials) and generate an API key.
-5. Back in Wordpress, go to the plugin’s settings page (Settings→Smartcat Translation Manager) and enter your API credentials.
+1. Install and activate [Polylang plugin](https://wordpress.org/plugins/polylang/) on the “Plugins” page
+2. Install and activate Smartcat Translation Manager plugin
+3. Sign up to [Smartcat](https://www.smartcat.ai)
+4. Go to the [API page](https://smartcat.ai/settings/api) and generate an API key.
+5. At WordPress, go to Localization -> Settings and enter your API credentials.
 
 You’re all set! The world is waiting for your content, so go ahead and translate it in a simple and quick way.
+
+== Support ==
+
+Contact us at support@smartcat.ai with any questions related to:
+- Module issues
+- Assistance in vendor management (freelancers or LSPs)
+- Use of the module for your clients’ needs
+
 
 == Frequently Asked Questions ==
 

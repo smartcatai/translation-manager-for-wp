@@ -62,7 +62,7 @@ final class Ajax implements HookInterface {
 		//проверка, что с кредами все ок
 		$account_info = null;
 		try {
-			$api          = new \SmartCAT\API\SmartCAT( $login, $password, $server );
+			$api          = new \SmartCat\Client\SmartCAT( $login, $password, $server );
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
 			$is_ok        = (bool) $account_info->getId();
 			if ( ! $is_ok ) {
@@ -151,6 +151,10 @@ final class Ajax implements HookInterface {
 			if ($statistic->get_target_post_id()) {
 				$statistic->set_status('sended');
 				$statistic_repository->update($statistic);
+
+				$data["statistic"] = [
+					'status' => __( 'In progress', 'translation-connectors' )
+				];
 
 				$ajax_response->send_success( 'ok', $data );
 			}
@@ -266,6 +270,8 @@ final class Ajax implements HookInterface {
 		} else {
 			$ajax_response->send_error( 'Task was not created', $data );
 		}
+
+		spawn_cron();
 
 		wp_die();
 	}

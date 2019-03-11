@@ -16,7 +16,6 @@ use SmartCAT\WP\Helpers\Language\LanguageConverter;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 
-
 /** Обработка очереди "Создания постов" */
 class CreatePost extends QueueAbstract {
 	protected $action = 'smartcat_createpost_async';

@@ -27,6 +27,7 @@ class StatisticsTable extends \WP_List_Table {
 
 	public function display() {
 		$this->prepare_items();
+		spawn_cron();
 		parent::display();
 	}
 
@@ -138,7 +139,7 @@ class StatisticsTable extends \WP_List_Table {
 				$message = '-';
 
 				if ( ! empty( $item->get_target_post_id() && $item->get_status() == 'completed') ) {
-					$message = "<a href='#'  class='refresh_stat_button' data-bind='{$item->get_id()}'>" . __( 'Check updates', 'translation-connectors' ) . "</a>";
+					$message = "<a href='javascript:void(0);'  class='refresh_stat_button' data-bind='{$item->get_id()}'>" . __( 'Check updates', 'translation-connectors' ) . "</a>";
 				}
 
 				return $message;

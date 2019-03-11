@@ -8,7 +8,6 @@
 
 namespace SmartCAT\WP\DB\Entity;
 
-
 class Task {
 	/** @var  integer */
 	private $id;
