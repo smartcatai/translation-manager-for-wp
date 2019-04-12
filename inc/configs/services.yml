@@ -95,6 +95,9 @@ services:
   cryptographer:
       class: \SmartCAT\WP\Helpers\Cryptographer
 
+  templater:
+      class: \SmartCAT\WP\Helpers\TemplateEngine
+
   language.converter:
       class: \SmartCAT\WP\Helpers\Language\LanguageConverter
 

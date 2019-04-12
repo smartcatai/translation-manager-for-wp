@@ -9,7 +9,7 @@
 namespace SmartCAT\WP\DB\Repository;
 
 use Psr\Container\ContainerInterface;
-use SmartCAT\API\Model\DocumentModel;
+use SmartCat\Client\Model\DocumentModel;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Entity\Task;

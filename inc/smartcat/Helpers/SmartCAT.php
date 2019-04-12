@@ -11,7 +11,7 @@ namespace SmartCAT\WP\Helpers;
 
 use SmartCAT\WP\Connector;
 
-class SmartCAT extends \SmartCAT\API\SmartCAT {
+class SmartCAT extends \SmartCat\Client\SmartCat {
 	/**
 	 * Проверяет можно ли использовать АПИ. Имеются ли сохраненые в настройках данные для доступа к АПИ
 	 */

@@ -137,25 +137,17 @@ $copyFiles = [
 ];
 
 $rmDirs = [
-	'inc/vendor/symfony/polyfill-php70/Resources/stubs',
 	'inc/vendor/symfony/dependency-injection/.git',
 	'inc/vendor/symfony/dependency-injection/Tests',
 	'inc/vendor/symfony/config/.git',
 	'inc/vendor/symfony/config/Tests',
 	'inc/vendor/symfony/filesystem/Tests',
-	'inc/vendor/symfony/property-access/Tests',
-	'inc/vendor/symfony/inflector/Tests',
 	'inc/vendor/symfony/serializer/Tests',
-	'inc/vendor/symfony/console/Tests',
-	'inc/vendor/symfony/debug/Tests',
 	'inc/vendor/symfony/yaml/Tests',
 	'inc/vendor/symfony/options-resolver/Tests',
-	'inc/vendor/symfony/debug/Resources/ext/tests',
-	'inc/vendor/jane/jane/tests',
-	'inc/vendor/jane/open-api/tests',
-	'inc/vendor/jane/openapi-runtime/tests',
-	'inc/vendor/jane/runtime/tests',
 	'inc/vendor/clue/stream-filter/tests',
+	'inc/vendor/mustache/mustache/test',
+	'inc/vendor/ralouphie/getallheaders/tests',
 ];
 
 chdir( __DIR__ . "/.." );
@@ -167,6 +159,14 @@ if ( ! file_exists( "$resDir/trunk" ) ) {
 
 chdir( "$resDir" );
 
+echo('=== 15% Updating svn to latest version ===' . PHP_EOL);
+exec('svn up');
+
+if (is_dir("$resDir/tags/$version")) {
+	die('ERROR: This version already exists!');
+}
+
+echo('=== 30% Copy files ===' . PHP_EOL);
 foreach ( $copyFiles as $file ) {
 	copy( __DIR__ . "/../$file", "$resDir/trunk/$file" );
 }
@@ -176,13 +176,20 @@ foreach ( $copyDirs as $dir ) {
 }
 
 foreach ( $rmDirs as $dir ) {
-	exec( "svn rm " . "$resDir/trunk/$dir");
+	exec( "svn --force rm " . "$resDir/trunk/$dir");
 	rrmdir( "$resDir/trunk/$dir" );
 }
 
+echo('=== 45% Delete files from svn ===' . PHP_EOL);
+exec("svn status | grep '^!' | awk '{print $2}' | xargs svn delete");
 
+echo('=== 60% Adding files to snv ===' . PHP_EOL);
+exec( "svn --force --depth infinity add ." );
+
+echo('=== 75% Commiting changes ===' . PHP_EOL);
 exec( "svn commit -m \"$message\"" );
 
+echo('=== 90% Create new version ===' . PHP_EOL);
 if ( ! file_exists( "$resDir/tags/$version" ) ) {
 	mkdir( "$resDir/tags/$version", 0777, true );
 }
@@ -190,3 +197,4 @@ if ( ! file_exists( "$resDir/tags/$version" ) ) {
 exec( "svn --force --depth infinity add ." );
 exec( "svn cp trunk/* tags/$version" );
 exec( "svn commit  -m \"$message\"" );
+echo('=== 100% Done ===' . PHP_EOL);

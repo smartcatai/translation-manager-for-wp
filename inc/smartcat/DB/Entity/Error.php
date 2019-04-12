@@ -8,7 +8,6 @@
 
 namespace SmartCAT\WP\DB\Entity;
 
-
 class Error {
 	/** @var  integer */
 	private $id;

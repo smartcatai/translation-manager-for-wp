@@ -10,10 +10,11 @@ namespace SmartCAT\WP\Cron;
 
 use Http\Client\Common\Exception\ClientErrorException;
 use Psr\Container\ContainerInterface;
-use SmartCAT\API\Model\BilingualFileImportSettingsModel;
-use SmartCAT\API\Model\CreateDocumentPropertyWithFilesModel;
-use SmartCAT\API\Model\CreateProjectWithFilesModel;
-use SmartCAT\API\Model\ProjectChangesModel;
+use SmartCat\Client\Model\BilingualFileImportSettingsModel;
+use SmartCat\Client\Model\CreateDocumentPropertyWithFilesModel;
+use SmartCat\Client\Model\CreateProjectWithFilesModel;
+use SmartCat\Client\Model\DocumentModel;
+use SmartCat\Client\Model\ProjectChangesModel;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
@@ -97,12 +98,31 @@ class SendToSmartCAT extends CronAbstract {
 
 				try {
 				    SmartCAT::debug("Sending '{$task_name}'");
-					$document = $sc->getProjectManager()->projectAddDocument( [
-						'documentModel' => [ $documentModel ],
-						'projectId'     => $project_id
-					] );
-
 					$sc_project = $sc->getProjectManager()->projectGet( $project_id );
+
+					$sc_documents = $sc_project->getDocuments();
+					$sc_document_names = array_map(function (DocumentModel $value) {
+						return $value->getName() . ".html";
+					}, $sc_documents);
+
+					$index = array_search($documentModel->getFile()['fileName'], $sc_document_names);
+
+					if ($index !== false) {
+						$document = $sc->getDocumentManager()->documentUpdate([
+							'documentId' => $sc_documents[$index]->getId(),
+							'uploadedFile' => $documentModel->getFile()
+						]);
+					} else {
+						$document = $sc->getProjectManager()->projectAddDocument( [
+							'documentModel' => [ $documentModel ],
+							'projectId'     => $project_id
+						] );
+					}
+
+					if (is_array($document)) {
+						$document = array_shift($document);
+					}
+
 					$updateModel = (new ProjectChangesModel())
 						->setName($sc_project->getName())
 						->setDescription($sc_project->getDescription())
@@ -116,7 +136,7 @@ class SendToSmartCAT extends CronAbstract {
 					$task->set_project_id( $project_id );
 					$task_repository->update( $task );
 
-					$statistic_repository->link_to_smartcat_document( $task, $document[0] );
+					$statistic_repository->link_to_smartcat_document( $task, $document );
 					SmartCAT::debug("Sended '{$task_name}'");
 				} catch ( \Exception $e ) {
 					if ( $e instanceof ClientErrorException ) {

@@ -62,7 +62,7 @@ final class Ajax implements HookInterface {
 		//проверка, что с кредами все ок
 		$account_info = null;
 		try {
-			$api          = new \SmartCAT\API\SmartCAT( $login, $password, $server );
+			$api          = new \SmartCat\Client\SmartCAT( $login, $password, $server );
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
 			$is_ok        = (bool) $account_info->getId();
 			if ( ! $is_ok ) {
