@@ -165,6 +165,7 @@ class SendToSmartCAT extends CronAbstract {
 						$project_model->setAssignToVendor( false );
 					}
 
+					$project_model->setDescription('Wordpress Smartcat сonnector');
 					$project_model->setExternalTag('source:WPPL');
 					$project_model->attacheFile( $file, $sc::filter_chars( $file_name ) );
 
