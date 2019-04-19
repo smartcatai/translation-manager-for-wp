@@ -196,12 +196,14 @@ final class Settings implements InitInterface {
 	}
 
 	static function render_settings_page() {
+        $isCookie = isset($_COOKIE['regform']);
 		$container = self::get_container();
 		/** @var TemplateEngine $render */
 		$render = $container->get('templater');
 
 		echo $render->render('settings', [
 			'title' => $GLOBALS['title'],
+            'isCookie' => $isCookie,
 			'saved' => isset( $_GET['settings-updated'] ),
 			'message' => __( 'Settings saved.' ),
 			'fields' => function () use ($render) {
@@ -215,6 +217,7 @@ final class Settings implements InitInterface {
 	}
 
 	static function render_progress_page() {
+        $isCookie = isset($_COOKIE['regform']);
 		$container = self::get_container();
 		/** @var TemplateEngine $render */
 		$render = $container->get('templater');
@@ -231,6 +234,7 @@ final class Settings implements InitInterface {
 
 		echo $render->render('dashboard', [
 			'title' => $GLOBALS['title'],
+			'isCookie' => $isCookie,
 			'button_status' => $is_statistics_queue_active ? 'disabled="disabled"' : false,
 			'statistic_result' => $statistics_result ? true : false,
 			'refresh_text' => __( 'Refresh statistics', 'translation-connectors' ),
