@@ -201,6 +201,8 @@ final class Settings implements InitInterface {
 		/** @var TemplateEngine $render */
 		$render = $container->get('templater');
 
+		add_thickbox();
+
 		echo $render->render('settings', [
 			'title' => $GLOBALS['title'],
             'isCookie' => $isCookie,
@@ -231,6 +233,8 @@ final class Settings implements InitInterface {
 		$page = self::get_page($max_page);
 		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
 		$statistics_result = $statistics_repository->get_statistics( $limit * ( $page - 1 ), $limit );
+
+		add_thickbox();
 
 		echo $render->render('dashboard', [
 			'title' => $GLOBALS['title'],
