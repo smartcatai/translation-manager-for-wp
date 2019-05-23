@@ -293,12 +293,26 @@ class StatisticRepository extends RepositoryAbstract {
 		}
 	}
 
-	public function link_to_smartcat_document( Task $task, DocumentModel $document ) {
+    /**
+     * @param Task $task
+     * @param DocumentModel[]|DocumentModel $document
+     * @return false|int
+     * @throws \SmartCAT\WP\Helpers\Language\Exceptions\LanguageNotFoundException
+     */
+    public function link_to_smartcat_document(Task $task, $document ) {
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
 
 		/** @var LanguageConverter $converter */
 		$converter = $container->get( 'language.converter' );
+
+		if (is_array($document)) {
+		    foreach ($document as $singleDocument) {
+		        if ($singleDocument instanceof DocumentModel) {
+                    $this->link_to_smartcat_document($task, $singleDocument);
+                }
+            }
+        }
 
 		$table_name = $this->get_table_name();
 		$wpdb       = $this->get_wp_db();
