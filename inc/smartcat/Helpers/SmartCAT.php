@@ -102,14 +102,14 @@ class SmartCAT extends \SmartCat\Client\SmartCat
         ] );
 
         /** @var ProjectModel $sc_project */
-        $sc_project = $sc->getProjectManager()->projectGet( $project_id );
+        $sc_project = $this->getProjectManager()->projectGet( $project_id );
         $updateModel = (new ProjectChangesModel())
             ->setName($sc_project->getName())
             ->setDescription($sc_project->getDescription())
             ->setExternalTag('source:WPPL');
 
         if ($sc_project->getExternalTag() != 'source:WPPL') {
-            $sc->getProjectManager()->projectUpdateProject( $project_id, $updateModel );
+            $this->getProjectManager()->projectUpdateProject( $project_id, $updateModel );
         }
 
         return array_shift( $document );
