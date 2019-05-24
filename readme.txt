@@ -89,7 +89,8 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 * General bug fixes.
 
 = 1.0.13 (2019-01-23) =
-* Fix tested version
+* Auto send on post update
+* Fix linebreaks bugs
 
 = 1.0.12 (2019-01-25) =
 * Add external tag
