@@ -1,117 +1,131 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 09.08.2017
- * Time: 15:28
+ * @package    Smartcat Translation Manager for Wordpress
+ *
+ * @author     Smartcat <support@smartcat.ai>
+ * @copyright  (c) 2019 Smartcat. All Rights Reserved.
+ * @license    GNU General Public License version 3 or later; see LICENSE.txt
+ * @link       http://smartcat.ai
  */
 
 namespace SmartCAT\WP\DB\Entity;
 
-class Error {
-	/** @var  integer */
-	private $id;
+use DateTime;
 
-	/** @var  \DateTime */
-	private $date;
+class Error
+{
+    /** @var  integer */
+    private $id;
 
-	/** @var  string */
-	private $type;
+    /** @var  DateTime */
+    private $date;
 
-	/** @var  string */
-	private $short_message;
+    /** @var  string */
+    private $type;
 
-	/** @var  string */
-	private $message;
+    /** @var  string */
+    private $short_message;
 
-	/**
-	 * @return int
-	 */
-	public function get_id() {
-		return $this->id;
-	}
+    /** @var  string */
+    private $message;
 
-	/**
-	 * @param int $id
-	 *
-	 * @return Error
-	 */
-	public function set_id( int $id ): Error {
-		$this->id = $id;
+    /**
+     * @return int
+     */
+    public function get_id()
+    {
+        return $this->id;
+    }
 
-		return $this;
-	}
+    /**
+     * @param int $id
+     *
+     * @return Error
+     */
+    public function set_id($id)
+    {
+        $this->id = $id;
 
-	/**
-	 * @return \DateTime
-	 */
-	public function get_date() {
-		return $this->date;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param \DateTime $date
-	 *
-	 * @return Error
-	 */
-	public function set_date( \DateTime $date ): Error {
-		$this->date = $date;
+    /**
+     * @return DateTime
+     */
+    public function get_date()
+    {
+        return $this->date;
+    }
 
-		return $this;
-	}
+    /**
+     * @param DateTime $date
+     *
+     * @return Error
+     */
+    public function set_date(DateTime $date)
+    {
+        $this->date = $date;
 
-	/**
-	 * @return string
-	 */
-	public function get_type() {
-		return $this->type;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $type
-	 *
-	 * @return Error
-	 */
-	public function set_type( string $type ): Error {
-		$this->type = $type;
+    /**
+     * @return string
+     */
+    public function get_type()
+    {
+        return $this->type;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $type
+     *
+     * @return Error
+     */
+    public function set_type($type)
+    {
+        $this->type = $type;
 
-	/**
-	 * @return string
-	 */
-	public function get_short_message() {
-		return $this->short_message;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $short_message
-	 *
-	 * @return Error
-	 */
-	public function set_short_message( string $short_message ): Error {
-		$this->short_message = $short_message;
+    /**
+     * @return string
+     */
+    public function get_short_message()
+    {
+        return $this->short_message;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $short_message
+     *
+     * @return Error
+     */
+    public function set_short_message($short_message)
+    {
+        $this->short_message = $short_message;
 
-	/**
-	 * @return string
-	 */
-	public function get_message() {
-		return $this->message;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $message
-	 *
-	 * @return Error
-	 */
-	public function set_message( string $message ): Error {
-		$this->message = $message;
+    /**
+     * @return string
+     */
+    public function get_message()
+    {
+        return $this->message;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $message
+     *
+     * @return Error
+     */
+    public function set_message($message)
+    {
+        $this->message = $message;
 
+        return $this;
+    }
 }

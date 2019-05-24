@@ -1,137 +1,143 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 17.07.2017
- * Time: 14:11
+ * @package    Smartcat Translation Manager for Wordpress
+ *
+ * @author     Smartcat <support@smartcat.ai>
+ * @copyright  (c) 2019 Smartcat. All Rights Reserved.
+ * @license    GNU General Public License version 3 or later; see LICENSE.txt
+ * @link       http://smartcat.ai
  */
 
 namespace SmartCAT\WP\DB\Entity;
 
 class Task {
-	/** @var  integer */
-	private $id;
+    const STATUS_NEW = 'new';
+    const STATUS_FAILED = 'failed';
+    const STATUS_CREATED = 'created';
 
-	/** @var  string */
-	private $source_language;
+    /** @var  integer */
+    private $id;
 
-	/** @var  string[] */
-	private $target_languages;
+    /** @var  string */
+    private $source_language;
 
-	/** @var  integer */
-	private $post_id;
+    /** @var  string[] */
+    private $target_languages;
 
-	/** @var  string */
-	private $status;
+    /** @var  integer */
+    private $post_id;
 
-	/** @var  string */
-	private $project_id = null;
+    /** @var  string */
+    private $status;
 
-	/**
-	 * @return int
-	 */
-	public function get_id() {
-		return $this->id;
-	}
+    /** @var  string */
+    private $project_id = null;
 
-	/**
-	 * @param int $id
-	 *
-	 * @return Task
-	 */
-	public function set_id( $id ) {
-		$this->id = $id;
+    /**
+     * @return int
+     */
+    public function get_id() {
+        return $this->id;
+    }
 
-		return $this;
-	}
+    /**
+     * @param int $id
+     *
+     * @return Task
+     */
+    public function set_id($id) {
+        $this->id = $id;
 
-	/**
-	 * @return string
-	 */
-	public function get_source_language() {
-		return $this->source_language;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $source_language
-	 *
-	 * @return Task
-	 */
-	public function set_source_language( $source_language ) {
-		$this->source_language = $source_language;
+    /**
+     * @return string
+     */
+    public function get_source_language() {
+        return $this->source_language;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $source_language
+     *
+     * @return Task
+     */
+    public function set_source_language($source_language) {
+        $this->source_language = $source_language;
 
-	/**
-	 * @return string[]
-	 */
-	public function get_target_languages() {
-		return $this->target_languages;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string[] $target_languages
-	 *
-	 * @return Task
-	 */
-	public function set_target_languages( $target_languages ) {
-		$this->target_languages = $target_languages;
+    /**
+     * @return string[]
+     */
+    public function get_target_languages() {
+        return $this->target_languages;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string[] $target_languages
+     *
+     * @return Task
+     */
+    public function set_target_languages($target_languages) {
+        $this->target_languages = $target_languages;
 
-	/**
-	 * @return int
-	 */
-	public function get_post_id() {
-		return $this->post_id;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param int $post_id
-	 *
-	 * @return Task
-	 */
-	public function set_post_id( $post_id ) {
-		$this->post_id = $post_id;
+    /**
+     * @return int
+     */
+    public function get_post_id() {
+        return $this->post_id;
+    }
 
-		return $this;
-	}
+    /**
+     * @param int $post_id
+     *
+     * @return Task
+     */
+    public function set_post_id($post_id) {
+        $this->post_id = $post_id;
 
-	/**
-	 * @return string
-	 */
-	public function get_status() {
-		return $this->status;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $status
-	 *
-	 * @return Task
-	 */
-	public function set_status( $status ) {
-		$this->status = $status;
+    /**
+     * @return string
+     */
+    public function get_status() {
+        return $this->status;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $status
+     *
+     * @return Task
+     */
+    public function set_status($status) {
+        $this->status = $status;
 
-	/**
-	 * @return string|null
-	 */
-	public function get_project_d() {
-		return $this->project_id;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $project_id
-	 *
-	 * @return Task
-	 */
-	public function set_project_id( $project_id ) {
-		$this->project_id = $project_id;
+    /**
+     * @return string|null
+     */
+    public function get_project_d() {
+        return $this->project_id;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $project_id
+     *
+     * @return Task
+     */
+    public function set_project_id($project_id) {
+        $this->project_id = $project_id;
+
+        return $this;
+    }
 }

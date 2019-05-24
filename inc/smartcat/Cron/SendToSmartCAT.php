@@ -1,20 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 19.06.2017
- * Time: 18:54
+ * @package    Smartcat Translation Manager for Wordpress
+ *
+ * @author     Smartcat <support@smartcat.ai>
+ * @copyright  (c) 2019 Smartcat. All Rights Reserved.
+ * @license    GNU General Public License version 3 or later; see LICENSE.txt
+ * @link       http://smartcat.ai
  */
 
 namespace SmartCAT\WP\Cron;
 
 use Http\Client\Common\Exception\ClientErrorException;
 use Psr\Container\ContainerInterface;
-use SmartCat\Client\Model\BilingualFileImportSettingsModel;
-use SmartCat\Client\Model\CreateDocumentPropertyWithFilesModel;
-use SmartCat\Client\Model\CreateProjectWithFilesModel;
-use SmartCat\Client\Model\ProjectChangesModel;
 use SmartCAT\WP\Connector;
+use SmartCAT\WP\DB\Entity\Task;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
@@ -26,7 +25,9 @@ use SmartCAT\WP\WP\Options;
 /** Отправка постов на перевод */
 class SendToSmartCAT extends CronAbstract
 {
-
+    /**
+     * @return mixed
+     */
     public function get_interval()
     {
         $schedules['1m'] = [
@@ -89,10 +90,10 @@ class SendToSmartCAT extends CronAbstract
                     SmartCAT::debug("Creating '{$task_name}'");
                     $smartcat_project = $sc->createProject($file, $task, $converter, $workflow_stages, $vendor_id);
                     $project_id = $smartcat_project->getId();
-					$statistic_repository->link_to_smartcat_document($task, $smartcat_project->getDocuments());
-					SmartCAT::debug("Created '{$task_name}'");
-			}
-                $task->set_status('created');
+                    $statistic_repository->link_to_smartcat_document($task, $smartcat_project->getDocuments());
+                    SmartCAT::debug("Created '{$task_name}'");
+            }
+                $task->set_status(Task::STATUS_CREATED);
                 $task->set_project_id($project_id);
                 $task_repository->update($task);
 
@@ -103,7 +104,7 @@ class SendToSmartCAT extends CronAbstract
                     $message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
                 }
                 Logger::error("Send to translate $task_name", $message);
-                $task->set_status('failed');
+                $task->set_status(Task::STATUS_FAILED);
                 $task_repository->update($task);
                 $statistic_repository->mark_failed_by_task_id($task->get_id());
             }

@@ -1,26 +1,29 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 19.06.2017
- * Time: 18:54
+ * @package    Smartcat Translation Manager for Wordpress
+ *
+ * @author     Smartcat <support@smartcat.ai>
+ * @copyright  (c) 2019 Smartcat. All Rights Reserved.
+ * @license    GNU General Public License version 3 or later; see LICENSE.txt
+ * @link       http://smartcat.ai
  */
 
 namespace SmartCAT\WP\Cron;
 
 /** Отчистка удаленных проектов */
-class ClearDeletedProject extends CronAbstract {
+class ClearDeletedProject extends CronAbstract
+{
 
-	public function get_interval() {
-		$schedules['daily'] = [
-			'interval' => DAY_IN_SECONDS,
-			'display'  => __( 'Once Daily', 'translation-connectors' )
-		];
+    public function get_interval() {
+        $schedules['daily'] = [
+            'interval' => DAY_IN_SECONDS,
+            'display'  => __('Once Daily', 'translation-connectors')
+        ];
 
-		return $schedules;
-	}
+        return $schedules;
+    }
 
-	public function run() {
-
-	}
+    public function run()
+    {
+    }
 }

@@ -1,18 +1,20 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 16.06.2017
- * Time: 12:49
+ * @package    Smartcat Translation Manager for Wordpress
+ *
+ * @author     Smartcat <support@smartcat.ai>
+ * @copyright  (c) 2019 Smartcat. All Rights Reserved.
+ * @license    GNU General Public License version 3 or later; see LICENSE.txt
+ * @link       http://smartcat.ai
  */
 
 namespace SmartCAT\WP\WP;
 
+interface PluginInterface
+{
+    public function plugin_activate();
 
-interface PluginInterface {
-	public function plugin_activate();
+    public function plugin_deactivate();
 
-	public function plugin_deactivate();
-
-	public function plugin_uninstall();
+    public function plugin_uninstall();
 }
