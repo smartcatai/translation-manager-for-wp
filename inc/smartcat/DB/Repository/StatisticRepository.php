@@ -17,40 +17,14 @@ use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Entity\Task;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
 
-
 /** Репозиторий таблицы статистики */
-class StatisticRepository extends RepositoryAbstract {
+class StatisticRepository extends RepositoryAbstract
+{
     const TABLE_NAME = 'statistic';
 
-    public function get_table_name() {
+    public function get_table_name()
+    {
         return $this->prefix . self::TABLE_NAME;
-    }
-
-    public function install() {
-        $table_name = $this->get_table_name();
-        $sql        = "
-            CREATE TABLE IF NOT EXISTS {$table_name} (
-                id  BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-                taskId BIGINT(20) UNSIGNED NOT NULL,
-                postID BIGINT(20) UNSIGNED NOT NULL,
-                sourceLanguage VARCHAR(255) NOT NULL,
-                targetLanguage VARCHAR(255) NOT NULL,
-                progress DECIMAL(10,2) NOT NULL DEFAULT '0',
-                wordsCount BIGINT(20) UNSIGNED,
-                targetPostID BIGINT(20) UNSIGNED,
-                documentID VARCHAR(255),
-                status VARCHAR(20) NOT NULL DEFAULT 'new',
-                errorCount BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
-                PRIMARY KEY  (id),
-                INDEX status (`status`),
-                INDEX documentID (`documentID`)
-           ) ROW_FORMAT=DYNAMIC ";
-        $this->create_table($sql);
-    }
-
-    public function uninstall() {
-        $table_name = $this->get_table_name();
-        $this->drop_table($table_name);
     }
 
     /**
@@ -59,15 +33,20 @@ class StatisticRepository extends RepositoryAbstract {
      *
      * @return Statistics[]
      */
-    public function get_statistics($from = 0, $limit = 100) {
+    public function get_statistics($from = 0, $limit = 100)
+    {
         $wpdb = $this->get_wp_db();
         $from = intval($from);
         $from >= 0 || $from = 0;
         $limit = intval($limit);
 
         $table_name = $this->get_table_name();
-        $results    = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name LIMIT %d, %d",
-            [ $from, $limit ]));
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+            "SELECT * FROM $table_name LIMIT %d, %d",
+                [$from, $limit]
+            )
+        );
 
         return $this->prepare_result($results);
     }
@@ -79,7 +58,8 @@ class StatisticRepository extends RepositoryAbstract {
      *
      * @return Statistics[]
      */
-    public function get_sended(array $documents = []) {
+    public function get_sended(array $documents = [])
+    {
         return $this->get_by_status('sended',  $documents);
     }
 
@@ -90,7 +70,8 @@ class StatisticRepository extends RepositoryAbstract {
      *
      * @return Statistics[]
      */
-    public function get_export(array $documents = []) {
+    public function get_export(array $documents = [])
+    {
         return $this->get_by_status('export',  $documents);
     }
 
@@ -101,7 +82,8 @@ class StatisticRepository extends RepositoryAbstract {
      *
      * @return Statistics[]
      */
-    public function get_new(array $documents = []) {
+    public function get_new(array $documents = [])
+    {
         return $this->get_by_status('new',  $documents);
     }
 
@@ -110,7 +92,8 @@ class StatisticRepository extends RepositoryAbstract {
      * @param array $documents
      * @return array
      */
-    private function get_by_status($status, array $documents = []) {
+    private function get_by_status($status, array $documents = [])
+    {
         $table_name = $this->get_table_name();
         $wpdb       = $this->get_wp_db();
 
@@ -129,7 +112,8 @@ class StatisticRepository extends RepositoryAbstract {
         return $this->prepare_result($results);
     }
 
-    public function add(Statistics $stat) {
+    public function add(Statistics $stat)
+    {
         $table_name = $this->get_table_name();
         $wpdb       = $this->get_wp_db();
 
@@ -160,7 +144,8 @@ class StatisticRepository extends RepositoryAbstract {
         return false;
     }
 
-    public function update(Statistics $stat) {
+    public function update(Statistics $stat)
+    {
         $table_name = $this->get_table_name();
         $wpdb       = $this->get_wp_db();
 
@@ -188,7 +173,8 @@ class StatisticRepository extends RepositoryAbstract {
         return false;
     }
 
-    public function delete_by_post_id($post_id) {
+    public function delete_by_post_id($post_id)
+    {
         $table_name = $this->get_table_name();
         $wpdb       = $this->get_wp_db();
 
@@ -216,7 +202,8 @@ class StatisticRepository extends RepositoryAbstract {
         return false;
     }
 
-    public function delete(Statistics $stat) {
+    public function delete(Statistics $stat)
+    {
         $table_name = $this->get_table_name();
         $wpdb       = $this->get_wp_db();
 
@@ -230,7 +217,8 @@ class StatisticRepository extends RepositoryAbstract {
         return false;
     }
 
-    protected function to_entity($row) {
+    protected function to_entity($row)
+    {
         $result = new Statistics();
 
         if (isset($row->id)) {
@@ -280,7 +268,8 @@ class StatisticRepository extends RepositoryAbstract {
         return $result;
     }
 
-    protected function do_flush(array $persists) {
+    protected function do_flush(array $persists)
+    {
         /* @var Statistics[] $persists */
         foreach ($persists as $stat) {
             if (get_class($stat) === 'SmartCAT\WP\DB\Entity\Statistics') {
@@ -301,7 +290,8 @@ class StatisticRepository extends RepositoryAbstract {
      * @return false|int
      * @throws \SmartCAT\WP\Helpers\Language\Exceptions\LanguageNotFoundException
      */
-    public function link_to_smartcat_document(Task $task, $document) {
+    public function link_to_smartcat_document(Task $task, $document)
+    {
         /** @var ContainerInterface $container */
         $container = Connector::get_container();
 
@@ -330,7 +320,7 @@ class StatisticRepository extends RepositoryAbstract {
                 'taskId'         => $task->get_id(),
                 'targetLanguage' => $converter->get_wp_code_by_sc($document->getTargetLanguage())->get_wp_code()
             ]
-       );
+        );
     }
 
     /**
@@ -338,7 +328,8 @@ class StatisticRepository extends RepositoryAbstract {
      *
      * @return Statistics|null
      */
-    public function get_one_by(array $criterias) {
+    public function get_one_by(array $criterias)
+    {
         $table_name = $this->get_table_name();
         $wpdb       = $this->get_wp_db();
         $query      = "SELECT * FROM $table_name WHERE ";
@@ -354,5 +345,4 @@ class StatisticRepository extends RepositoryAbstract {
 
         return $row ? $this->to_entity($row) : null;
     }
-
 }

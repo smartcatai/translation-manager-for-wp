@@ -14,11 +14,14 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\RepositoryInterface;
 use SmartCAT\WP\WP\PluginInterface;
 
-class DB implements PluginInterface {
-
+class DB implements PluginInterface
+{
+    /**
+     * @throws \Exception
+     */
     public function plugin_activate()
     {
-        $repositories = Connector::get_container()->findTaggedServiceIds('repositories');
+        $repositories = Connector::get_container()->findTaggedServiceIds('setup');
         foreach ($repositories as $repository => $tag) {
             $object = Connector::get_container()->get($repository);
             if ($object instanceof RepositoryInterface) {
@@ -31,9 +34,12 @@ class DB implements PluginInterface {
     {
     }
 
+    /**
+     * @throws \Exception
+     */
     public function plugin_uninstall()
     {
-        $repositories = Connector::get_container()->findTaggedServiceIds('repositories');
+        $repositories = Connector::get_container()->findTaggedServiceIds('setup');
         foreach ($repositories as $repository => $tag) {
             $object = Connector::get_container()->get($repository);
             if ($object instanceof RepositoryInterface) {

@@ -13,54 +13,40 @@ namespace SmartCAT\WP\DB\Repository;
 use SmartCAT\WP\DB\Entity\Task;
 
 /** Репозиторий таблицы обмена */
-class TaskRepository extends RepositoryAbstract {
+class TaskRepository extends RepositoryAbstract
+{
     const TABLE_NAME = 'tasks';
 
-    public function get_table_name() {
+    public function get_table_name()
+    {
         return $this->prefix . self::TABLE_NAME;
-    }
-
-    public function install() {
-        $table_name = $this->get_table_name();
-        $sql        = "
-            CREATE TABLE IF NOT EXISTS {$table_name} (
-                id  BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-                sourceLanguage VARCHAR(255) NOT NULL,
-                targetLanguages TEXT NOT NULL,
-                postID BIGINT(20) UNSIGNED NOT NULL,
-                status VARCHAR(20) NOT NULL DEFAULT 'new',
-                projectID VARCHAR(255),
-                PRIMARY KEY  (id),
-                INDEX status (`status`)
-           )";
-        $this->create_table($sql);
-    }
-
-    public function uninstall() {
-        $table_name = $this->get_table_name();
-        $this->drop_table($table_name);
     }
 
     /**
      * @return Task[]
      */
-    public function get_new_task() {
+    public function get_new_task()
+    {
         return $this->get_tasks_by_status(Task::STATUS_NEW);
     }
 
     /**
-     * @param $status string
+     * @param $status string|array
      * @return Task[]
      */
     public function get_tasks_by_status($status)
     {
         $table_name = $this->get_table_name();
 
+        if (is_array($status)) {
+            $status = implode("', and status='", $status);
+        }
+
         $query = sprintf(
             "SELECT * FROM %s WHERE status='%s'",
             $table_name,
             $status
-       );
+        );
 
         $results = $this->get_wp_db()->get_results($query);
 
@@ -137,7 +123,8 @@ class TaskRepository extends RepositoryAbstract {
         return false;
     }
 
-    protected function do_flush(array $persists) {
+    protected function do_flush(array $persists)
+    {
         /* @var Task[] $persists */
         foreach ($persists as $task) {
             if (get_class($task) === 'SmartCAT\WP\DB\Entity\Task') {
@@ -188,7 +175,8 @@ class TaskRepository extends RepositoryAbstract {
      *
      * @return Task|null
      */
-    public function get_one_by_id($id) {
+    public function get_one_by_id($id)
+    {
         $table_name = $this->get_table_name();
         $wpdb       = $this->get_wp_db();
 

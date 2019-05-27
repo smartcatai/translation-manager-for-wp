@@ -13,10 +13,12 @@ namespace SmartCAT\WP\DB\Repository;
 use SmartCAT\WP\DB\Entity\Error;
 
 /** Репозиторий таблицы обмена */
-class ErrorRepository extends RepositoryAbstract {
+class ErrorRepository extends RepositoryAbstract
+{
     const TABLE_NAME = 'errors';
 
-    public function get_table_name() {
+    public function get_table_name()
+    {
         return $this->prefix . self::TABLE_NAME;
     }
 
@@ -26,7 +28,8 @@ class ErrorRepository extends RepositoryAbstract {
      *
      * @return Error[]
      */
-    public function get_errors($from = 0, $limit = 100) {
+    public function get_errors($from = 0, $limit = 100)
+    {
         $wpdb = $this->get_wp_db();
         $from = intval($from);
         $from >= 0 || $from = 0;
@@ -38,31 +41,12 @@ class ErrorRepository extends RepositoryAbstract {
         return $this->prepare_result($results);
     }
 
-    public function install() {
-        $table_name = $this->get_table_name();
-        $sql       = "
-            CREATE TABLE IF NOT EXISTS {$table_name} (
-                `id` BIGINT NOT NULL AUTO_INCREMENT, 
-                `date` DATETIME NOT NULL, 
-                `type` VARCHAR(255) NOT NULL,
-                `shortMessage` VARCHAR(255) NOT NULL,
-                `message` TEXT NOT NULL,
-                PRIMARY KEY (`id`),
-                INDEX (`date`)
-           )";
-        $this->create_table($sql);
-    }
-
-    public function uninstall() {
-        $table_name = $this->get_table_name();
-        $this->drop_table($table_name);
-    }
-
     /**
      * @param Error $error
      * @return bool|int
      */
-    public function add(Error $error) {
+    public function add(Error $error)
+    {
         $table_name = $this->get_table_name();
         $wpdb      = $this->get_wp_db();
 
@@ -86,7 +70,8 @@ class ErrorRepository extends RepositoryAbstract {
         return false;
     }
 
-    public function update(Error $error) {
+    public function update(Error $error)
+    {
         $table_name = $this->get_table_name();
         $wpdb      = $this->get_wp_db();
 
@@ -106,7 +91,8 @@ class ErrorRepository extends RepositoryAbstract {
         return false;
     }
 
-    protected function do_flush(array $persists) {
+    protected function do_flush(array $persists)
+    {
         /* @var Error[] $persists */
         foreach ($persists as $error) {
             if (get_class($error) === 'SmartCAT\WP\DB\Entity\Error') {
@@ -121,7 +107,8 @@ class ErrorRepository extends RepositoryAbstract {
         }
     }
 
-    protected function to_entity($row) {
+    protected function to_entity($row)
+    {
         $result = new Error();
 
         if (isset($row->id)) {

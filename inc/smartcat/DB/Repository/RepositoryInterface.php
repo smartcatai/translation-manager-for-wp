@@ -21,10 +21,6 @@ interface RepositoryInterface {
 
     public function get_table_name();
 
-    public function install();
-
-    public function uninstall();
-
     public function persist($o);
 
     public function flush();

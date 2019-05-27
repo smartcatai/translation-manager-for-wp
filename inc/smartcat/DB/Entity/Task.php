@@ -10,10 +10,14 @@
 
 namespace SmartCAT\WP\DB\Entity;
 
-class Task {
+class Task
+{
     const STATUS_NEW = 'new';
     const STATUS_FAILED = 'failed';
     const STATUS_CREATED = 'created';
+    const STATUS_SENDED = 'sended';
+    const STATUS_EXPORT = 'export';
+    const STATUS_COMPLETED = 'completed';
 
     /** @var  integer */
     private $id;

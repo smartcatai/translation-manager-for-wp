@@ -61,8 +61,8 @@ class SendToSmartCAT extends CronAbstract
         /** @var Utils $utils */
         $utils = $container->get('utils');
 
-        /** @var SmartCAT $sc */
-        $sc = $container->get('smartcat');
+        /** @var SmartCAT $smartcat */
+        $smartcat = $container->get('smartcat');
 
         $tasks = $task_repository->get_new_task();
         $workflow_stages = $options->get('smartcat_workflow_stages');
@@ -77,26 +77,25 @@ class SendToSmartCAT extends CronAbstract
 
         foreach ($tasks as $task) {
             $file = $utils->getPostToFile($task->get_post_id());
-            $task_name = $sc::getTaskNameFromStream($file);
+            $task_name = $smartcat::getTaskNameFromStream($file);
 
             try {
                 if (!empty($project_id)) {
                     SmartCAT::debug("Sending '{$task_name}'");
-                    $documentModel = $sc->createDocument($file);
-                    $document = $sc->updateProject($documentModel, $project_id);
+                    $documentModel = $smartcat->createDocument($file);
+                    $document = $smartcat->updateProject($documentModel, $project_id);
                     $statistic_repository->link_to_smartcat_document($task, $document);
                     SmartCAT::debug("Sended '{$task_name}'");
                 } else {
                     SmartCAT::debug("Creating '{$task_name}'");
-                    $smartcat_project = $sc->createProject($file, $task, $converter, $workflow_stages, $vendor_id);
+                    $smartcat_project = $smartcat->createProject($file, $task, $converter, $workflow_stages, $vendor_id);
                     $project_id = $smartcat_project->getId();
                     $statistic_repository->link_to_smartcat_document($task, $smartcat_project->getDocuments());
                     SmartCAT::debug("Created '{$task_name}'");
-            }
+                }
                 $task->set_status(Task::STATUS_CREATED);
                 $task->set_project_id($project_id);
                 $task_repository->update($task);
-
             } catch (\Throwable $e) {
                 if ($e instanceof ClientErrorException) {
                     $message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
