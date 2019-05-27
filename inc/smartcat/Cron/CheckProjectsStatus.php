@@ -10,6 +10,9 @@
 
 namespace SmartCAT\WP\Cron;
 
+use Psr\Container\ContainerInterface;
+use SmartCAT\WP\Connector;
+use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\Helpers\SmartCAT;
 
 class CheckProjectsStatus extends CronAbstract
@@ -29,5 +32,42 @@ class CheckProjectsStatus extends CronAbstract
         if (!SmartCAT::is_active()) {
             return;
         }
+
+        SmartCAT::debug("Checking documents started");
+
+        /** @var ContainerInterface $container */
+        $container = Connector::get_container();
+
+        /** @var StatisticRepository $statistic_repository */
+        $statistic_repository = $container->get('entity.repository.statistic');
+
+        /** @var SmartCAT $smartcat */
+        $smartcat = $container->get('smartcat');
+
+        $statistics = $statistic_repository->get_sended();
+        $count = count($statistics);
+
+        SmartCAT::debug("Finded $count documents to check");
+
+        foreach ($statistics as $statistic) {
+            $document = $smartcat->getDocumentManager()->documentGet(
+                ['documentId' => $statistic->get_document_id()]
+            );
+
+            $stages   = $document->getWorkflowStages();
+            $progress = 0;
+
+            foreach ($stages as $stage) {
+                $progress += $stage->getProgress();
+            }
+
+            $progress = round($progress / count($stages), 2);
+            $statistic->set_progress($progress)
+                ->set_words_count($document->getWordsCount());
+            
+            $statistic_repository->update($statistic);
+        }
+
+        SmartCAT::debug("Checking documents ended");
     }
 }

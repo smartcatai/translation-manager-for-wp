@@ -46,9 +46,7 @@ class TablesSetup extends DbAbstract implements SetupInterface
 
     private function initial()
     {
-        $prefix = $this->get_wp_db()->get_blog_prefix();
-
-        $tasks_table_name = $prefix . 'smartcat_connector_tasks';
+        $tasks_table_name = $this->prefix . 'smartcat_connector_tasks';
         $sql = "CREATE TABLE IF NOT EXISTS {$tasks_table_name} (
 				id  BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 				sourceLanguage VARCHAR(255) NOT NULL,
@@ -62,7 +60,7 @@ class TablesSetup extends DbAbstract implements SetupInterface
 
         $this->create_table($sql);
 
-        $statistic_table_name = $prefix . 'smartcat_connector_statistic';
+        $statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
         $sql = "CREATE TABLE IF NOT EXISTS {$statistic_table_name} (
 				id  BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 				taskId BIGINT(20) UNSIGNED NOT NULL,
@@ -82,7 +80,7 @@ class TablesSetup extends DbAbstract implements SetupInterface
 
         $this->create_table($sql);
 
-        $errors_table_name = $prefix . 'smartcat_connector_errors';
+        $errors_table_name = $this->prefix . 'smartcat_connector_errors';
         $sql = "CREATE TABLE IF NOT EXISTS {$errors_table_name} (
 				`id` BIGINT NOT NULL AUTO_INCREMENT, 
 				`date` DATETIME NOT NULL, 

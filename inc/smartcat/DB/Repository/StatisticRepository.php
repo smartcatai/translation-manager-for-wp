@@ -88,17 +88,20 @@ class StatisticRepository extends RepositoryAbstract
     }
 
     /**
-     * @param $status
+     * @param $status string|array
      * @param array $documents
      * @return array
      */
-    private function get_by_status($status, array $documents = [])
+    public function get_by_status($status, array $documents = [])
     {
         $table_name = $this->get_table_name();
         $wpdb       = $this->get_wp_db();
 
-        $query = /** @lang MySQL */
-            "SELECT * FROM $table_name WHERE status='$status'";
+        if (is_array($status)) {
+            $status = implode("', and status='", $status);
+        }
+
+        $query = "SELECT * FROM $table_name WHERE status='$status'";
 
         $documents_count = count($documents);
         if ($documents_count > 0) {
