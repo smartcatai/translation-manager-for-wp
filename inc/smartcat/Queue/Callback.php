@@ -38,14 +38,19 @@ class Callback extends QueueAbstract {
                 $document = $sc->getDocumentManager()->documentGet([ 'documentId' => $statistics->get_document_id() ]);
                 $stages   = $document->getWorkflowStages();
                 $progress = 0;
+
                 foreach ($stages as $stage) {
                     $progress += $stage->getProgress();
                 }
+
                 $progress = round($progress / count($stages), 2);
                 $statistics->set_progress($progress)
                            ->set_words_count($document->getWordsCount())
                            ->set_error_count(0);
+
+                SmartCAT::debug("[Callback] Set statistics config for '{$statistics->get_id()}'");
                 $statistic_repository->update($statistics);
+
                 if ($document->getStatus() == 'completed') {
                     /** @var Publication $queue */
                     $queue = $container->get('core.queue.publication');

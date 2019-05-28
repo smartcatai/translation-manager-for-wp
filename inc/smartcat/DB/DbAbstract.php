@@ -14,17 +14,26 @@ abstract class DbAbstract
 {
     protected $wpdb;
 
+    /**
+     * DbAbstract constructor.
+     */
     public function __construct()
     {
         global $wpdb;
         $this->wpdb = $wpdb;
     }
 
+    /**
+     * @return \wpdb
+     */
     public function get_wp_db()
     {
         return $this->wpdb;
     }
 
+    /**
+     * @param $sql
+     */
     protected function create_table($sql)
     {
         $charset_collate = "DEFAULT CHARACTER SET {$this->get_wp_db()->charset} COLLATE {$this->get_wp_db()->collate}";
@@ -32,11 +41,17 @@ abstract class DbAbstract
         $this->update_table($sql);
     }
 
+    /**
+     * @param $tableName
+     */
     protected function drop_table($tableName)
     {
         $this->get_wp_db()->query("DROP TABLE IF EXISTS $tableName");
     }
 
+    /**
+     * @return int
+     */
     protected function get_plugin_version()
     {
         if (defined('SMARTCAT_PLUGIN_FILE')) {
@@ -46,6 +61,9 @@ abstract class DbAbstract
         return 0;
     }
 
+    /**
+     * @param $sql
+     */
     protected function update_table($sql)
     {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

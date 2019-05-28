@@ -153,8 +153,9 @@ class CreatePost extends QueueAbstract {
                 }
 
                 $statistics->set_status('completed');
+                SmartCAT::debug("[CreatePost] Set completed status for statistic id '{$statistics->get_id()}'");
                 $statistic_repository->update($statistics);
-                SmartCAT::debug("[CreatePost] Generated post for '{$item['documentID']}'");
+                SmartCAT::debug("[CreatePost] Generated post for '{$item['documentID']}' and status = {$statistics->get_status()}");
             }
         } catch (ClientErrorException $e) {
             if (404 == $e->getResponse()->getStatusCode()) {

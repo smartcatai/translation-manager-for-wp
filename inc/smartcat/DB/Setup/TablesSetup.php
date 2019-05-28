@@ -21,6 +21,7 @@ class TablesSetup extends DbAbstract implements SetupInterface
      */
     public function __construct()
     {
+        parent::__construct();
         $this->prefix = $this->get_wp_db()->get_blog_prefix();
     }
 
