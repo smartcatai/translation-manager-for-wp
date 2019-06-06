@@ -39,7 +39,7 @@ class TaskRepository extends RepositoryAbstract
         $table_name = $this->get_table_name();
 
         if (is_array($status)) {
-            $status = implode("', and status='", $status);
+            $status = implode("', OR status='", $status);
         }
 
         $query = sprintf(
