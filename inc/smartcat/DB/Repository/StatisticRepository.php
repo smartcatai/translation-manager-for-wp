@@ -307,6 +307,8 @@ class StatisticRepository extends RepositoryAbstract
                     $this->link_to_smartcat_document($task, $singleDocument);
                 }
             }
+
+            return true;
         }
 
         $table_name = $this->get_table_name();

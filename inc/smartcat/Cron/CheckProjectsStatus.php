@@ -64,7 +64,7 @@ class CheckProjectsStatus extends CronAbstract
             $progress = round($progress / count($stages), 2);
             $statistic->set_progress($progress)
                 ->set_words_count($document->getWordsCount());
-            
+
             $statistic_repository->update($statistic);
         }
 
