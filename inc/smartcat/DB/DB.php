@@ -14,37 +14,31 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\RepositoryInterface;
 use SmartCAT\WP\WP\PluginInterface;
 
-class DB implements PluginInterface
-{
-    /**
-     * @throws \Exception
-     */
-    public function plugin_activate()
-    {
-        $repositories = Connector::get_container()->findTaggedServiceIds('setup');
-        foreach ($repositories as $repository => $tag) {
-            $object = Connector::get_container()->get($repository);
-            if ($object instanceof RepositoryInterface) {
-                $object->install();
-            }
-        }
-    }
+class DB implements PluginInterface {
+
+	public function plugin_activate() {
+		$repositories = Connector::get_container()->findTaggedServiceIds( 'repositories' );
+		foreach ( $repositories as $repository => $tag ) {
+			$object = Connector::get_container()->get( $repository );
+			if ( $object instanceof RepositoryInterface ) {
+				$object->install();
+			}
+		}
+		update_option('smartcat_connector_smartcat_db_version', '1.2.2');
+	}
 
     public function plugin_deactivate()
     {
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function plugin_uninstall()
-    {
-        $repositories = Connector::get_container()->findTaggedServiceIds('setup');
-        foreach ($repositories as $repository => $tag) {
-            $object = Connector::get_container()->get($repository);
-            if ($object instanceof RepositoryInterface) {
-                $object->uninstall();
-            }
-        }
-    }
+	public function plugin_uninstall() {
+		$repositories = Connector::get_container()->findTaggedServiceIds( 'repositories' );
+		foreach ( $repositories as $repository => $tag ) {
+			$object = Connector::get_container()->get( $repository );
+			if ( $object instanceof RepositoryInterface ) {
+				$object->uninstall();
+			}
+		}
+		delete_option('smartcat_connector_smartcat_db_version');
+	}
 }
