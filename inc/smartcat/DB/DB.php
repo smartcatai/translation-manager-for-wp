@@ -23,6 +23,7 @@ class DB implements PluginInterface {
 				$object->install();
 			}
 		}
+		update_option('smartcat_db_version', '1.2.1');
 	}
 
 	public function plugin_deactivate() {
@@ -37,5 +38,6 @@ class DB implements PluginInterface {
 				$object->uninstall();
 			}
 		}
+		delete_option('smartcat_db_version');
 	}
 }
