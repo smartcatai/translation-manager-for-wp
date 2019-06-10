@@ -11,34 +11,45 @@
 namespace SmartCAT\WP\DB;
 
 use SmartCAT\WP\Connector;
-use SmartCAT\WP\DB\Repository\RepositoryInterface;
+use SmartCAT\WP\DB\Setup\SetupInterface;
 use SmartCAT\WP\WP\PluginInterface;
 
-class DB implements PluginInterface {
-
-	public function plugin_activate() {
-		$repositories = Connector::get_container()->findTaggedServiceIds( 'repositories' );
-		foreach ( $repositories as $repository => $tag ) {
-			$object = Connector::get_container()->get( $repository );
-			if ( $object instanceof RepositoryInterface ) {
+class DB implements PluginInterface
+{
+	public function plugin_activate()
+    {
+		$repositories = Connector::get_container()->findTaggedServiceIds('setup');
+		foreach ($repositories as $repository => $tag) {
+			$object = Connector::get_container()->get($repository);
+			if ($object instanceof SetupInterface) {
 				$object->install();
 			}
 		}
-		update_option('smartcat_connector_smartcat_db_version', '1.2.2');
+		update_option('smartcat_connector_smartcat_db_version', $this->get_file_version());
 	}
 
     public function plugin_deactivate()
     {
     }
 
-	public function plugin_uninstall() {
-		$repositories = Connector::get_container()->findTaggedServiceIds( 'repositories' );
-		foreach ( $repositories as $repository => $tag ) {
-			$object = Connector::get_container()->get( $repository );
-			if ( $object instanceof RepositoryInterface ) {
+	public function plugin_uninstall()
+    {
+		$repositories = Connector::get_container()->findTaggedServiceIds('setup');
+		foreach ($repositories as $repository => $tag) {
+			$object = Connector::get_container()->get($repository);
+			if ($object instanceof SetupInterface) {
 				$object->uninstall();
 			}
 		}
 		delete_option('smartcat_connector_smartcat_db_version');
 	}
+
+	private function get_file_version()
+    {
+        if (defined('SMARTCAT_PLUGIN_FILE')) {
+            $plugin_data = get_file_data(SMARTCAT_PLUGIN_FILE, ['Version' => 'Version']);
+            return trim($plugin_data['Version']);
+        }
+        return 0;
+    }
 }

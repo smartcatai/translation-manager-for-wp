@@ -18,7 +18,8 @@ use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 
 /** Обработка очереди "Публикация перевода" */
-class Publication extends QueueAbstract {
+class Publication extends QueueAbstract
+{
     protected $action = 'smartcat_publication_async';
 
     /**
@@ -33,7 +34,8 @@ class Publication extends QueueAbstract {
      *
      * @return mixed
      */
-    protected function task($item) {
+    protected function task($item)
+    {
         // Actions to perform
         if (! SmartCAT::is_active()) {
             sleep(10);
@@ -56,7 +58,8 @@ class Publication extends QueueAbstract {
         try {
             if ($statistics && $statistics->get_status() == 'sended') {
                 SmartCAT::debug("[Publication] Export '{$item}'");
-                $task = $sc->getDocumentExportManager()->documentExportRequestExport([ 'documentIds' => [ $statistics->get_document_id() ] ]);
+                $task = $sc->getDocumentExportManager()
+                    ->documentExportRequestExport([ 'documentIds' => [ $statistics->get_document_id() ] ]);
                 if ($task->getId()) {
                     $statistics->set_status('export')
                                ->set_error_count(0);
@@ -85,11 +88,15 @@ class Publication extends QueueAbstract {
                     SmartCAT::debug("[Publication] new {$statistics->get_error_count()} try of '{$item}'");
                     return $item;
                 }
-                Logger::error("Document $item, start download translate",
-                    "API error code: {$status_code}. API error message: {$e->getResponse()->getBody()->getContents()}");
+                Logger::error(
+                    "Document $item, start download translate",
+                    "API error code: {$status_code}. API error message: {$e->getResponse()->getBody()->getContents()}"
+                );
             }
         } catch (\Throwable $e) {
-            Logger::error("Document {$item}, publication translate","Message: {$e->getMessage()}");
+            Logger::error(
+                "Document {$item}, publication translate","Message: {$e->getMessage()}"
+            );
         }
 
         SmartCAT::debug("[Publication] End queue '{$item}'");
@@ -103,7 +110,8 @@ class Publication extends QueueAbstract {
      * Override if applicable, but ensure that the below actions are
      * performed, or, call parent::complete().
      */
-    protected function complete() {
+    protected function complete()
+    {
         parent::complete();
         // Show notice to user or perform some other arbitrary task...
         /** @var CreatePost $queue */

@@ -46,19 +46,29 @@ abstract class DbAbstract
      */
     protected function drop_table($tableName)
     {
-        $this->get_wp_db()->query("DROP TABLE IF EXISTS $tableName");
+        return $this->exec("DROP TABLE IF EXISTS $tableName");
+    }
+
+    protected function exec($query)
+    {
+        return $this->get_wp_db()->query($query);
     }
 
     /**
      * @return int
      */
-    protected function get_plugin_version()
+    protected function get_plugin_version_file()
     {
         if (defined('SMARTCAT_PLUGIN_FILE')) {
             $plugin_data = get_file_data(SMARTCAT_PLUGIN_FILE, [ 'Version' => 'Version' ]);
             return $plugin_data['Version'];
         }
         return 0;
+    }
+
+    function get_plugin_version()
+    {
+        return get_option('st_manager_db_version');
     }
 
     /**

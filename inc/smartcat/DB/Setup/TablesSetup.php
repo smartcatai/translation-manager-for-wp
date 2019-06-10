@@ -29,20 +29,23 @@ class TablesSetup extends DbAbstract implements SetupInterface
     {
         $this->initial();
 
-        //if (version_compare($this->get_plugin_version(), '1.3.0', '<')) {
-        //    $this->v130();
-        //}
+        if (version_compare($this->get_plugin_version(), '1.3.0', '<')) {
+            $this->v130();
+        }
     }
 
-    //private function v130()
-    //{
-    //}
+    private function v130()
+    {
+        $statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
+        $this->exec("ALTER TABLE {$statistic_table_name} ADD COLUMN profileID BIGINT(20) UNSIGNED NOT NULL;");
+    }
 
     public function uninstall()
     {
         $this->drop_table($this->prefix . 'smartcat_connector_tasks');
         $this->drop_table($this->prefix . 'smartcat_connector_statistic');
         $this->drop_table($this->prefix . 'smartcat_connector_errors');
+        $this->drop_table($this->prefix . 'smartcat_connector_profiles');
     }
 
     private function initial()
@@ -57,7 +60,7 @@ class TablesSetup extends DbAbstract implements SetupInterface
 				projectID VARCHAR(255),
 				PRIMARY KEY  (id),
 				INDEX status (`status`)
-			)";
+			);";
 
         $this->create_table($sql);
 
@@ -77,7 +80,7 @@ class TablesSetup extends DbAbstract implements SetupInterface
 				PRIMARY KEY  (id),
 				INDEX status (`status`),
 				INDEX documentID (`documentID`)
-			) ROW_FORMAT=DYNAMIC ";
+			) ROW_FORMAT=DYNAMIC;";
 
         $this->create_table($sql);
 
@@ -90,7 +93,23 @@ class TablesSetup extends DbAbstract implements SetupInterface
 				`message` TEXT NOT NULL,
 				PRIMARY KEY (`id`),
 				INDEX (`date`)
-			)";
+			);";
+
+        $this->create_table($sql);
+
+        $profiles_table_name = $this->prefix . 'smartcat_connector_profiles';
+        $sql = "CREATE TABLE IF NOT EXISTS {$profiles_table_name} (
+				id  BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				vendor VARCHAR(255),
+				vendorName TEXT,
+				sourceLanguage VARCHAR(255) NOT NULL,
+				targetLanguages TEXT NOT NULL,
+				workflowStages TEXT,
+				projectID VARCHAR(255),
+                autoSend BOOLEAN,
+                autoUpdate BOOLEAN,
+				PRIMARY KEY  (id)
+			);";
 
         $this->create_table($sql);
     }
