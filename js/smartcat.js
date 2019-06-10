@@ -438,7 +438,7 @@ jQuery( function ( $ ) {
 
 		//если статистика была запущена уже в первый запуск
 		if ( isStatWasStarted ) {
-			intervalTimer = setInterval( checkStatistics, 5000 );
+			intervalTimer = setInterval( checkStatistics, 1000*60 );
 		}
 
 		if ( !isStatWasStarted ) {
@@ -456,7 +456,7 @@ jQuery( function ( $ ) {
 
 				location.reload();
 				event.preventDefault();
-			}, 1000 * 300 );
+			}, 1000 * 60 );
 		}
 	}
 
