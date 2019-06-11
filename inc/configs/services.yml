@@ -89,6 +89,12 @@ services:
       - "%plugin.table.prefix%"
     tags: [repositories]
 
+  entity.repository.profile:
+    class: SmartCAT\WP\DB\Repository\ProfileRepository
+    arguments:
+      - "%plugin.table.prefix%"
+    tags: [repositories]
+
   setup.tables:
     class: SmartCAT\WP\DB\Setup\TablesSetup
     tags: [setup]

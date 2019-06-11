@@ -13,21 +13,26 @@ namespace SmartCAT\WP\DB\Setup;
 
 use SmartCAT\WP\DB\DbAbstract;
 
-class TablesSetup extends DbAbstract implements SetupInterface
-{
+/**
+ * Class TablesSetup
+ *
+ * @package SmartCAT\WP\DB\Setup
+ */
+class TablesSetup extends DbAbstract implements SetupInterface {
 	private $prefix = '';
 
 	/**
 	 * TablesSetup constructor.
 	 */
-	public function __construct()
-	{
+	public function __construct() {
 		parent::__construct();
 		$this->prefix = $this->get_wp_db()->get_blog_prefix();
 	}
 
-	public function install()
-	{
+	/**
+	 *
+	 */
+	public function install() {
 		$this->initial();
 
 		if ( version_compare( $this->get_plugin_version(), '1.3.0', '<' ) ) {
@@ -35,24 +40,30 @@ class TablesSetup extends DbAbstract implements SetupInterface
 		}
 	}
 
-	private function v130()
-	{
+	/**
+	 *
+	 */
+	private function v130() {
 		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
 		$this->exec( "ALTER TABLE {$statistic_table_name} ADD COLUMN profileID BIGINT( 20 ) UNSIGNED NOT NULL;" );
 	}
 
-	public function uninstall()
-	{
+	/**
+	 *
+	 */
+	public function uninstall() {
 		$this->drop_table( $this->prefix . 'smartcat_connector_tasks' );
 		$this->drop_table( $this->prefix . 'smartcat_connector_statistic' );
 		$this->drop_table( $this->prefix . 'smartcat_connector_errors' );
 		$this->drop_table( $this->prefix . 'smartcat_connector_profiles' );
 	}
 
-	private function initial()
-	{
+	/**
+	 *
+	 */
+	private function initial() {
 		$tasks_table_name = $this->prefix . 'smartcat_connector_tasks';
-		$sql = "CREATE TABLE IF NOT EXISTS {$tasks_table_name} ( 
+		$sql              = "CREATE TABLE IF NOT EXISTS {$tasks_table_name} ( 
 				id  BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				sourceLanguage VARCHAR( 255 ) NOT NULL,
 				targetLanguages TEXT NOT NULL,
@@ -66,7 +77,7 @@ class TablesSetup extends DbAbstract implements SetupInterface
 		$this->create_table( $sql );
 
 		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
-		$sql = "CREATE TABLE IF NOT EXISTS {$statistic_table_name} ( 
+		$sql                  = "CREATE TABLE IF NOT EXISTS {$statistic_table_name} ( 
 				id  BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				taskId BIGINT( 20 ) UNSIGNED NOT NULL,
 				postID BIGINT( 20 ) UNSIGNED NOT NULL,
@@ -86,7 +97,7 @@ class TablesSetup extends DbAbstract implements SetupInterface
 		$this->create_table( $sql );
 
 		$errors_table_name = $this->prefix . 'smartcat_connector_errors';
-		$sql = "CREATE TABLE IF NOT EXISTS {$errors_table_name} ( 
+		$sql               = "CREATE TABLE IF NOT EXISTS {$errors_table_name} ( 
 				`id` BIGINT NOT NULL AUTO_INCREMENT, 
 				`date` DATETIME NOT NULL, 
 				`type` VARCHAR( 255 ) NOT NULL,
@@ -99,16 +110,16 @@ class TablesSetup extends DbAbstract implements SetupInterface
 		$this->create_table( $sql );
 
 		$profiles_table_name = $this->prefix . 'smartcat_connector_profiles';
-		$sql = "CREATE TABLE IF NOT EXISTS {$profiles_table_name} ( 
+		$sql                 = "CREATE TABLE IF NOT EXISTS {$profiles_table_name} ( 
 				id  BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				vendor VARCHAR( 255 ),
-				vendorName TEXT,
-				sourceLanguage VARCHAR( 255 ) NOT NULL,
-				targetLanguages TEXT NOT NULL,
-				workflowStages TEXT,
-				projectID VARCHAR( 255 ),
-				autoSend BOOLEAN,
-				autoUpdate BOOLEAN,
+				vendor_name TEXT,
+				source_language VARCHAR( 255 ) NOT NULL,
+				target_languages TEXT NOT NULL,
+				workflow_stages TEXT,
+				project_id VARCHAR( 255 ),
+				auto_send BOOLEAN,
+				auto_update BOOLEAN,
 				PRIMARY KEY  ( id )
 			 );";
 

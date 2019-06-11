@@ -13,78 +13,69 @@ namespace SmartCAT\WP\DB\Repository;
 
 use SmartCAT\WP\DB\Entity\Profile;
 
-class ProfileRepository extends RepositoryAbstract
-{
+/**
+ * Class ProfileRepository
+ *
+ * @package SmartCAT\WP\DB\Repository
+ */
+class ProfileRepository extends RepositoryAbstract {
 	const TABLE_NAME = 'profiles';
 
 	/**
+	 * Get entity table name
+	 *
 	 * @return string
 	 */
-	protected function getTableName()
-	{
+	public function get_table_name() {
 		return $this->prefix . self::TABLE_NAME;
 	}
 
 	/**
-	 * @param \stdClass $row
+	 * Serialize RAW data from DB to Profile object
+	 *
+	 * @param \stdClass $row RAW data from DB in stdClass.
 	 * @return Profile
 	 *
 	 * @SuppressWarnings( PHPMD.CyclomaticComplexity )
 	 * @SuppressWarnings( PHPMD.NPathComplexity )
 	 */
-	protected function toEntity( $row )
-	{
+	protected function to_entity( $row ) {
 		$result = new Profile();
 
-		if ( isset( $row->id ) ) {
-			$result->setId( intval( $row->id ) );
-		}
+		$columns = [
+			'id',
+			'vendor',
+			'vendor_name',
+			'source_language',
+			'target_languages',
+			'project_id',
+			'workflow_stages',
+			'auto_send',
+			'auto_update',
+		];
 
-		if ( isset( $row->vendor ) ) {
-			$result->setVendor( $row->vendor );
-		}
-
-		if ( isset( $row->vendorName ) ) {
-			$result->setVendorName( $row->vendorName );
-		}
-
-		if ( isset( $row->sourceLanguage ) ) {
-			$result->setSourceLanguage( $row->sourceLanguage );
-		}
-
-		if ( isset( $row->targetLanguages ) ) {
-			$result->setTargetLanguages( unserialize( $row->targetLanguages ) );
-		}
-
-		if ( isset( $row->projectID ) ) {
-			$result->setProjectID( intval( $row->projectID ) );
-		}
-
-		if ( isset( $row->workflowStages ) ) {
-			$result->setWorkflowStages( $row->workflowStages );
-		}
-
-		if ( isset( $row->autoSend ) ) {
-			$result->setAutoSend( boolval( $row->autoSend ) );
-		}
-
-		if ( isset( $row->autoUpdate ) ) {
-			$result->setAutoUpdate( boolval( $row->autoUpdate ) );
+		foreach ( $columns as $column ) {
+			if ( isset( $row->{$column} ) ) {
+				$result->{'set_' . $column}( $row->{$column} );
+			}
 		}
 
 		return $result;
 	}
 
 	/**
-	 * @param Profile[] $persists
+	 * Flush data
+	 *
+	 * @param Profile[] $persists Persists.
 	 */
-	protected function doFlush( array $persists )
-	{
+	protected function do_flush( array $persists ) {
 		foreach ( $persists as $profile ) {
 			if ( $profile instanceof Profile ) {
-				if ( empty( $profile->getId() ) ) {
-					if ( $res = $this->add( $profile ) ) {
-						$profile->setId( $res );
+				if ( empty( $profile->get_id() ) ) {
+					$res = $this->add( $profile );
+
+					if ( $res ) {
+						$profile->set_id( $res );
 					}
 				} else {
 					$this->update( $profile );
@@ -94,30 +85,31 @@ class ProfileRepository extends RepositoryAbstract
 	}
 
 	/**
-	 * @param Profile $profile
+	 * Add profile record to DB
+	 *
+	 * @param Profile $profile Profile object.
 	 * @return bool|int
 	 */
-	public function add( Profile $profile )
-	{
+	public function add( Profile $profile ) {
 		$wpdb = $this->get_wp_db();
 
 		$data = [
-			'sourceLanguage'	=> $profile->getSourceLanguage(),
-			'targetLanguages'   => serialize( $profile->getTargetLanguages() ),
-			'projectID'		 => $profile->getProjectID(),
-			'workflowStages'	=> serialize( $profile->getWorkflowStages() ),
-			'vendor'			=> $profile->getVendor(),
-			'vendorName'		=> $profile->getVendorName(),
-			'autoSend'		  => $profile->isAutoSend(),
-			'autoUpdate'		=> $profile->isAutoUpdate(),
+			'source_language'  => $profile->get_source_language(),
+			'target_languages' => wp_json_encode( $profile->get_target_languages() ),
+			'project_id'       => $profile->get_project_id(),
+			'workflow_stages'  => $profile->get_workflow_stages(),
+			'vendor'           => $profile->get_vendor(),
+			'vendor_name'      => $profile->get_vendor_name(),
+			'auto_send'        => $profile->is_auto_send(),
+			'auto_update'      => $profile->is_auto_update(),
 		];
 
-		if ( !empty( $profile->getId() ) ) {
-			$data['id'] = $profile->getId();
+		if ( ! empty( $profile->get_id() ) ) {
+			$data['id'] = $profile->get_id();
 		}
 
 		if ( $wpdb->insert( $this->getTableName(), $data ) ) {
-			$profile->setId( $wpdb->insert_id );
+			$profile->set_id( $wpdb->insert_id );
 			return $wpdb->insert_id;
 		}
 
@@ -125,48 +117,31 @@ class ProfileRepository extends RepositoryAbstract
 	}
 
 	/**
-	 * @param Profile $profile
+	 * Update Profile object in DB
+	 *
+	 * @param Profile $profile Profile object.
 	 * @return bool
 	 */
-	public function update( Profile $profile )
-	{
+	public function update( Profile $profile ) {
 		$wpdb = $this->get_wp_db();
 
-		if ( !empty( $profile->getId() ) ) {
+		if ( ! empty( $profile->get_id() ) ) {
 			$data = [
-				'sourceLanguage'	=> $profile->getSourceLanguage(),
-				'targetLanguages'   => serialize( $profile->getTargetLanguages() ),
-				'projectID'		 => $profile->getProjectID(),
-				'workflowStages'	=> serialize( $profile->getWorkflowStages() ),
-				'vendor'			=> $profile->getVendor(),
-				'vendorName'		=> $profile->getVendorName(),
-				'autoSend'		  => $profile->isAutoSend(),
-				'autoUpdate'		=> $profile->isAutoUpdate(),
+				'source_language'  => $profile->get_source_language(),
+				'target_languages' => wp_json_encode( $profile->get_target_languages() ),
+				'project_id'       => $profile->get_project_id(),
+				'workflow_stages'  => $profile->get_workflow_stages(),
+				'vendor'           => $profile->get_vendor(),
+				'vendor_name'      => $profile->get_vendor_name(),
+				'auto_send'        => $profile->is_auto_send(),
+				'auto_update'      => $profile->is_auto_update(),
 			];
 
-			if ( $wpdb->update( $this->getTableName(), $data, [ 'id' => $profile->getId() ] ) ) {
+			if ( $wpdb->update( $this->get_table_name(), $data, [ 'id' => $profile->get_id() ] ) ) {
 				return true;
 			}
 		}
 
 		return false;
-	}
-
-	/** @deprecated  */
-	protected function do_flush( array $persists )
-	{
-		return $this->doFlush( $persists );
-	}
-
-	/** @deprecated  */
-	protected function to_entity( $row )
-	{
-		return $this->toEntity( $row );
-	}
-
-	/** @deprecated  */
-	public function get_table_name()
-	{
-		return $this->getTableName();
 	}
 }

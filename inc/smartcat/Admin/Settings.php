@@ -11,6 +11,9 @@
 
 namespace SmartCAT\WP\Admin;
 
+use SmartCAT\WP\Admin\Pages\Dashboard;
+use SmartCAT\WP\Admin\Pages\Errors;
+use SmartCAT\WP\Admin\Pages\Profiles;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\Helpers\Cryptographer;
@@ -20,47 +23,77 @@ use SmartCAT\WP\WP\InitInterface;
 use SmartCAT\WP\WP\Options;
 
 /**
- * Класс для инкапсуляции настроек и опций
+ * Class Settings
+ *
+ * @package SmartCAT\WP\Admin
  */
-final class Settings implements InitInterface
-{
+final class Settings implements InitInterface {
 	use DITrait;
 
-	static function add_admin_menu()
-	{
+	/**
+	 * Render menu in sidebar
+	 */
+	public static function add_admin_menu() {
 		add_menu_page(
 			__( 'Localization', 'translation-connectors' ),
 			__( 'Localization', 'translation-connectors' ),
 			'edit_pages',
-			'sc-settings',
-			[ self::class, 'render_settings_page' ],
+			'sc-dashboard',
+			[ Dashboard::class, 'render' ],
 			'dashicons-translation'
 		);
 
-		add_submenu_page( 'sc-settings', __( 'Settings', 'translation-connectors' ),
-			__( 'Settings', 'translation-connectors' ),
-			'edit_pages',
-			'sc-settings', [ self::class, 'render_settings_page' ] );
-		add_submenu_page( 'sc-settings', __( 'Dashboard', 'translation-connectors' ),
+		add_submenu_page(
+			'sc-dashboard',
+			__( 'Dashboard', 'translation-connectors' ),
 			__( 'Dashboard', 'translation-connectors' ),
 			'edit_pages',
-			'sc-translation-progress', [ self::class, 'render_progress_page' ] );
+			'sc-dashboard',
+			[ Dashboard::class, 'render' ]
+		);
+
+		add_submenu_page(
+			'sc-dashboard',
+			__( 'Profiles', 'translation-connectors' ),
+			__( 'Profiles', 'translation-connectors' ),
+			'edit_pages',
+			'sc-profiles',
+			[ Profiles::class, 'render' ]
+		);
+
+		add_submenu_page(
+			'sc-dashboard',
+			__( 'Errors', 'translation-connectors' ),
+			__( 'Errors', 'translation-connectors' ),
+			'edit_pages',
+			'sc-errors',
+			[ Errors::class, 'render' ]
+		);
+
+		add_submenu_page(
+			'sc-dashboard',
+			__( 'Settings', 'translation-connectors' ),
+			__( 'Settings', 'translation-connectors' ),
+			'edit_pages',
+			'sc-settings',
+			[ self::class, 'render_settings_page' ]
+		);
 	}
 
-	static function make_settings_page()
-	{
-		$container = self::get_container();
-		$prefix	= $container->getParameter( 'plugin.table.prefix' );
-
-		$server		  = $prefix . 'smartcat_api_server';
-		$login		   = $prefix . 'smartcat_api_login';
-		$password		= $prefix . 'smartcat_api_password';
-		$project_id	  = $prefix . 'smartcat_api_project_id';
-		$workflow_stages = $prefix . 'smartcat_workflow_stages';
-		$vendor_id	   = $prefix . 'smartcat_vendor_id';
+	/**
+	 * @throws \Exception
+	 */
+	public static function make_settings_page() {
+		$container           = self::get_container();
+		$prefix              = $container->getParameter( 'plugin.table.prefix' );
+		$server              = $prefix . 'smartcat_api_server';
+		$login               = $prefix . 'smartcat_api_login';
+		$password            = $prefix . 'smartcat_api_password';
+		$project_id          = $prefix . 'smartcat_api_project_id';
+		$workflow_stages     = $prefix . 'smartcat_workflow_stages';
+		$vendor_id           = $prefix . 'smartcat_vendor_id';
 		$auto_send_on_update = $prefix . 'smartcat_auto_send_on_update';
 
-		//общая регистрация параметров
 		register_setting( 'smartcat', $server, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $login, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $password, [ 'type' => 'string' ] );
@@ -69,7 +102,6 @@ final class Settings implements InitInterface
 		register_setting( 'smartcat', $vendor_id, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $auto_send_on_update, [ 'type' => 'bool' ] );
 
-		//секции
 		add_settings_section(
 			'smartcat_required',
 			__( 'Required settings', 'translation-connectors' ),
@@ -82,9 +114,8 @@ final class Settings implements InitInterface
 			__( 'Additional settings', 'translation-connectors' ),
 			[ FrontendCallbacks::class, 'dummy_callback' ],
 			'smartcat'
-		 );
+		);
 
-		//привязка параметров к секциям
 		add_settings_field(
 			$server,
 			__( 'API server', 'translation-connectors' ),
@@ -92,15 +123,15 @@ final class Settings implements InitInterface
 			'smartcat',
 			'smartcat_required',
 			[
-				'label_for'	  => $server,
-				'option_name'	=> $server,
+				'label_for'      => $server,
+				'option_name'    => $server,
 				'select_options' => [
 					SmartCAT::SC_EUROPE => __( 'Europe', 'translation-connectors' ),
-					SmartCAT::SC_USA	=> __( 'USA', 'translation-connectors' ),
-					SmartCAT::SC_ASIA   => __( 'Asia', 'translation-connectors' )
-				]
+					SmartCAT::SC_USA    => __( 'USA', 'translation-connectors' ),
+					SmartCAT::SC_ASIA   => __( 'Asia', 'translation-connectors' ),
+				],
 			]
-		 );
+		);
 
 		add_settings_field(
 			$login,
@@ -198,8 +229,8 @@ final class Settings implements InitInterface
 					'smartcat',
 					'smartcat_additional',
 					[
-						'label_for'	  => $vendor_id,
-						'option_name'	=> $vendor_id,
+						'label_for'	     => $vendor_id,
+						'option_name'	 => $vendor_id,
 						'select_options' => $select_array
 					]
 				);
@@ -207,8 +238,7 @@ final class Settings implements InitInterface
 		}
 	}
 
-	static function render_settings_page()
-	{
+	static function render_settings_page() {
 		$isCookie = isset( $_COOKIE['regform'] );
 		$container = self::get_container();
 		/** @var TemplateEngine $render */
@@ -231,77 +261,11 @@ final class Settings implements InitInterface
 		] );
 	}
 
-	static function render_progress_page()
-	{
-		$isCookie = isset( $_COOKIE['regform'] );
-		$container = self::get_container();
-		/** @var TemplateEngine $render */
-		$render = $container->get( 'templater' );
-		$statistics_repository = $container->get( 'entity.repository.statistic' );
-		$options = $container->get( 'core.options' );
-
-		$limit = 100;
-
-		$statistics_table = new StatisticsTable();
-		$max_page = ceil( $statistics_repository->get_count() / $limit );
-		$page = self::get_page( $max_page );
-		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
-		$statistics_result = $statistics_repository->get_statistics( $limit * ( $page - 1 ), $limit );
-
-		add_thickbox();
-
-		echo $render->render( 'dashboard', [
-			'title' => $GLOBALS['title'],
-			'isCookie' => $isCookie,
-			'button_status' => $is_statistics_queue_active ? 'disabled="disabled"' : false,
-			'statistic_result' => $statistics_result ? true : false,
-			'refresh_text' => __( 'Refresh statistics', 'translation-connectors' ),
-			'statistic_table' => function () use ( $statistics_table, $render, $statistics_result ) {
-				$table_with_data = $statistics_table->set_data( $statistics_result );
-				return	 $render->ob_to_string( [$table_with_data, 'display'] );
-			},
-			'pages_text' => __( 'Pages', 'translation-connectors' ),
-			'empty_message' => __( 'Statistics is empty', 'translation-connectors' ),
-			'paginator' => function () use ( $max_page, $page ) {
-				return self::get_paginator_code( $max_page, $page );
-			}
-		] );
-	}
-
-	static private function get_paginator_code( $max_page, $page )
-	{
-		$url = strtok( $_SERVER['REQUEST_URI'], '?' );
-
-		$paginator = '';
-
-		for ( $page_number = 1; $page_number <= $max_page; $page_number ++ ) {
-			if ( $page_number == $page ) {
-				$paginator .= "<span>{$page_number}</span>";
-			} else {
-				$full_url = esc_html( $url . '?page=sc-translation-progress&page-number=' . $page_number );
-				$paginator .= '<a href="' . $full_url . '">' . $page_number . '</a>';
-			}
-		}
-
-		return $paginator;
-	}
-
-	static private function get_page( $max_page )
-	{
-		$page = isset( $_GET['page-number'] ) ? abs( intval( $_GET['page-number'] ) ) : 1;
-		$page = ( $page > $max_page ) ? $max_page : $page;
-		$page = ( $page >= 1 ) ? $page : 1;
-
-		return $page;
-	}
-
-	public function plugin_init()
-	{
+	public function plugin_init() {
 		self::apply_filters_to_settings();
 	}
 
-	static function pre_update_password( $new_value )
-	{
+	static function pre_update_password( $new_value ) {
 		if ( $new_value == '******' ) {
 			$container = self::get_container();
 			/** @var Options $options */
@@ -313,8 +277,7 @@ final class Settings implements InitInterface
 		return Cryptographer::encrypt( $new_value );
 	}
 
-	static function pre_update_vendor_id( $new_value )
-	{
+	static function pre_update_vendor_id( $new_value ) {
 		if ( $new_value === 0 ) {
 			return null;
 		}

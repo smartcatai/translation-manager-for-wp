@@ -11,168 +11,270 @@
 
 namespace SmartCAT\WP\DB\Entity;
 
-class Profile
-{
-	/** * @var int */
-	private $profileId;
-	/** @var string */
-	private $vendor;
-	/** @var string */
-	private $vendorName;
-	/** @var string */
-	private $sourceLanguage;
-	/** @var string[] */
-	private $targetLanguages;
-	/** @var string[] */
-	private $workflowStages;
-	/** @var int */
-	private $projectID;
-	/** @var bool */
-	private $autoSend;
-	/** @var bool */
-	private $autoUpdate;
+/**
+ * Class Profile
+ *
+ * @package SmartCAT\WP\DB\Entity
+ */
+class Profile {
+	/**
+	 * Profile primary key
+	 *
+	 * @var int
+	 */
+	private $profile_id;
 
 	/**
+	 * Selected vendor GUID to send in
+	 *
+	 * @var string
+	 */
+	private $vendor;
+
+	/**
+	 * Vendor name for display when connection lost
+	 *
+	 * @var string
+	 */
+	private $vendor_name;
+
+	/**
+	 * Source language translate from
+	 *
+	 * @var string
+	 */
+	private $source_language;
+
+	/**
+	 * Array of target languages
+	 *
+	 * @var string[]
+	 */
+	private $target_languages;
+
+	/**
+	 * Array of workflow stages
+	 *
+	 * @var string[]
+	 */
+	private $workflow_stages;
+
+	/**
+	 * Project GUID to store translates
+	 *
+	 * @var int
+	 */
+	private $project_id;
+
+	/**
+	 * Automatic Send on content Create
+	 *
+	 * @var bool
+	 */
+	private $auto_send;
+
+	/**
+	 * Automatic Send on content Update
+	 *
+	 * @var bool
+	 */
+	private $auto_update;
+
+	/**
+	 * Profile ID getter
+	 *
 	 * @return int
 	 */
-	public function getId(): int
-	{
-		return $this->profileId;
+	public function get_id(): int {
+		return $this->profile_id;
 	}
 
 	/**
-	 * @param int $profileId
+	 * Profile ID setter
+	 *
+	 * @param int $profile_id Profile primary key.
+	 *
+	 * @return Profile
 	 */
-	public function setId( int $profileId )
-	{
-		$this->profileId = $profileId;
+	public function set_id( int $profile_id ) {
+		$this->profile_id = intval( $profile_id );
+
+		return $this;
 	}
 
 	/**
+	 * Profile Vendor
+	 *
 	 * @return string
 	 */
-	public function getVendor(): string
-	{
+	public function get_vendor(): string {
 		return $this->vendor;
 	}
 
 	/**
-	 * @param string $vendor
+	 * Profile Vendor
+	 *
+	 * @param string $vendor Vendor GUID.
+	 *
+	 * @return Profile
 	 */
-	public function setVendor( string $vendor )
-	{
+	public function set_vendor( string $vendor ) {
 		$this->vendor = $vendor;
+
+		return $this;
 	}
 
 	/**
+	 * Profile Vendor Name
+	 *
 	 * @return string
 	 */
-	public function getVendorName(): string
-	{
-		return $this->vendorName;
+	public function get_vendor_name(): string {
+		return $this->vendor_name;
 	}
 
 	/**
-	 * @param string $vendorName
+	 * Profile Vendor Name
+	 *
+	 * @param string $vendor_name Vendor Name.
+	 *
+	 * @return Profile
 	 */
-	public function setVendorName( string $vendorName )
-	{
-		$this->vendorName = $vendorName;
+	public function set_vendor_name( string $vendor_name ) {
+		$this->vendor_name = $vendor_name;
+
+		return $this;
 	}
 
 	/**
+	 * Profile Source Language getter
+	 *
 	 * @return string
 	 */
-	public function getSourceLanguage(): string
-	{
-		return $this->sourceLanguage;
+	public function get_source_language(): string {
+		return $this->source_language;
 	}
 
 	/**
-	 * @param string $sourceLanguage
+	 * Profile Source Language setter
+	 *
+	 * @param string $source_language Source Language.
+	 *
+	 * @return Profile
 	 */
-	public function setSourceLanguage( string $sourceLanguage )
-	{
-		$this->sourceLanguage = $sourceLanguage;
+	public function set_source_language( string $source_language ) {
+		$this->source_language = $source_language;
+
+		return $this;
 	}
 
 	/**
+	 * Profile Target Languages getter
+	 *
 	 * @return string[]
 	 */
-	public function getTargetLanguages(): array
-	{
-		return $this->targetLanguages;
+	public function get_target_languages(): array {
+		return json_decode( $this->target_languages, true );
 	}
 
 	/**
-	 * @param string[] $targetLanguages
+	 * Profile Target Languages setter
+	 *
+	 * @param string[] $target_languages Target Languages.
+	 *
+	 * @return Profile
 	 */
-	public function setTargetLanguages( array $targetLanguages )
-	{
-		$this->targetLanguages = $targetLanguages;
+	public function set_target_languages( array $target_languages ) {
+		$this->target_languages = wp_json_encode( $target_languages );
+
+		return $this;
 	}
 
 	/**
+	 * Profile Workflow Stages getter
+	 *
 	 * @return string[]
 	 */
-	public function getWorkflowStages(): array
-	{
-		return $this->workflowStages;
+	public function get_workflow_stages(): array {
+		return $this->workflow_stages;
 	}
 
 	/**
-	 * @param string[] $workflowStages
+	 * Profile Workflow Stages setter
+	 *
+	 * @param string[] $workflow_stages Workflow Stages.
+	 *
+	 * @return Profile
 	 */
-	public function setWorkflowStages( array $workflowStages )
-	{
-		$this->workflowStages = $workflowStages;
+	public function set_workflow_stages( array $workflow_stages ) {
+		$this->workflow_stages = $workflow_stages;
+
+		return $this;
 	}
 
 	/**
+	 * Profile Automatic Send on content Create getter
+	 *
 	 * @return bool
 	 */
-	public function isAutoSend(): bool
-	{
-		return $this->autoSend;
+	public function is_auto_send(): bool {
+		return $this->auto_send;
 	}
 
 	/**
-	 * @param bool $autoSend
+	 * Profile Automatic Send on content Create setter
+	 *
+	 * @param bool $auto_send Auto Send.
+	 *
+	 * @return Profile
 	 */
-	public function setAutoSend( bool $autoSend )
-	{
-		$this->autoSend = $autoSend;
+	public function set_auto_send( bool $auto_send ) {
+		$this->auto_send = boolval( $auto_send );
+
+		return $this;
 	}
 
 	/**
+	 * Profile Automatic Send on content Update getter
+	 *
 	 * @return bool
 	 */
-	public function isAutoUpdate(): bool
-	{
-		return $this->autoUpdate;
+	public function is_auto_update(): bool {
+		return $this->auto_update;
 	}
 
 	/**
-	 * @param bool $autoUpdate
+	 * Profile Automatic Send on content Update setter
+	 *
+	 * @param bool $auto_update Auto Update.
+	 *
+	 * @return Profile
 	 */
-	public function setAutoUpdate( bool $autoUpdate )
-	{
-		$this->autoUpdate = $autoUpdate;
+	public function set_auto_update( bool $auto_update ) {
+		$this->auto_update = boolval( $auto_update );
+
+		return $this;
 	}
 
 	/**
+	 * Profile Project ID getter
+	 *
 	 * @return int
 	 */
-	public function getProjectID(): int
-	{
-		return $this->projectID;
+	public function get_project_id(): int {
+		return $this->project_id;
 	}
 
 	/**
-	 * @param int $projectID
+	 * Profile Project ID setter
+	 *
+	 * @param int $project_id Project id.
+	 *
+	 * @return Profile
 	 */
-	public function setProjectID( int $projectID )
-	{
-		$this->projectID = $projectID;
+	public function set_project_id( int $project_id ) {
+		$this->project_id = $project_id;
+
+		return $this;
 	}
 }
