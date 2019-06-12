@@ -11,7 +11,6 @@
 
 namespace SmartCAT\WP\Admin\Pages;
 
-use SmartCAT\WP\DITrait;
 use SmartCAT\WP\Helpers\TemplateEngine;
 
 /**
@@ -19,9 +18,7 @@ use SmartCAT\WP\Helpers\TemplateEngine;
  *
  * @package SmartCAT\WP\Admin\Pages
  */
-class Errors {
-	use DITrait;
-
+class Errors extends PageAbstract {
 	/**
 	 * Render errors page
 	 */
@@ -33,7 +30,7 @@ class Errors {
 		echo $render->render(
 			'errors',
 			[
-				'title'            => $GLOBALS['title'],
+				'title' => $GLOBALS['title'],
 			]
 		);
 	}

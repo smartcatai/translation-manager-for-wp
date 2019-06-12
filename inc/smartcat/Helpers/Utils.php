@@ -88,21 +88,21 @@ class Utils {
 	}
 
 	/**
-	 * @param $postId
+	 * @param $post_id
+	 *
 	 * @return bool|resource
 	 */
-	public function getPostToFile( $postId )
-	{
-		$post = get_post( $postId );
+	public function get_post_to_file( $post_id ) {
+		$post      = get_post( $post_id );
 		$post_body = $post->post_content;
 
-		// Ох уж этот Gutenberg....
-		if ( !function_exists( 'has_blocks' ) || !has_blocks( $postId ) ) {
+		// Gutenberg fix for WP 4.9 and lower.
+		if ( ! function_exists( 'has_blocks' ) || ! has_blocks( $post_id ) ) {
 			$post_body = wpautop( $post_body );
 		}
 
 		$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post_body}</body></html>";
-		$file	  = fopen( "php://temp/{$post->post_title}.html", "r+" );
+		$file      = fopen( "php://temp/{$post->post_title}.html", 'r+' );
 		fwrite( $file, $file_body );
 		rewind( $file );
 

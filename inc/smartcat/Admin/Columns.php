@@ -16,11 +16,8 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
 use SmartCAT\WP\WP\HookInterface;
 
-final class Columns implements HookInterface
-{
-
-	static function bulk_handler( $redirect_to, $action_name, $post_ids )
-	{
+final class Columns implements HookInterface {
+	static function bulk_handler( $redirect_to, $action_name, $post_ids ) {
 		if ( 'send_to_smartcat' === $action_name ) {
 			$redirect_to = add_query_arg( 'submit_for_translation_success', 'success', $redirect_to );
 		}
@@ -28,15 +25,13 @@ final class Columns implements HookInterface
 		return $redirect_to;
 	}
 
-	static function register_bulk_actions( $bulk_actions )
-	{
+	static function register_bulk_actions( $bulk_actions ) {
 		$bulk_actions['send_to_smartcat'] = __( 'Submit for translation', 'translation-connectors' );
 
 		return $bulk_actions;
 	}
 
-	static function register_bulk_action_notices()
-	{
+	static function register_bulk_action_notices() {
 		//TODO: переехать на Notice
 		if ( ! empty( $_REQUEST['submit_for_translation_success'] ) ) {
 			if ( 'success' === $_REQUEST['submit_for_translation_success'] ) {
@@ -49,13 +44,11 @@ final class Columns implements HookInterface
 		}
 	}
 
-	static function add_post_column( $columns )
-	{
+	static function add_post_column( $columns ) {
 		return self::add_column( $columns, 'comments' );
 	}
 
-	static protected function add_column( $columns, $before )
-	{
+	static protected function add_column( $columns, $before ) {
 		if ( $n = array_search( $before, array_keys( $columns ) ) ) {
 			$end	 = array_slice( $columns, $n );
 			$columns = array_slice( $columns, 0, $n );
@@ -66,8 +59,7 @@ final class Columns implements HookInterface
 		return isset( $end ) ? array_merge( $columns, $end ) : $columns;
 	}
 
-	static function post_column( $column, $post_id )
-	{
+	static function post_column( $column, $post_id ) {
 		//чтобы не отражалось на других колонках
 		if ( false === strpos( $column, 'smartCAT' ) ) {
 			return;
@@ -122,13 +114,11 @@ final class Columns implements HookInterface
 		echo $result_string;
 	}
 
-	public function register_hooks()
-	{
+	public function register_hooks() {
 		self::register_columns();
 	}
 
-	static function register_columns()
-	{
+	static function register_columns() {
 		$post_types = [ 'post' => 'post', 'page' => 'page' ];
 		foreach ( $post_types as $type ) {
 			add_filter( 'manage_' . ( 'edit-' . $type ) . '_columns', [ self::class, 'add_post_column' ], 100 );
@@ -144,8 +134,7 @@ final class Columns implements HookInterface
 		add_action( 'admin_notices', [ self::class, 'register_bulk_action_notices' ] );
 	}
 
-	static function make_attributes_string( $array )
-	{
+	static function make_attributes_string( $array ) {
 		$result = ' ';
 		foreach ( $array as $key => $value ) {
 			if ( ! is_string( $value ) ) {

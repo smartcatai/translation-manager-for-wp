@@ -27,22 +27,22 @@
 </div>
 {{/ isCookie }}
 <div class="smartcat-connector wrap">
-    <h1 class="wp-heading-inline">{{ title }}</h1>
+    <h1 class="wp-heading-inline">{{ texts.title }}</h1>
     <input type="button" class="page-title-action"
            id="smartcat-connector-refresh-statistics"
-           value="{{ refresh_text }}" {{ button_status }} />
+           value="{{ texts.refresh }}" {{ button_status }} />
 
     <hr class="wp-header-end" />
 
     {{# statistic_result }}
         {{# statistic_table }}{{/ statistic_table }}
         <div class="pagination">
-            <span class="title">{{ pages_text }}:</span>
+            <span class="title">{{ texts.pages }}:</span>
             {{# paginator }}{{/ paginator }}
         </div>
     {{/ statistic_result }}
 
     {{^ statistic_result }}
-        <div> {{ empty_message }} </div>
+        <div> {{ texts.empty }} </div>
     {{/ statistic_result }}
 </div>

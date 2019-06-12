@@ -11,31 +11,56 @@
 
 namespace SmartCAT\WP;
 
-class VariableStream
-{
+/**
+ * Class VariableStream
+ *
+ * @package SmartCAT\WP
+ */
+class VariableStream {
+	/**
+	 * @var
+	 */
 	private $position;
+	/**
+	 * @var
+	 */
 	private $varname;
 
-	public function stream_open( $path, $mode, $options, &$opened_path )
-	{
-		$url			= parse_url( $path );
-		$this->varname  = $url["host"];
+	/**
+	 * @param $path
+	 * @param $mode
+	 * @param $options
+	 * @param $opened_path
+	 *
+	 * @return bool
+	 */
+	public function stream_open( $path, $mode, $options, &$opened_path ) {
+		$url            = wp_parse_url( $path );
+		$this->varname  = $url['host'];
 		$this->position = 0;
 
 		return true;
 	}
 
-	public function stream_read( $count )
-	{
+	/**
+	 * @param $count
+	 *
+	 * @return bool|string
+	 */
+	public function stream_read( $count ) {
 		$p   =& $this->position;
 		$ret = substr( $GLOBALS[ $this->varname ], $p, $count );
-		$p   += strlen( $ret );
+		$p  += strlen( $ret );
 
 		return $ret;
 	}
 
-	public function stream_write( $data )
-	{
+	/**
+	 * @param $data
+	 *
+	 * @return int
+	 */
+	public function stream_write( $data ) {
 		$v =& $GLOBALS[ $this->varname ];
 		$l = strlen( $data );
 		$p =& $this->position;
@@ -44,42 +69,55 @@ class VariableStream
 		return $l;
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function stream_tell() {
 		return $this->position;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function stream_eof() {
 		return $this->position >= strlen( $GLOBALS[ $this->varname ] );
 	}
 
-	public function stream_seek( $offset, $whence )
-	{
+	/**
+	 * @param $offset
+	 * @param $whence
+	 *
+	 * @return bool
+	 */
+	public function stream_seek( $offset, $whence ) {
 		$v = &$GLOBALS[ $this->varname ];
 		$l = strlen( $v );
 		$p =& $this->position;
 		switch ( $whence ) {
 			case SEEK_SET:
-				$newPos = $offset;
+				$new_pos = $offset;
 				break;
 			case SEEK_CUR:
-				$newPos = $p + $offset;
+				$new_pos = $p + $offset;
 				break;
 			case SEEK_END:
-				$newPos = $l + $offset;
+				$new_pos = $l + $offset;
 				break;
 			default:
 				return false;
 		}
-		$ret = ( $newPos >= 0 && $newPos <= $l );
+		$ret = ( $new_pos >= 0 && $new_pos <= $l );
 		if ( $ret ) {
-			$p = $newPos;
+			$p = $new_pos;
 		}
 
 		return $ret;
 	}
 
-	public function stream_stat()
-	{
+	/**
+	 * @return array
+	 */
+	public function stream_stat() {
 		return [ 'size' => strlen( $GLOBALS[ $this->varname ] ) ];
 	}
 }

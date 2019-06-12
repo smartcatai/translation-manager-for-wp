@@ -77,7 +77,7 @@ class SendToSmartCAT extends CronAbstract
 		$converter = $container->get( 'language.converter' );
 
 		foreach ( $tasks as $task ) {
-			$file = $utils->getPostToFile( $task->get_post_id() );
+			$file = $utils->get_post_to_file( $task->get_post_id() );
 			$task_name = $smartcat::getTaskNameFromStream( $file );
 
 			try {

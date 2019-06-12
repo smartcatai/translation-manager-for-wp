@@ -15,8 +15,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-trait DITrait
-{
+trait DITrait {
 	/**
 	 * @var ContainerBuilder $container
 	 */
@@ -25,8 +24,7 @@ trait DITrait
 	/**
 	 * Initializes DI Container from YAML config file
 	 */
-	protected static function init_container()
-	{
+	protected static function init_container() {
 		$container = new ContainerBuilder();
 
 		$config_dir = [ SMARTCAT_PLUGIN_DIR . 'inc' . DIRECTORY_SEPARATOR . 'configs' ];
@@ -37,8 +35,9 @@ trait DITrait
 
 		$loader->load( 'autoload.yml' );
 		$config_files = $container->getParameter( 'config.files' );
-		foreach ( $config_files as $configFile ) {
-			$loader->load( $configFile );
+
+		foreach ( $config_files as $config_file ) {
+			$loader->load( $config_file );
 		}
 
 		self::$container_instance = $container;
@@ -48,16 +47,16 @@ trait DITrait
 	 * Extracts mixed from container
 	 *
 	 * @param string $id
-	 * @param bool $isParam
+	 * @param bool $is_param
 	 *
 	 * @return mixed
+	 * @throws \Exception
 	 */
-	protected function from_container( $id, $isParam = false )
-	{
+	protected function from_container( $id, $is_param = false ) {
 		$container = self::get_container();
 		$content   = null;
 
-		if ( $isParam ) {
+		if ( $is_param ) {
 			$content = $container->getParameter( $id );
 		} else {
 			$content = $container->get( $id );
@@ -69,8 +68,7 @@ trait DITrait
 	/**
 	 * @return ContainerBuilder
 	 */
-	public static function get_container()
-	{
+	public static function get_container() {
 		if ( null === self::$container_instance ) {
 			self::init_container();
 		}

@@ -12,7 +12,6 @@
 namespace SmartCAT\WP\Admin\Pages;
 
 use SmartCAT\WP\Admin\Tables\StatisticsTable;
-use SmartCAT\WP\DITrait;
 use SmartCAT\WP\Helpers\TemplateEngine;
 
 /**
@@ -20,9 +19,7 @@ use SmartCAT\WP\Helpers\TemplateEngine;
  *
  * @package SmartCAT\WP\Admin\Pages
  */
-class Dashboard {
-	use DITrait;
-
+class Dashboard extends PageAbstract {
 	/**
 	 * Render dasboard page
 	 */
@@ -42,65 +39,37 @@ class Dashboard {
 		$page                       = self::get_page( $max_page );
 		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
 		$statistics_result          = $stat_repo->get_statistics( $limit * ( $page - 1 ), $limit );
+		$table_code                 = self::get_table_code( $statistics_table, $statistics_result );
+		$paginator                  = self::get_paginator_code( 'sc-dashboard', $max_page, $page );
 
 		add_thickbox();
 
 		echo $render->render(
 			'dashboard',
 			[
-				'title'            => $GLOBALS['title'],
 				'isCookie'         => $is_cookie,
 				'button_status'    => $is_statistics_queue_active ? 'disabled="disabled"' : false,
 				'statistic_result' => $statistics_result ? true : false,
-				'refresh_text'     => __( 'Refresh statistics', 'translation-connectors' ),
-				'statistic_table'  => function () use ( $statistics_table, $render, $statistics_result ) {
-					$table_with_data = $statistics_table->set_data( $statistics_result );
-
-					return $render->ob_to_string( [ $table_with_data, 'display' ] );
+				'statistic_table'  => function () use ( $table_code ) {
+					return $table_code;
 				},
-				'pages_text'       => __( 'Pages', 'translation-connectors' ),
-				'empty_message'    => __( 'Statistics is empty', 'translation-connectors' ),
-				'paginator'        => function () use ( $max_page, $page ) {
-					return self::get_paginator_code( $max_page, $page );
+				'texts'            => self::get_texts(),
+				'paginator'        => function () use ( $paginator ) {
+					return $paginator;
 				},
 			]
 		);
 	}
 
 	/**
-	 * @param $max_page
-	 *
-	 * @return float|int
+	 * @return array
 	 */
-	private static function get_page( $max_page ) {
-		$page = isset( $_GET['page-number'] ) ? abs( intval( $_GET['page-number'] ) ) : 1;
-		$page = ( $page > $max_page ) ? $max_page : $page;
-		$page = ( $page >= 1 ) ? $page : 1;
-
-		return $page;
-	}
-
-	/**
-	 * @param int $max_page
-	 * @param int $page
-	 *
-	 * @return string
-	 */
-	private static function get_paginator_code( $max_page, $page ) {
-		$uri = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-		$url = strtok( $uri, '?' );
-
-		$paginator = '';
-
-		for ( $page_number = 1; $page_number <= $max_page; $page_number ++ ) {
-			if ( $page_number === $page ) {
-				$paginator .= "<span>{$page_number}</span>";
-			} else {
-				$full_url   = esc_html( $url . '?page=sc-translation-progress&page-number=' . $page_number );
-				$paginator .= '<a href="' . $full_url . '">' . $page_number . '</a>';
-			}
-		}
-
-		return $paginator;
+	private static function get_texts() {
+		return [
+			'refresh' => __( 'Refresh statistics', 'translation-connectors' ),
+			'pages'   => __( 'Pages', 'translation-connectors' ),
+			'empty'   => __( 'Statistics is empty', 'translation-connectors' ),
+			'title'   => $GLOBALS['title'],
+		];
 	}
 }

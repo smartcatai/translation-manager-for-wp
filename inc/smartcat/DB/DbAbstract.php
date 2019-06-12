@@ -77,7 +77,7 @@ abstract class DbAbstract {
 	 * @return mixed|void
 	 */
 	protected function get_plugin_version() {
-		return get_option( 'st_manager_db_version', 0 );
+		return get_option( 'smartcat_connector_smartcat_db_version', 0 );
 	}
 
 	/**

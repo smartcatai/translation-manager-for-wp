@@ -35,7 +35,7 @@ final class StatisticsAjax implements HookInterface
 	{
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
-			$ajax_response->sendError( __( 'Access denied', 'translation-connectors' ), [], 403 );
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
 			wp_die();
 		}
 
@@ -68,7 +68,7 @@ final class StatisticsAjax implements HookInterface
 			}
 		}
 
-		$ajax_response->sendSuccess( 'ok' );
+		$ajax_response->send_success( 'ok' );
 		wp_die();
 	}
 
@@ -76,7 +76,7 @@ final class StatisticsAjax implements HookInterface
 	{
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
-			$ajax_response->sendError( __( 'Access denied', 'translation-connectors' ), [], 403 );
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
 			wp_die();
 		}
 
@@ -85,7 +85,7 @@ final class StatisticsAjax implements HookInterface
 
 		/** @var Options $options */
 		$options = $container->get( 'core.options' );
-		$ajax_response->sendSuccess( 'ok',
+		$ajax_response->send_success( 'ok',
 			[ 'statistic_queue_active' => boolval( $options->get( 'statistic_queue_active' ) ) ] );
 		wp_die();
 	}

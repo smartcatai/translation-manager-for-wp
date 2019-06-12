@@ -42,25 +42,59 @@ class ProfileRepository extends RepositoryAbstract {
 	protected function to_entity( $row ) {
 		$result = new Profile();
 
-		$columns = [
+		$text_columns = [
 			'id',
+			'name',
 			'vendor',
 			'vendor_name',
 			'source_language',
-			'target_languages',
 			'project_id',
-			'workflow_stages',
 			'auto_send',
 			'auto_update',
 		];
 
-		foreach ( $columns as $column ) {
+		$array_columns = [
+			'target_languages',
+			'workflow_stages',
+		];
+
+		foreach ( $text_columns as $column ) {
 			if ( isset( $row->{$column} ) ) {
 				$result->{'set_' . $column}( $row->{$column} );
 			}
 		}
 
+		foreach ( $array_columns as $column ) {
+			if ( isset( $row->{$column} ) ) {
+				$result->{'set_' . $column}( json_decode( $row->{$column}, true ) );
+			}
+		}
+
 		return $result;
+	}
+
+	/**
+	 * @param int $from
+	 * @param int $limit
+	 *
+	 * @return Profile[]
+	 */
+	public function get_all( $from = 0, $limit = 100 ) {
+		$wpdb  = $this->get_wp_db();
+		$from  = intval( $from );
+		$limit = intval( $limit );
+
+		$from >= 0 || $from = 0;
+
+		$table_name = $this->get_table_name();
+		$results    = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM $table_name LIMIT %d, %d",
+				[ $from, $limit ]
+			)
+		);
+
+		return $this->prepare_result( $results );
 	}
 
 	/**
@@ -94,10 +128,11 @@ class ProfileRepository extends RepositoryAbstract {
 		$wpdb = $this->get_wp_db();
 
 		$data = [
+			'name'             => $profile->get_name(),
 			'source_language'  => $profile->get_source_language(),
 			'target_languages' => wp_json_encode( $profile->get_target_languages() ),
 			'project_id'       => $profile->get_project_id(),
-			'workflow_stages'  => $profile->get_workflow_stages(),
+			'workflow_stages'  => wp_json_encode( $profile->get_workflow_stages() ),
 			'vendor'           => $profile->get_vendor(),
 			'vendor_name'      => $profile->get_vendor_name(),
 			'auto_send'        => $profile->is_auto_send(),
@@ -108,7 +143,7 @@ class ProfileRepository extends RepositoryAbstract {
 			$data['id'] = $profile->get_id();
 		}
 
-		if ( $wpdb->insert( $this->getTableName(), $data ) ) {
+		if ( $wpdb->insert( $this->get_table_name(), $data ) ) {
 			$profile->set_id( $wpdb->insert_id );
 			return $wpdb->insert_id;
 		}
@@ -127,10 +162,11 @@ class ProfileRepository extends RepositoryAbstract {
 
 		if ( ! empty( $profile->get_id() ) ) {
 			$data = [
+				'name'             => $profile->get_name(),
 				'source_language'  => $profile->get_source_language(),
 				'target_languages' => wp_json_encode( $profile->get_target_languages() ),
 				'project_id'       => $profile->get_project_id(),
-				'workflow_stages'  => $profile->get_workflow_stages(),
+				'workflow_stages'  => wp_json_encode( $profile->get_workflow_stages() ),
 				'vendor'           => $profile->get_vendor(),
 				'vendor_name'      => $profile->get_vendor_name(),
 				'auto_send'        => $profile->is_auto_send(),

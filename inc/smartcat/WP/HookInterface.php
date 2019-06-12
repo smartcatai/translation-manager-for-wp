@@ -11,7 +11,16 @@
 
 namespace SmartCAT\WP\WP;
 
-interface HookInterface
-{
+/**
+ * Interface HookInterface
+ *
+ * @package SmartCAT\WP\WP
+ */
+interface HookInterface {
+	/**
+	 * Register hooks function
+	 *
+	 * @return mixed
+	 */
 	public function register_hooks();
 }

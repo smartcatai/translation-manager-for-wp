@@ -1,9 +1,20 @@
 <div class="smartcat-connector wrap">
-    <h1 class="wp-heading-inline">{{ title }}</h1>
+    <h1 class="wp-heading-inline">{{ texts.title }}</h1>
     <input type="button" class="page-title-action"
            id="smartcat-connector-refresh-statistics"
-           value="{{ add_profile_text }}" />
+           value="{{ texts.add_profile }}" />
 
     <hr class="wp-header-end" />
 
+    {{# profiles_result }}
+    {{# profiles_table }}{{/ profiles_table }}
+    <div class="pagination">
+        <span class="title">{{ texts.pages }}:</span>
+        {{# paginator }}{{/ paginator }}
+    </div>
+    {{/ profiles_result }}
+
+    {{^ profiles_result }}
+    <div> {{ texts.empty }} </div>
+    {{/ profiles_result }}
 </div>

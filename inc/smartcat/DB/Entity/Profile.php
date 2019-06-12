@@ -25,6 +25,13 @@ class Profile {
 	private $profile_id;
 
 	/**
+	 * Profile name
+	 *
+	 * @var string
+	 */
+	private $name;
+
+	/**
 	 * Selected vendor GUID to send in
 	 *
 	 * @var string
@@ -85,7 +92,7 @@ class Profile {
 	 *
 	 * @return int
 	 */
-	public function get_id(): int {
+	public function get_id() {
 		return $this->profile_id;
 	}
 
@@ -96,8 +103,30 @@ class Profile {
 	 *
 	 * @return Profile
 	 */
-	public function set_id( int $profile_id ) {
-		$this->profile_id = intval( $profile_id );
+	public function set_id( $profile_id ) {
+		$this->profile_id = $profile_id;
+
+		return $this;
+	}
+
+	/**
+	 * Profile name getter
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return $this->name;
+	}
+
+	/**
+	 * Profile name setter
+	 *
+	 * @param string $name Name of profile.
+	 *
+	 * @return Profile
+	 */
+	public function set_name( $name ) {
+		$this->name = $name;
 
 		return $this;
 	}
@@ -107,7 +136,7 @@ class Profile {
 	 *
 	 * @return string
 	 */
-	public function get_vendor(): string {
+	public function get_vendor() {
 		return $this->vendor;
 	}
 
@@ -118,7 +147,7 @@ class Profile {
 	 *
 	 * @return Profile
 	 */
-	public function set_vendor( string $vendor ) {
+	public function set_vendor( $vendor ) {
 		$this->vendor = $vendor;
 
 		return $this;
@@ -127,9 +156,9 @@ class Profile {
 	/**
 	 * Profile Vendor Name
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function get_vendor_name(): string {
+	public function get_vendor_name() {
 		return $this->vendor_name;
 	}
 
@@ -140,7 +169,7 @@ class Profile {
 	 *
 	 * @return Profile
 	 */
-	public function set_vendor_name( string $vendor_name ) {
+	public function set_vendor_name( $vendor_name ) {
 		$this->vendor_name = $vendor_name;
 
 		return $this;
@@ -151,7 +180,7 @@ class Profile {
 	 *
 	 * @return string
 	 */
-	public function get_source_language(): string {
+	public function get_source_language() {
 		return $this->source_language;
 	}
 
@@ -162,7 +191,7 @@ class Profile {
 	 *
 	 * @return Profile
 	 */
-	public function set_source_language( string $source_language ) {
+	public function set_source_language( $source_language ) {
 		$this->source_language = $source_language;
 
 		return $this;
@@ -173,19 +202,19 @@ class Profile {
 	 *
 	 * @return string[]
 	 */
-	public function get_target_languages(): array {
-		return json_decode( $this->target_languages, true );
+	public function get_target_languages() {
+		return $this->target_languages;
 	}
 
 	/**
 	 * Profile Target Languages setter
 	 *
-	 * @param string[] $target_languages Target Languages.
+	 * @param string[]|string $target_languages Target Languages.
 	 *
 	 * @return Profile
 	 */
-	public function set_target_languages( array $target_languages ) {
-		$this->target_languages = wp_json_encode( $target_languages );
+	public function set_target_languages( $target_languages ) {
+		$this->target_languages = $target_languages;
 
 		return $this;
 	}
@@ -195,18 +224,18 @@ class Profile {
 	 *
 	 * @return string[]
 	 */
-	public function get_workflow_stages(): array {
+	public function get_workflow_stages() {
 		return $this->workflow_stages;
 	}
 
 	/**
 	 * Profile Workflow Stages setter
 	 *
-	 * @param string[] $workflow_stages Workflow Stages.
+	 * @param string[]|string $workflow_stages Workflow Stages.
 	 *
 	 * @return Profile
 	 */
-	public function set_workflow_stages( array $workflow_stages ) {
+	public function set_workflow_stages( $workflow_stages ) {
 		$this->workflow_stages = $workflow_stages;
 
 		return $this;
@@ -217,7 +246,7 @@ class Profile {
 	 *
 	 * @return bool
 	 */
-	public function is_auto_send(): bool {
+	public function is_auto_send() {
 		return $this->auto_send;
 	}
 
@@ -228,8 +257,8 @@ class Profile {
 	 *
 	 * @return Profile
 	 */
-	public function set_auto_send( bool $auto_send ) {
-		$this->auto_send = boolval( $auto_send );
+	public function set_auto_send( $auto_send ) {
+		$this->auto_send = $auto_send;
 
 		return $this;
 	}
@@ -239,7 +268,7 @@ class Profile {
 	 *
 	 * @return bool
 	 */
-	public function is_auto_update(): bool {
+	public function is_auto_update() {
 		return $this->auto_update;
 	}
 
@@ -250,8 +279,8 @@ class Profile {
 	 *
 	 * @return Profile
 	 */
-	public function set_auto_update( bool $auto_update ) {
-		$this->auto_update = boolval( $auto_update );
+	public function set_auto_update( $auto_update ) {
+		$this->auto_update = $auto_update;
 
 		return $this;
 	}
@@ -261,18 +290,18 @@ class Profile {
 	 *
 	 * @return int
 	 */
-	public function get_project_id(): int {
+	public function get_project_id() {
 		return $this->project_id;
 	}
 
 	/**
 	 * Profile Project ID setter
 	 *
-	 * @param int $project_id Project id.
+	 * @param string $project_id Project id.
 	 *
 	 * @return Profile
 	 */
-	public function set_project_id( int $project_id ) {
+	public function set_project_id( $project_id ) {
 		$this->project_id = $project_id;
 
 		return $this;

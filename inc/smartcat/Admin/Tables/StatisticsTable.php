@@ -15,9 +15,7 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\Helpers\Utils;
 
-class StatisticsTable extends \WP_List_Table {
-	protected $data = [];
-
+class StatisticsTable extends TableAbstract {
 	/**
 	 * @return array
 	 */
@@ -35,46 +33,6 @@ class StatisticsTable extends \WP_List_Table {
 
 		return $columns;
 	}
-
-	/**
-	 *
-	 */
-	public function display()
-	{
-		$this->prepare_items();
-		spawn_cron();
-		parent::display();
-	}
-
-	/**
-	 *
-	 */
-	public function prepare_items() {
-		$columns               = $this->get_columns();
-		$hidden                = [];
-		$sortable              = [];
-		$this->_column_headers = [ $columns, $hidden, $sortable ];
-		$this->items           = $this->get_data();
-	}
-
-	/**
-	 * @return array
-	 */
-	public function get_data() {
-		return $this->data;
-	}
-
-	/**
-	 * @param $data
-	 *
-	 * @return $this
-	 */
-	public function set_data( $data ) {
-		$this->data = $data;
-
-		return $this;
-	}
-
 
 	/**
 	 * @param Statistics $item

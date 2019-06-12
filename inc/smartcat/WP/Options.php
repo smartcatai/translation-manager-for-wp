@@ -13,8 +13,11 @@ namespace SmartCAT\WP\WP;
 
 use SmartCAT\WP\Connector;
 
-class Options implements PluginInterface
-{
+/**
+ * Class Options
+ * @package SmartCAT\WP\WP
+ */
+class Options implements PluginInterface {
 	static private $options_list = null;
 	private $prefix;
 
@@ -36,11 +39,9 @@ class Options implements PluginInterface
 	}
 
 	public function plugin_activate() {
-
 	}
 
 	public function plugin_deactivate() {
-
 	}
 
 	public function plugin_uninstall() {
@@ -57,11 +58,11 @@ class Options implements PluginInterface
 	 * @return mixed|bool
 	 */
 	public function get( $name ) {
-		$systemName = "{$this->prefix}{$name}";
+		$system_name = "{$this->prefix}{$name}";
 		//TODO: избавиться от ассертов
-		assert( isset( self::$options_list[ $systemName ] ), "Неизвестная опция $name. Добавьте ее в plugin.options" );
+		assert( isset( self::$options_list[ $system_name ] ), "Неизвестная опция $name. Добавьте ее в plugin.options" );
 
-		return get_option( $systemName );
+		return get_option( $system_name );
 	}
 
 	/**

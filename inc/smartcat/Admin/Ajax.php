@@ -34,14 +34,13 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 final class Ajax implements HookInterface {
 	use DITrait;
 
-	static public function validate_settings()
-	{
+	static public function validate_settings() {
 		// валидация на js страницы с настройками
 		// в общем виде - проверка на стороне смартката правильности логина и пароля
 
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
-			$ajax_response->sendError( __( 'Access denied', 'translation-connectors' ), [], 403 );
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
 			wp_die();
 		}
 
@@ -57,9 +56,9 @@ final class Ajax implements HookInterface {
 		/** @var Utils $utils */
 		$utils = $container->get( 'utils' );
 		if ( ! $utils->is_array_in_array( $required_parameters, array_keys( $parameters ) ) ) {
-			$ajax_response->sendError( __( 'Login and password are required', 'translation-connectors' ), $data );
+			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
 		} elseif ( empty( $login = $parameters[ $prefix . 'smartcat_api_login' ] ) || empty( $password = $parameters[ $prefix . 'smartcat_api_password' ] ) ) {
-			$ajax_response->sendError( __( 'Login and password are required', 'translation-connectors' ), $data );
+			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
 		}
 
 		$server = $parameters[ $prefix . 'smartcat_api_server' ];
@@ -85,9 +84,9 @@ final class Ajax implements HookInterface {
 			}
 		} catch ( \Exception $e ) {
 			if ( $e->getMessage() === 'Invalid username or password' ) {
-				$ajax_response->sendError( __( 'Invalid username or password', 'translation-connectors' ), $data );
+				$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
 			} else {
-				$ajax_response->sendError( 'nok', $data );
+				$ajax_response->send_error( 'nok', $data );
 			}
 		}
 
@@ -107,7 +106,7 @@ final class Ajax implements HookInterface {
 
 				Logger::error( "Callback delete failed, user {$previous_login}", $message );
 
-				$ajax_response->sendError(
+				$ajax_response->send_error(
 					__( 'Problem with deleting of previous callback', 'translation-connectors' ),
 					$data
 				 );
@@ -129,7 +128,7 @@ final class Ajax implements HookInterface {
 
 			Logger::error( "Callback register failed, user {$login}", $message );
 
-			$ajax_response->sendError( __( 'Problem with setting of new callback', 'translation-connectors' ), $data );
+			$ajax_response->send_error( __( 'Problem with setting of new callback', 'translation-connectors' ), $data );
 		}
 
 		//сохраняем account_name
@@ -139,7 +138,7 @@ final class Ajax implements HookInterface {
 			$options->set( 'smartcat_account_name', $account_info->getName() );
 		}
 
-		$ajax_response->sendSuccess( 'ok', $data );
+		$ajax_response->send_success( 'ok', $data );
 		wp_die();
 	}
 
@@ -152,7 +151,7 @@ final class Ajax implements HookInterface {
 	{
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
-			$ajax_response->sendError( __( 'Access denied', 'translation-connectors' ), [], 403 );
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
 			wp_die();
 		}
 
@@ -172,13 +171,13 @@ final class Ajax implements HookInterface {
 					'status' => __( 'In progress', 'translation-connectors' )
 				];
 
-				$ajax_response->sendSuccess( 'ok', $data );
+				$ajax_response->send_success( 'ok', $data );
 			}
 
 			wp_die();
 		}
 
-		$ajax_response->sendError( 'nok', $data );
+		$ajax_response->send_error( 'nok', $data );
 
 		wp_die();
 	}
@@ -187,7 +186,7 @@ final class Ajax implements HookInterface {
 	{
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
-			$ajax_response->sendError( __( 'Access denied', 'translation-connectors' ), [], 403 );
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
 			wp_die();
 		}
 
@@ -197,7 +196,7 @@ final class Ajax implements HookInterface {
 			unset( $target_languages[ $empty_language_key ] );
 		}
 
-		! empty( $target_languages ) || $ajax_response->sendError( __( 'Target languages are empty',
+		! empty( $target_languages ) || $ajax_response->send_error( __( 'Target languages are empty',
 			'translation-connectors' ) );
 
 		$container = self::get_container();
@@ -272,19 +271,19 @@ final class Ajax implements HookInterface {
 					}
 
 					if ( count( $data['stats'] ) != count( $post_target_languages ) ) {
-						$ajax_response->sendError( __( 'Not all stats was created', 'translation-connectors' ) );
+						$ajax_response->send_error( __( 'Not all stats was created', 'translation-connectors' ) );
 					}
 				} else {
 					$data['task'] = $task;
-					$ajax_response->sendError( __( 'Task was not created', 'translation-connectors' ), $data );
+					$ajax_response->send_error( __( 'Task was not created', 'translation-connectors' ), $data );
 				}
 			}
 		}
 
 		if ( $is_new_task_created ) {
-			$ajax_response->sendSuccess( 'ok', $data );
+			$ajax_response->send_success( 'ok', $data );
 		} else {
-			$ajax_response->sendError( 'Task was not created', $data );
+			$ajax_response->send_error( 'Task was not created', $data );
 		}
 
 		spawn_cron();

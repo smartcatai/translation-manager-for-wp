@@ -14,11 +14,27 @@ namespace SmartCAT\WP\Helpers\Language;
 use SmartCAT\WP\Helpers\Language\Exceptions\LanguageNotFoundException;
 
 //TODO: возможно вынести отдельно релэйшены длы WP и SC по разным классам, данный класс оставить в качестве интерфейсного
+
+/**
+ * Class LanguageConverter
+ * @package SmartCAT\WP\Helpers\Language
+ */
 final class LanguageConverter {
+	/**
+	 * @var
+	 */
 	protected $wp_to_sc_relations;
+	/**
+	 * @var
+	 */
 	protected $sc_to_wp_relations;
 
-	//весь сырбор из-за требования обратной конвертации ( из SC в WP )
+	/**
+	 * @param $wp_code
+	 * @param $sc_code
+	 * @param $wp_name
+	 * @param null $sc_name
+	 */
 	protected function add_relation( $wp_code, $sc_code, $wp_name, $sc_name = null ) {
 		//использую объект для передачи по ссылке в два места ( теоретически, сэкономит память )
 		$language = new LanguageEntity( $wp_code, $sc_code, $wp_name, $sc_name );
@@ -28,8 +44,10 @@ final class LanguageConverter {
 		$this->sc_to_wp_relations[ $sc_code ][] = $language; // 1 ко многим
 	}
 
+	/**
+	 * отдельным методом, чтоб можно было подменить при необходимости
+	 */
 	protected function init() {
-		//отдельным методом, чтоб можно было подменить при необходимости
 		$this->add_relation( 'af', 'af', __( 'Afrikaans', 'translation-connectors' ) );
 		$this->add_relation( 'am', 'am', __( 'Amharic', 'translation-connectors' ) );
 		$this->add_relation( 'ar', 'ar', __( 'Arabic', 'translation-connectors' ) );
@@ -172,6 +190,9 @@ final class LanguageConverter {
 		$this->add_relation( 'yor', 'yo', __( 'Yoruba', 'translation-connectors' ) );
 	}
 
+	/**
+	 * LanguageConverter constructor.
+	 */
 	public function __construct() {
 		$this->init();
 	}
@@ -203,34 +224,55 @@ final class LanguageConverter {
 				'translation-connectors' ) );
 		}
 
-		return $this->sc_to_wp_relations[ $sc_code ][0]; //возвращаем первый попавшийся до новых требований
+		return $this->sc_to_wp_relations[ $sc_code ][0];
 	}
 
+	/**
+	 * @param $sc_code
+	 *
+	 * @return mixed
+	 * @throws LanguageNotFoundException
+	 */
 	public function get_all_wp_codes_by_sc( $sc_code ) {
 		if ( ! isset( $this->sc_to_wp_relations[ $sc_code ] ) || ! is_array( $this->sc_to_wp_relations[ $sc_code ] ) ) {
 			throw new LanguageNotFoundException( __( 'Not found wp lang by sc_code = ' . $sc_code,
 				'translation-connectors' ) );
 		}
 
-		return $this->sc_to_wp_relations[ $sc_code ]; //возвращаем весь массив
+		return $this->sc_to_wp_relations[ $sc_code ];
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function get_all_sc_languages() {
 		return $this->sc_to_wp_relations;
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function get_all_wp_languages() {
 		return $this->wp_to_sc_relations;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function get_sc_codes() {
 		return array_keys( $this->sc_to_wp_relations );
 	}
 
+	/**
+	 * @return array
+	 */
 	public function get_wp_codes() {
 		return array_keys( $this->wp_to_sc_relations );
 	}
 
+	/**
+	 * @return array
+	 */
 	public function get_wp_languages() {
 		$result = array_map( function (
 			/** @var LanguageEntity $value */
@@ -244,6 +286,9 @@ final class LanguageConverter {
 		return $result;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function get_sc_languages() {
 		$result = array_map( function (
 			/** @var LanguageEntity[] $value */
@@ -257,6 +302,11 @@ final class LanguageConverter {
 		return $result;
 	}
 
+	/**
+	 * @param $source_language_code
+	 *
+	 * @return array
+	 */
 	public function get_wp_target_languages( $source_language_code ) {
 		$languages = $this->get_wp_languages();
 		if ( isset( $languages[ $source_language_code ] ) ) {
@@ -267,6 +317,11 @@ final class LanguageConverter {
 	}
 
 
+	/**
+	 * @param $source_language_code
+	 *
+	 * @return array
+	 */
 	public function get_sc_target_languages( $source_language_code ) {
 		$languages = $this->get_sc_languages();
 		if ( isset( $languages[ $source_language_code ] ) ) {
@@ -276,6 +331,9 @@ final class LanguageConverter {
 		return $languages;
 	}
 
+	/**
+	 * @return array|false
+	 */
 	public function get_polylang_names_to_locales() {
 		/** @noinspection PhpUndefinedFunctionInspection */
 		$pll_names = pll_languages_list( [ 'fields' => 'name' ] );
@@ -287,6 +345,9 @@ final class LanguageConverter {
 		return $result;
 	}
 
+	/**
+	 * @return array|false
+	 */
 	public function get_polylang_names_to_slugs() {
 		/** @noinspection PhpUndefinedFunctionInspection */
 		$pll_names = pll_languages_list( [ 'fields' => 'name' ] );
@@ -298,6 +359,9 @@ final class LanguageConverter {
 		return $result;
 	}
 
+	/**
+	 * @return array|false
+	 */
 	public function get_polylang_slugs_to_names() {
 		/** @noinspection PhpUndefinedFunctionInspection */
 		$pll_slugs = pll_languages_list( [ 'fields' => 'slug' ] );
@@ -309,13 +373,21 @@ final class LanguageConverter {
 		return $result;
 	}
 
-	public function get_polylang_language_name_by_slug( $slug )
-	{
+	/**
+	 * @param $slug
+	 *
+	 * @return mixed|string
+	 */
+	public function get_polylang_language_name_by_slug( $slug ) {
 		$languages = $this->get_polylang_slugs_to_names();
 		return $languages[$slug] ?? '';
 	}
 
-	//не классичный подход с возвращаемыми параметрами в интерфейсе метода, здесь мне показалось уместным и удобным
+	/**
+	 * @param array $unsupported_languages_array
+	 *
+	 * @return array
+	 */
 	public function get_polylang_languages_supported_by_sc( &$unsupported_languages_array = [] ) {
 		$languages = $this->get_polylang_names_to_locales();
 
@@ -335,7 +407,30 @@ final class LanguageConverter {
 		return $result;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function get_polylang_locales_supported_by_sc() {
+		$languages = $this->get_polylang_languages_supported_by_sc();
+
+		return array_keys( $languages );
+	}
+
+	/**
+	 * @return mixed
+	 * @throws LanguageNotFoundException
+	 */
+	public function get_default_language_sc_code() {
+		$default_polylang = pll_default_language( 'locale' );
+
+		return $this->get_sc_code_by_wp( $default_polylang )->get_sc_code();
+	}
+
 	//пришлось писать отдельную функцию для фронта
+
+	/**
+	 * @return array
+	 */
 	public function get_polylang_slugs_supported_by_sc() {
 		//TODO: далеко не самое оптимальное решение, мб назреет что-то более адекватное
 		$name_to_slug	= $this->get_polylang_names_to_slugs();
@@ -349,6 +444,9 @@ final class LanguageConverter {
 		return $result;
 	}
 
+	/**
+	 * @return array|false
+	 */
 	public function get_polylang_slugs_to_locales() {
 		/** @noinspection PhpUndefinedFunctionInspection */
 		$pll_slug = pll_languages_list( [ 'fields' => 'slug' ] );
@@ -360,6 +458,9 @@ final class LanguageConverter {
 		return $result;
 	}
 
+	/**
+	 * @return array|false
+	 */
 	public function get_polylang_locales_to_slugs() {
 		/** @noinspection PhpUndefinedFunctionInspection */
 		$pll_slug = pll_languages_list( [ 'fields' => 'slug' ] );

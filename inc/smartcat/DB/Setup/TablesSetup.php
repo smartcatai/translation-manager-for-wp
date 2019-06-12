@@ -11,7 +11,12 @@
 
 namespace SmartCAT\WP\DB\Setup;
 
+use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\DbAbstract;
+use SmartCAT\WP\DB\Entity\Profile;
+use SmartCAT\WP\DB\Repository\ProfileRepository;
+use SmartCAT\WP\Helpers\Language\LanguageConverter;
+use SmartCAT\WP\WP\Options;
 
 /**
  * Class TablesSetup
@@ -30,7 +35,7 @@ class TablesSetup extends DbAbstract implements SetupInterface {
 	}
 
 	/**
-	 *
+	 * Install plugin function
 	 */
 	public function install() {
 		$this->initial();
@@ -41,15 +46,44 @@ class TablesSetup extends DbAbstract implements SetupInterface {
 	}
 
 	/**
-	 *
+	 * Update to version 1.3.0
 	 */
 	private function v130() {
 		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
-		$this->exec( "ALTER TABLE {$statistic_table_name} ADD COLUMN profileID BIGINT( 20 ) UNSIGNED NOT NULL;" );
+		$this->exec( "ALTER TABLE {$statistic_table_name} ADD COLUMN IF NOT EXISTS profileID BIGINT( 20 ) UNSIGNED NOT NULL;" );
+
+		if ( $this->get_plugin_version() !== 0 ) {
+			$container = Connector::get_container();
+
+			/** @var ProfileRepository $profile_repo */
+			$profile_repo = $container->get( 'entity.repository.profile' );
+			/** @var Options $options */
+			$options = $container->get( 'core.options' );
+			/** @var LanguageConverter $language_converter */
+			$language_converter = $container->get( 'language.converter' );
+
+			$profile = new Profile();
+			$profile
+				->set_source_language( $language_converter->get_default_language_sc_code() )
+				->set_target_languages( $language_converter->get_polylang_locales_supported_by_sc() )
+				->set_auto_send( false )
+				->set_auto_update( false )
+				->set_workflow_stages( $options->get( 'smartcat_workflow_stages' ) )
+				->set_vendor( $options->get( 'smartcat_vendor_id' ) )
+				->set_vendor_name( $options->get( 'smartcat_account_name' ) );
+
+			$project_id = $options->get( 'smartcat_api_project_id' );
+
+			if ( $project_id ) {
+				$profile->set_project_id( $project_id );
+			}
+
+			$profile_repo->add( $profile );
+		}
 	}
 
 	/**
-	 *
+	 * Uninstall plugin function
 	 */
 	public function uninstall() {
 		$this->drop_table( $this->prefix . 'smartcat_connector_tasks' );
@@ -59,7 +93,7 @@ class TablesSetup extends DbAbstract implements SetupInterface {
 	}
 
 	/**
-	 *
+	 * Initial database function
 	 */
 	private function initial() {
 		$tasks_table_name = $this->prefix . 'smartcat_connector_tasks';
@@ -112,6 +146,7 @@ class TablesSetup extends DbAbstract implements SetupInterface {
 		$profiles_table_name = $this->prefix . 'smartcat_connector_profiles';
 		$sql                 = "CREATE TABLE IF NOT EXISTS {$profiles_table_name} ( 
 				id  BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
+				`name` VARCHAR( 255 ),
 				vendor VARCHAR( 255 ),
 				vendor_name TEXT,
 				source_language VARCHAR( 255 ) NOT NULL,

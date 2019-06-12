@@ -27,8 +27,12 @@ use SmartCAT\WP\WP\PluginInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class Connector
-{
+/**
+ * Class Connector
+ *
+ * @package SmartCAT\WP
+ */
+class Connector {
 	use DITrait;
 
 	public static $plugin_version = null;

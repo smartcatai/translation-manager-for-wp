@@ -11,7 +11,16 @@
 
 namespace SmartCAT\WP\WP;
 
-interface InitInterface
-{
+/**
+ * Interface InitInterface
+ *
+ * @package SmartCAT\WP\WP
+ */
+interface InitInterface {
+	/**
+	 * Plugin init function
+	 *
+	 * @return mixed
+	 */
 	public function plugin_init();
 }
