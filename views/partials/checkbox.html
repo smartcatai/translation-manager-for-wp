@@ -1,6 +1,2 @@
-{{# checkboxes_list}}
-<label for="{{ checkbox_value }}">
-    <input name="{{ option_name }}[]" type="checkbox" id="{{ checkbox_value }}" value="{{ checkbox_value }}" {{ checked }} />
-    {{ checkbox_text }}
-</label>
-{{/ checkboxes_list}}
+<input type="checkbox" id="{{ label_for }}" name="{{ option_name }}" value="1" {{ checked }} />
+{{# hint }}<p>{{& hint }}</p>{{/ hint }}

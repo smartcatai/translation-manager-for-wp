@@ -42,7 +42,7 @@ services:
     tags: [hook]
 
   core.admin.settings:
-    class: SmartCAT\WP\Admin\Settings
+    class: SmartCAT\WP\Admin\Menu
     tags: [initable]
 
   core.admin.statistics:
@@ -97,6 +97,10 @@ services:
 
   setup.tables:
     class: SmartCAT\WP\DB\Setup\TablesSetup
+    tags: [setup]
+
+  update.tables:
+    class: SmartCAT\WP\DB\Setup\TablesUpdate
     tags: [setup]
 
   smartcat:

@@ -7,11 +7,11 @@
     <hr class="wp-header-end" />
 
     {{# profiles_result }}
-    {{# profiles_table }}{{/ profiles_table }}
-    <div class="pagination">
-        <span class="title">{{ texts.pages }}:</span>
-        {{# paginator }}{{/ paginator }}
-    </div>
+        {{& profiles_table }}
+        <div class="pagination">
+            <span class="title">{{ texts.pages }}:</span>
+            {{& paginator }}
+        </div>
     {{/ profiles_result }}
 
     {{^ profiles_result }}

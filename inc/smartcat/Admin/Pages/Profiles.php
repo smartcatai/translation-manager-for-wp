@@ -32,20 +32,14 @@ class Profiles extends PageAbstract {
 		$max_page        = ceil( $profiles_repo->get_count() / $limit );
 		$page            = self::get_page( $max_page );
 		$profiles_result = $profiles_repo->get_all( $limit * ( $page - 1 ), $limit );
-		$table_code      = self::get_table_code( $profiles_table, $profiles_result );
-		$paginator       = self::get_paginator_code( 'sc-profiles', $max_page, $page );
 
 		echo self::get_renderer()->render(
 			'profiles',
 			[
 				'texts'           => self::get_texts(),
 				'profiles_result' => $profiles_result ? true : false,
-				'profiles_table'  => function () use ( $table_code ) {
-					return $table_code;
-				},
-				'paginator'       => function () use ( $paginator ) {
-					return $paginator;
-				},
+				'profiles_table'  => self::get_table_code( $profiles_table, $profiles_result ),
+				'paginator'       => self::get_paginator_code( 'sc-profiles', $max_page, $page ),
 			]
 		);
 	}

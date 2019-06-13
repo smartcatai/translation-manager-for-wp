@@ -30,13 +30,14 @@ class FrontendCallbacks {
 		$option      = get_option( $option_name );
 		$type        = isset( $args['type'] ) ? esc_attr( $args['type'] ) : 'text';
 
-		echo self::render(
+		echo self::get_renderer()->render(
 			'partials/input',
 			[
 				'option'      => $type === 'password' && ! empty( $option ) ? '******' : $option,
 				'type'        => $type,
 				'option_name' => $option_name,
-				'label_for'   => $args['label_for'],
+				'label_for'   => $args['label_for'] ?? false,
+				'hint'        => $args['hint'] ?? false,
 			]
 		);
 	}
@@ -45,19 +46,36 @@ class FrontendCallbacks {
 	 * @param $args
 	 */
 	public static function input_checkbox_callback( $args ) {
+		$option_name = $args['option_name'];
+
+		echo self::get_renderer()->render(
+			'partials/checkbox',
+			[
+				'option_name' => $option_name,
+				'label_for'   => $args['label_for'] ?? false,
+				'hint'        => $args['hint'] ?? false,
+				'checked'     => checked( 1, get_option( $args['option_name'] ), false ),
+			]
+		);
+	}
+
+	/**
+	 * @param $args
+	 */
+	public static function input_checkbox_list_callback( $args ) {
 		$option  = get_option( $args['option_name'] );
 		$options = [];
 
 		foreach ( $args['checkboxes_list'] as $checkbox_value => $checkbox_text ) {
 			$options[] = [
-				'option_name'    => $args['option_name'],
+				'option_name'    => $args['option_name'] ?? false,
 				'checkbox_value' => $checkbox_value,
 				'checkbox_text'  => __( $checkbox_text, 'translation-connectors' ),
 				'checked'        => in_array( $checkbox_value, ! $option ? [ 'Translation' ] : $option, true ) ? 'checked' : '',
 			];
 		}
 
-		echo self::render( 'partials/checkbox', [ 'checkboxes_list' => $options ] );
+		echo self::get_renderer()->render( 'partials/checkbox_list', [ 'checkboxes_list' => $options ] );
 	}
 
 	/**
@@ -74,11 +92,11 @@ class FrontendCallbacks {
 			];
 		}
 
-		echo self::render(
+		echo self::get_renderer()->render(
 			'partials/select',
 			[
-				'label_for'      => $args['label_for'],
-				'option_name'    => $args['option_name'],
+				'label_for'      => $args['label_for'] ?? false,
+				'option_name'    => $args['option_name'] ?? false,
 				'select_options' => $options,
 			]
 		);
@@ -88,7 +106,6 @@ class FrontendCallbacks {
 	 * @param $args
 	 */
 	public static function input_radio_callback( $args ) {
-		//на случай добавления радиобаттонов, пока не используется
 	}
 
 	/**
@@ -98,18 +115,17 @@ class FrontendCallbacks {
 	}
 
 	/**
-	 * @param string $template
-	 * @param array $context
+	 * Get template engine fo render
 	 *
-	 * @return string
-	 * @throws \Exception
+	 * @return TemplateEngine|null
 	 */
-	private static function render( string $template, array $context ) {
+	private static function get_renderer() {
 		$container = self::get_container();
 
-		/** @var TemplateEngine $renderer */
-		$renderer = $container->get( 'templater' );
-
-		return $renderer->render( $template, $context );
+		try {
+			return $container->get( 'templater' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
 	}
 }

@@ -32,20 +32,14 @@ class Errors extends PageAbstract {
 		$max_page          = ceil( $errors_repo->get_count() / $limit );
 		$page              = self::get_page( $max_page );
 		$statistics_result = $errors_repo->get_all( $limit * ( $page - 1 ), $limit );
-		$table_code        = self::get_table_code( $statistics_table, $statistics_result );
-		$paginator         = self::get_paginator_code( 'sc-errors', $max_page, $page );
 
 		echo self::get_renderer()->render(
 			'errors',
 			[
 				'errors_result'    => $statistics_result ? true : false,
-				'errors_table'     => function () use ( $table_code ) {
-					return $table_code;
-				},
+				'errors_table'     => self::get_table_code( $statistics_table, $statistics_result ),
 				'texts'            => self::get_texts(),
-				'paginator'        => function () use ( $paginator ) {
-					return $paginator;
-				},
+				'paginator'        => self::get_paginator_code( 'sc-errors', $max_page, $page ),
 			]
 		);
 	}

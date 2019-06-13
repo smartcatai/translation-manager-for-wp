@@ -241,26 +241,6 @@ jQuery(function ($) {
         formData = add_action_to_serialized_data(
             formData, SmartcatFrontend.smartcat_table_prefix + 'validate_settings');
 
-        var workflowStages = ['Translation', 'Editing', 'Proofreading', 'Postediting'];
-        var selector = workflowStages.map(function (name) {
-            return 'input[value=' + name + ']';
-        }).join(', ');
-        var checkboxList = document.querySelectorAll(selector);
-
-        var isWorkflowsChecked = false;
-        for (var i = 0; i < checkboxList.length; i ++) {
-            if (checkboxList[i].checked) {
-                isWorkflowsChecked = true;
-                break;
-            }
-        }
-
-        if (! isWorkflowsChecked) {
-            printError(SmartcatFrontend.workflowStagesAreNotSelected);
-            event.preventDefault();
-            return false;
-        }
-
         // noinspection JSUnusedLocalSymbols
         $.ajax({
             type: "POST",

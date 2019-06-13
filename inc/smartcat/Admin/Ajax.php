@@ -147,8 +147,7 @@ final class Ajax implements HookInterface {
 	 *
 	 * @throws \Exception
 	 */
-	public function refresh_translation()
-	{
+	public function refresh_translation() {
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
@@ -182,8 +181,7 @@ final class Ajax implements HookInterface {
 		wp_die();
 	}
 
-	static public function send_to_smartcat()
-	{
+	static public function send_to_smartcat() {
 		$ajax_response = new AjaxResponse();
 		if ( ! current_user_can( 'publish_posts' ) ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );

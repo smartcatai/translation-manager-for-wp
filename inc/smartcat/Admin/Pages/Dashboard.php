@@ -37,8 +37,6 @@ class Dashboard extends PageAbstract {
 		$page                       = self::get_page( $max_page );
 		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
 		$statistics_result          = $stat_repo->get_statistics( $limit * ( $page - 1 ), $limit );
-		$table_code                 = self::get_table_code( $statistics_table, $statistics_result );
-		$paginator                  = self::get_paginator_code( 'sc-dashboard', $max_page, $page );
 
 		add_thickbox();
 
@@ -48,13 +46,9 @@ class Dashboard extends PageAbstract {
 				'isCookie'         => $is_cookie,
 				'button_status'    => $is_statistics_queue_active ? 'disabled="disabled"' : false,
 				'statistic_result' => $statistics_result ? true : false,
-				'statistic_table'  => function () use ( $table_code ) {
-					return $table_code;
-				},
+				'statistic_table'  => self::get_table_code( $statistics_table, $statistics_result ),
 				'texts'            => self::get_texts(),
-				'paginator'        => function () use ( $paginator ) {
-					return $paginator;
-				},
+				'paginator'        => self::get_paginator_code( 'sc-dashboard', $max_page, $page ),
 			]
 		);
 	}

@@ -1,0 +1,26 @@
+<a id="url" href="#TB_inline?&width=600&height=550&inlineId=my-content-id" class="thickbox" title="Please fill the form" style="display:none;">Open</a>
+<div id="my-content-id" style="display:none;">
+    <!--[if lte IE 8]>
+    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2-legacy.js"></script>
+    <![endif]-->
+    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
+    <script type="text/javascript">
+        hbspt.forms.create({
+            portalId: "4950983",
+            formId: "5da21dc3-49d9-49bb-aec1-2272338dbdcb",
+            onFormReady: function($form) {
+                $form.find('input[name="utm_source"]').val('connectors');
+                $form.find('input[name="utm_medium"]').val('referral');
+                $form.find('input[name="utm_campaign"]').val('wordpress');
+            }
+        });
+        jQuery(function ($) {
+            $(document).ready(function () {
+                $("#url").click();
+                var expires = new Date();
+                expires.setTime(expires.getTime() + (1000*60*60*24*365*100));
+                document.cookie = "regform=true; expires= " + expires.toUTCString();
+            });
+        });
+    </script>
+</div>
