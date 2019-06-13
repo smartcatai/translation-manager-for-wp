@@ -12,7 +12,8 @@
 namespace SmartCAT\WP\Admin\Pages;
 
 use SmartCAT\WP\Admin\Tables\StatisticsTable;
-use SmartCAT\WP\Helpers\TemplateEngine;
+use SmartCAT\WP\DB\Repository\StatisticRepository;
+use SmartCAT\WP\WP\Options;
 
 /**
  * Class Dashboard
@@ -25,12 +26,9 @@ class Dashboard extends PageAbstract {
 	 */
 	public static function render() {
 		$is_cookie = isset( $_COOKIE['regform'] );
-		$container = self::get_container();
 
-		/** @var TemplateEngine $render */
-		$render    = $container->get( 'templater' );
-		$stat_repo = $container->get( 'entity.repository.statistic' );
-		$options   = $container->get( 'core.options' );
+		$stat_repo = self::get_repository();
+		$options   = self::get_options();
 
 		$limit = 100;
 
@@ -44,7 +42,7 @@ class Dashboard extends PageAbstract {
 
 		add_thickbox();
 
-		echo $render->render(
+		echo self::get_renderer()->render(
 			'dashboard',
 			[
 				'isCookie'         => $is_cookie,
@@ -62,6 +60,8 @@ class Dashboard extends PageAbstract {
 	}
 
 	/**
+	 * Get texts array for render
+	 *
 	 * @return array
 	 */
 	private static function get_texts() {
@@ -71,5 +71,35 @@ class Dashboard extends PageAbstract {
 			'empty'   => __( 'Statistics is empty', 'translation-connectors' ),
 			'title'   => $GLOBALS['title'],
 		];
+	}
+
+	/**
+	 * Get statistics repository
+	 *
+	 * @return StatisticRepository|null
+	 */
+	private static function get_repository() {
+		$container = self::get_container();
+
+		try {
+			return $container->get( 'entity.repository.statistic' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
+	}
+
+	/**
+	 * Get options service
+	 *
+	 * @return Options|null
+	 */
+	private static function get_options() {
+		$container = self::get_container();
+
+		try {
+			return $container->get( 'core.options' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
 	}
 }

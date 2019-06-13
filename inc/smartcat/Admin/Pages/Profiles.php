@@ -12,7 +12,7 @@
 namespace SmartCAT\WP\Admin\Pages;
 
 use SmartCAT\WP\Admin\Tables\ProfilesTable;
-use SmartCAT\WP\Helpers\TemplateEngine;
+use SmartCAT\WP\DB\Repository\ProfileRepository;
 
 /**
  * Class Profiles
@@ -24,12 +24,7 @@ class Profiles extends PageAbstract {
 	 * Render profiles page
 	 */
 	public static function render() {
-		$container = self::get_container();
-
-		/** @var TemplateEngine $render */
-		$render = $container->get( 'templater' );
-
-		$profiles_repo = $container->get( 'entity.repository.profile' );
+		$profiles_repo = self::get_repository();
 
 		$limit = 100;
 
@@ -40,7 +35,7 @@ class Profiles extends PageAbstract {
 		$table_code      = self::get_table_code( $profiles_table, $profiles_result );
 		$paginator       = self::get_paginator_code( 'sc-profiles', $max_page, $page );
 
-		echo $render->render(
+		echo self::get_renderer()->render(
 			'profiles',
 			[
 				'texts'           => self::get_texts(),
@@ -56,6 +51,8 @@ class Profiles extends PageAbstract {
 	}
 
 	/**
+	 * Get texts array for render
+	 *
 	 * @return array
 	 */
 	private static function get_texts() {
@@ -65,5 +62,20 @@ class Profiles extends PageAbstract {
 			'pages'       => __( 'Pages', 'translation-connectors' ),
 			'title'       => $GLOBALS['title'],
 		];
+	}
+
+	/**
+	 * Get errors repository
+	 *
+	 * @return ProfileRepository|null
+	 */
+	private static function get_repository() {
+		$container = self::get_container();
+
+		try {
+			return $container->get( 'entity.repository.profile' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
 	}
 }

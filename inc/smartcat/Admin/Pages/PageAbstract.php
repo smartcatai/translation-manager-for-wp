@@ -13,6 +13,7 @@ namespace SmartCAT\WP\Admin\Pages;
 
 use SmartCAT\WP\Admin\Tables\TableAbstract;
 use SmartCAT\WP\DITrait;
+use SmartCAT\WP\Helpers\TemplateEngine;
 
 /**
  * Class PageAbstract
@@ -64,11 +65,25 @@ abstract class PageAbstract {
 	 * @param array $objects
 	 *
 	 * @return bool|false|string
-	 * @throws \Exception
 	 */
 	protected static function get_table_code( $table, $objects ) {
 		$table_with_data = $table->set_data( $objects );
 
 		return $table_with_data->display();
+	}
+
+	/**
+	 * Get Mustache template engine
+	 *
+	 * @return TemplateEngine|null
+	 */
+	protected static function get_renderer() {
+		$container = self::get_container();
+
+		try {
+			return $container->get( 'templater' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
 	}
 }

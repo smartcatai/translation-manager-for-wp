@@ -18,13 +18,15 @@ use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Entity\Task;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
 
-/** Репозиторий таблицы статистики */
-class StatisticRepository extends RepositoryAbstract
-{
+/**
+ * Class StatisticRepository
+ *
+ * @package SmartCAT\WP\DB\Repository
+ */
+class StatisticRepository extends RepositoryAbstract {
 	const TABLE_NAME = 'statistic';
 
-	public function get_table_name()
-	{
+	public function get_table_name() {
 		return $this->prefix . self::TABLE_NAME;
 	}
 
@@ -34,18 +36,18 @@ class StatisticRepository extends RepositoryAbstract
 	 *
 	 * @return Statistics[]
 	 */
-	public function get_statistics( $from = 0, $limit = 100 )
-	{
-		$wpdb = $this->get_wp_db();
-		$from = intval( $from );
-		$from >= 0 || $from = 0;
+	public function get_statistics( $from = 0, $limit = 100 ) {
+		$wpdb  = $this->get_wp_db();
+		$from  = intval( $from );
 		$limit = intval( $limit );
+
+		$from >= 0 || $from = 0;
 
 		$table_name = $this->get_table_name();
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-			"SELECT * FROM $table_name LIMIT %d, %d",
-				[$from, $limit]
+				"SELECT * FROM $table_name LIMIT %d, %d",
+				[ $from, $limit ]
 			 )
 		 );
 
@@ -59,9 +61,8 @@ class StatisticRepository extends RepositoryAbstract
 	 *
 	 * @return Statistics[]
 	 */
-	public function get_sended( array $documents = [] )
-	{
-		return $this->get_by_status( 'sended',  $documents );
+	public function get_sended( array $documents = [] ) {
+		return $this->get_by_status( 'sended', $documents );
 	}
 
 	/**
@@ -71,9 +72,8 @@ class StatisticRepository extends RepositoryAbstract
 	 *
 	 * @return Statistics[]
 	 */
-	public function get_export( array $documents = [] )
-	{
-		return $this->get_by_status( 'export',  $documents );
+	public function get_export( array $documents = [] ) {
+		return $this->get_by_status( 'export', $documents );
 	}
 
 	/**
@@ -83,9 +83,8 @@ class StatisticRepository extends RepositoryAbstract
 	 *
 	 * @return Statistics[]
 	 */
-	public function get_new( array $documents = [] )
-	{
-		return $this->get_by_status( 'new',  $documents );
+	public function get_new( array $documents = [] ) {
+		return $this->get_by_status( 'new', $documents );
 	}
 
 	/**
@@ -93,10 +92,9 @@ class StatisticRepository extends RepositoryAbstract
 	 * @param array $documents
 	 * @return array
 	 */
-	public function get_by_status( $status, array $documents = [] )
-	{
+	public function get_by_status( $status, array $documents = [] ) {
 		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
+		$wpdb       = $this->get_wp_db();
 
 		if ( is_array( $status ) ) {
 			$status = implode( "', and status='", $status );
@@ -106,9 +104,9 @@ class StatisticRepository extends RepositoryAbstract
 
 		$documents_count = count( $documents );
 		if ( $documents_count > 0 ) {
-			$ids			 = array_fill( 0, $documents_count, '%s' );
+			$ids             = array_fill( 0, $documents_count, '%s' );
 			$documents_where = 'AND documentID in ( ' . implode( ',', $ids ) . ' )';
-			$query		   = $wpdb->prepare( "$query $documents_where", $documents );
+			$query           = $wpdb->prepare( "$query $documents_where", $documents );
 		}
 
 		$results = $wpdb->get_results( $query );
@@ -116,22 +114,21 @@ class StatisticRepository extends RepositoryAbstract
 		return $this->prepare_result( $results );
 	}
 
-	public function add( Statistics $stat )
-	{
+	public function add( Statistics $stat ) {
 		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
+		$wpdb       = $this->get_wp_db();
 
 		$data = [
-			'taskId'		 => $stat->get_task_id(),
-			'postID'		 => $stat->get_post_id(),
+			'taskId'         => $stat->get_task_id(),
+			'postID'         => $stat->get_post_id(),
 			'sourceLanguage' => $stat->get_source_language(),
 			'targetLanguage' => $stat->get_target_language(),
-			'progress'	   => $stat->get_progress(),
-			'wordsCount'	 => $stat->get_words_count(),
+			'progress'       => $stat->get_progress(),
+			'wordsCount'     => $stat->get_words_count(),
 			'targetPostID'   => $stat->get_target_post_id(),
-			'documentID'	 => $stat->get_document_id(),
-			'status'		 => $stat->get_status(),
-			'errorCount'	 => $stat->get_error_count(),
+			'documentID'     => $stat->get_document_id(),
+			'status'         => $stat->get_status(),
+			'errorCount'     => $stat->get_error_count(),
 		];
 
 		if ( ! empty( $stat->get_id() ) ) {
@@ -148,22 +145,21 @@ class StatisticRepository extends RepositoryAbstract
 		return false;
 	}
 
-	public function update( Statistics $stat )
-	{
+	public function update( Statistics $stat ) {
 		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
+		$wpdb       = $this->get_wp_db();
 
 		$data = [
-			'taskId'		 => $stat->get_task_id(),
-			'postID'		 => $stat->get_post_id(),
+			'taskId'         => $stat->get_task_id(),
+			'postID'         => $stat->get_post_id(),
 			'sourceLanguage' => $stat->get_source_language(),
 			'targetLanguage' => $stat->get_target_language(),
-			'progress'	   => $stat->get_progress(),
-			'wordsCount'	 => $stat->get_words_count(),
+			'progress'       => $stat->get_progress(),
+			'wordsCount'     => $stat->get_words_count(),
 			'targetPostID'   => $stat->get_target_post_id(),
-			'documentID'	 => $stat->get_document_id(),
-			'status'		 => $stat->get_status(),
-			'errorCount'	 => $stat->get_error_count(),
+			'documentID'     => $stat->get_document_id(),
+			'status'         => $stat->get_status(),
+			'errorCount'     => $stat->get_error_count(),
 		];
 
 		if ( ! empty( $stat->get_id() ) ) {
@@ -177,8 +173,7 @@ class StatisticRepository extends RepositoryAbstract
 		return false;
 	}
 
-	public function delete_by_post_id( $post_id )
-	{
+	public function delete_by_post_id( $post_id ) {
 		$table_name = $this->get_table_name();
 		$wpdb	   = $this->get_wp_db();
 
@@ -192,8 +187,7 @@ class StatisticRepository extends RepositoryAbstract
 		return false;
 	}
 
-	public function mark_failed_by_task_id( $task_id )
-	{
+	public function mark_failed_by_task_id( $task_id ) {
 		$table_name = $this->get_table_name();
 		$wpdb	   = $this->get_wp_db();
 
@@ -206,8 +200,7 @@ class StatisticRepository extends RepositoryAbstract
 		return false;
 	}
 
-	public function delete( Statistics $stat )
-	{
+	public function delete( Statistics $stat ) {
 		$table_name = $this->get_table_name();
 		$wpdb	   = $this->get_wp_db();
 

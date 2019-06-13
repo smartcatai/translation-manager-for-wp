@@ -13,43 +13,76 @@ namespace SmartCAT\WP\DB\Repository;
 
 use SmartCAT\WP\DB\DbAbstract;
 
-abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterface
-{
+/**
+ * Class RepositoryAbstract
+ *
+ * @package SmartCAT\WP\DB\Repository
+ */
+abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterface {
+	/**
+	 * @var string
+	 */
 	protected $prefix = '';
+	/**
+	 * @var array
+	 */
+	private $persists = [];
 
-	public function __construct( $prefix )
-	{
+	/**
+	 * RepositoryAbstract constructor.
+	 *
+	 * @param $prefix
+	 */
+	public function __construct( $prefix ) {
 		parent::__construct();
 		$this->prefix = $this->wpdb->get_blog_prefix() . $prefix;
 	}
 
-	public function get_count()
-	{
+	/**
+	 * @return string|null
+	 */
+	public function get_count() {
 		$table_name = $this->get_table_name();
-		$count	  = $this->get_wp_db()->get_var( "SELECT COUNT( * ) FROM $table_name" );
+		$count	    = $this->get_wp_db()->get_var( "SELECT COUNT( * ) FROM $table_name" );
 
 		return $count;
 	}
 
-	private $persists = [];
-
-	public function persist( $o )
-	{
+	/**
+	 * @param $o
+	 */
+	public function persist( $o ) {
 		$this->persists[] = $o;
 	}
 
-	protected abstract function do_flush( array $persists );
+	/**
+	 * @param array $persists
+	 *
+	 * @return mixed
+	 */
+	abstract protected function do_flush( array $persists );
 
-	public function flush()
-	{
+	/**
+	 *
+	 */
+	public function flush() {
 		$this->do_flush( $this->persists );
 		$this->persists = [];
 	}
 
+	/**
+	 * @param $row
+	 *
+	 * @return mixed
+	 */
 	protected abstract function to_entity( $row );
 
-	protected function prepare_result( $rows )
-	{
+	/**
+	 * @param $rows
+	 *
+	 * @return array
+	 */
+	protected function prepare_result( $rows ) {
 		$result = [];
 		foreach ( $rows as $row ) {
 			$result[] = $this->to_entity( $row );

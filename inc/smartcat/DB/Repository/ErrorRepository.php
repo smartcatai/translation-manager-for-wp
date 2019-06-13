@@ -13,13 +13,18 @@ namespace SmartCAT\WP\DB\Repository;
 
 use SmartCAT\WP\DB\Entity\Error;
 
-/** Репозиторий таблицы обмена */
-class ErrorRepository extends RepositoryAbstract
-{
+/**
+ * Class ErrorRepository
+ *
+ * @package SmartCAT\WP\DB\Repository
+ */
+class ErrorRepository extends RepositoryAbstract {
 	const TABLE_NAME = 'errors';
 
-	public function get_table_name()
-	{
+	/**
+	 * @return string
+	 */
+	public function get_table_name() {
 		return $this->prefix . self::TABLE_NAME;
 	}
 
@@ -29,15 +34,20 @@ class ErrorRepository extends RepositoryAbstract
 	 *
 	 * @return Error[]
 	 */
-	public function get_errors( $from = 0, $limit = 100 )
-	{
-		$wpdb = $this->get_wp_db();
-		$from = intval( $from );
-		$from >= 0 || $from = 0;
+	public function get_all( $from = 0, $limit = 100 ) {
+		$wpdb  = $this->get_wp_db();
+		$from  = intval( $from );
 		$limit = intval( $limit );
 
+		$from >= 0 || $from = 0;
+
 		$table_name = $this->get_table_name();
-		$results   = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name ORDER BY date DESC LIMIT %d, %d", [ $from, $limit ] ) );
+		$results    = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM $table_name ORDER BY date DESC LIMIT %d, %d",
+				[ $from, $limit ]
+			)
+		);
 
 		return $this->prepare_result( $results );
 	}
@@ -46,8 +56,7 @@ class ErrorRepository extends RepositoryAbstract
 	 * @param Error $error
 	 * @return bool|int
 	 */
-	public function add( Error $error )
-	{
+	public function add( Error $error ) {
 		$table_name = $this->get_table_name();
 		$wpdb	  = $this->get_wp_db();
 
@@ -71,8 +80,7 @@ class ErrorRepository extends RepositoryAbstract
 		return false;
 	}
 
-	public function update( Error $error )
-	{
+	public function update( Error $error ) {
 		$table_name = $this->get_table_name();
 		$wpdb	  = $this->get_wp_db();
 
@@ -92,8 +100,7 @@ class ErrorRepository extends RepositoryAbstract
 		return false;
 	}
 
-	protected function do_flush( array $persists )
-	{
+	protected function do_flush( array $persists ) {
 		/* @var Error[] $persists */
 		foreach ( $persists as $error ) {
 			if ( get_class( $error ) === 'SmartCAT\WP\DB\Entity\Error' ) {
@@ -108,8 +115,7 @@ class ErrorRepository extends RepositoryAbstract
 		}
 	}
 
-	protected function to_entity( $row )
-	{
+	protected function to_entity( $row ) {
 		$result = new Error();
 
 		if ( isset( $row->id ) ) {

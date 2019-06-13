@@ -11,9 +11,7 @@
 
 namespace SmartCAT\WP\Admin\Tables;
 
-use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
-use SmartCAT\WP\Helpers\Utils;
 
 /**
  * Class ProfilesTable

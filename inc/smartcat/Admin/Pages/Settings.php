@@ -11,16 +11,12 @@
 
 namespace SmartCAT\WP\Admin\Pages;
 
-use SmartCAT\WP\DITrait;
-
 /**
  * Class Settings
  *
  * @package SmartCAT\WP\Admin\Pages
  */
-class Settings {
-	use DITrait;
-
+class Settings extends PageAbstract {
 	/**
 	 * Render settings page
 	 */
