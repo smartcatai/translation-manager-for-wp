@@ -64,6 +64,14 @@ if ( ! $connector::check_dependency() ) {
 } else {
 	add_action( 'init', [ $connector, 'plugin_init' ] );
 	add_action( 'admin_notices', [ $connector, 'plugin_admin_notice' ], 0 );
+	add_filter(
+		'set-screen-option',
+		function( $status, $option, $value ) {
+			return ( $option === 'sc_profiles_per_page' ) ? (int) $value : $status;
+		},
+		10,
+		3
+	);
 	add_action( 'admin_menu', [ Menu::class, 'add_admin_menu' ] );
 	add_action( 'admin_init', [ Settings::class, 'make_page' ] );
 	add_action( 'post_updated', [ $connector, 'post_update_hook' ], 10, 3 );

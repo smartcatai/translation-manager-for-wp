@@ -13,6 +13,7 @@ namespace SmartCAT\WP\Admin;
 
 use SmartCAT\WP\Admin\Pages\Dashboard;
 use SmartCAT\WP\Admin\Pages\Errors;
+use SmartCAT\WP\Admin\Pages\ProfileEdit;
 use SmartCAT\WP\Admin\Pages\Profiles;
 use SmartCAT\WP\Admin\Pages\Settings;
 use SmartCAT\WP\Connector;
@@ -31,7 +32,7 @@ final class Menu implements InitInterface {
 	public static function add_admin_menu() {
 		$container = Connector::get_container();
 		/** @var Options $options */
-		$options   = $container->get( 'core.options' );
+		$options = $container->get( 'core.options' );
 
 		add_menu_page(
 			__( 'Localization', 'translation-connectors' ),
@@ -51,13 +52,36 @@ final class Menu implements InitInterface {
 			[ Dashboard::class, 'render' ]
 		);
 
-		add_submenu_page(
+		$profiles_hook = add_submenu_page(
 			'sc-dashboard',
 			__( 'Profiles', 'translation-connectors' ),
 			__( 'Profiles', 'translation-connectors' ),
 			'edit_pages',
 			'sc-profiles',
 			[ Profiles::class, 'render' ]
+		);
+
+		add_submenu_page(
+			'sc-profiles',
+			__( 'New profile', 'translation-connectors' ),
+			__( 'New profile', 'translation-connectors' ),
+			'edit_pages',
+			'sc-edit-profile',
+			[ ProfileEdit::class, 'render' ]
+		);
+
+		add_action(
+			"load-$profiles_hook",
+			function () {
+				add_screen_option(
+					'per_page',
+					[
+						'label'   => __( 'Show per page', 'translation-connectors' ),
+						'default' => 20,
+						'option'  => 'sc_profiles_per_page',
+					]
+				);
+			}
 		);
 
 		if ( $options->get( 'smartcat_debug_mode' ) ) {

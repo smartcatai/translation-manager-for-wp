@@ -135,8 +135,6 @@ class StatisticRepository extends RepositoryAbstract {
 			$data['id'] = $stat->get_id();
 		}
 
-		//TODO: м.б. заменить на try-catch
-
 		if ( $wpdb->insert( $table_name, $data ) ) {
 			$stat->set_id( $wpdb->insert_id );
 			return $wpdb->insert_id;
@@ -163,8 +161,6 @@ class StatisticRepository extends RepositoryAbstract {
 		];
 
 		if ( ! empty( $stat->get_id() ) ) {
-			//TODO: м.б. заменить на try-catch
-
 			if ( $wpdb->update( $table_name, $data, [ 'id' => $stat->get_id() ] ) ) {
 				return true;
 			}
@@ -214,8 +210,7 @@ class StatisticRepository extends RepositoryAbstract {
 		return false;
 	}
 
-	protected function to_entity( $row )
-	{
+	protected function to_entity( $row ) {
 		$result = new Statistics();
 
 		if ( isset( $row->id ) ) {
@@ -265,8 +260,7 @@ class StatisticRepository extends RepositoryAbstract {
 		return $result;
 	}
 
-	protected function do_flush( array $persists )
-	{
+	protected function do_flush( array $persists ) {
 		/* @var Statistics[] $persists */
 		foreach ( $persists as $stat ) {
 			if ( get_class( $stat ) === 'SmartCAT\WP\DB\Entity\Statistics' ) {
@@ -287,8 +281,7 @@ class StatisticRepository extends RepositoryAbstract {
 	 * @return false|int
 	 * @throws \SmartCAT\WP\Helpers\Language\Exceptions\LanguageNotFoundException
 	 */
-	public function link_to_smartcat_document( Task $task, $document )
-	{
+	public function link_to_smartcat_document( Task $task, $document ) {
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
 
@@ -327,8 +320,7 @@ class StatisticRepository extends RepositoryAbstract {
 	 *
 	 * @return Statistics|null
 	 */
-	public function get_one_by( array $criterias )
-	{
+	public function get_one_by( array $criterias ) {
 		$table_name = $this->get_table_name();
 		$wpdb	   = $this->get_wp_db();
 		$query	  = "SELECT * FROM $table_name WHERE ";

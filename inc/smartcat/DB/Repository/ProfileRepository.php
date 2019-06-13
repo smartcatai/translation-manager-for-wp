@@ -151,6 +151,14 @@ class ProfileRepository extends RepositoryAbstract {
 		return false;
 	}
 
+	public function save( Profile $profile ) {
+		if ( $profile->get_id() ) {
+			$this->update( $profile );
+		} else {
+			$this->add( $profile );
+		}
+	}
+
 	/**
 	 * Update Profile object in DB
 	 *
@@ -179,5 +187,14 @@ class ProfileRepository extends RepositoryAbstract {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param array $criterias
+	 *
+	 * @return Profile|null
+	 */
+	public function get_one_by_id( $id ) {
+		return parent::get_one_by_id( $id );
 	}
 }

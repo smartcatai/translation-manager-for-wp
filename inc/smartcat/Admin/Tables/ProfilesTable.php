@@ -19,16 +19,34 @@ use SmartCAT\WP\DB\Entity\Profile;
  * @package SmartCAT\WP\Admin\Tables
  */
 class ProfilesTable extends TableAbstract {
+
+	function __construct() {
+		parent::__construct(
+			[
+				'singular' => 'profile',
+				'plural'   => 'profiles',
+				'ajax'     => false,
+			]
+		);
+
+		$this->bulk_action_handler();
+	}
+
+	public function column_cb ( $item ) {
+		echo "<input type='checkbox' name='{$this->_args['plural']}[]' id='cb-select-{$item->get_id()}' value='{$item->get_id()}' />";
+	}
+
 	/**
 	 * @return array
 	 */
 	public function get_columns() {
 		$columns = [
+			'cb'               => '<input type="checkbox" />',
 			'name'             => __( 'Name', 'translation-connectors' ),
 			'source_language'  => __( 'Source language', 'translation-connectors' ),
 			'target_languages' => __( 'Target languages', 'translation-connectors' ),
 			'vendor_name'      => __( 'Vendor', 'translation-connectors' ),
-			'workflow_stages'  => __( 'Edit post', 'translation-connectors' ),
+			'workflow_stages'  => __( 'Workflow stages', 'translation-connectors' ),
 			'auto_send'        => __( 'Auto send', 'translation-connectors' ),
 			'auto_update'      => __( 'Auto update', 'translation-connectors' ),
 		];
@@ -66,5 +84,57 @@ class ProfilesTable extends TableAbstract {
 			default:
 				return null;
 		}
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function get_bulk_actions() {
+		$actions = [
+			'bulk-delete-' . $this->_args['plural'] => 'Delete',
+		];
+
+		return $actions;
+	}
+
+	private function bulk_action_handler() {
+		if ( empty( $_POST['profiles'] ) || empty( $_POST['_wpnonce'] ) ) {
+			return;
+		}
+
+		$action       = $this->current_action();
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ) ),
+			'bulk-' . $this->_args['plural']
+		);
+
+		if ( ! $action || ! $verify_nonce ) {
+			return;
+		}
+
+		$post = sanitize_post( $_POST );
+
+		switch ( $action ) {
+			case 'bulk-delete-' . $this->_args['plural']:
+				// delete
+				break;
+		}
+	}
+
+	protected function get_default_primary_column_name() {
+		return 'name';
+	}
+
+	protected function handle_row_actions( $item, $column_name, $primary ) {
+		if ( $primary !== $column_name ) {
+			return '';
+		}
+
+		$actions = [
+			'edit'   => sprintf( '<a href="admin.php?page=sc-edit-profile%s">%s</a>', '&profile=' . $item->get_id(), __('Edit', 'translation-connectors') ),
+			'delete' => sprintf( '<a href="%s">%s</a>', '#', __('Delete', 'translation-connectors') ),
+		];
+
+		return $this->row_actions( $actions );
 	}
 }

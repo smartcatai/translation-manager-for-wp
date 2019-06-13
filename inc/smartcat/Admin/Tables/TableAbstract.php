@@ -19,6 +19,8 @@ namespace SmartCAT\WP\Admin\Tables;
 abstract class TableAbstract extends \WP_List_Table {
 	protected $data = [];
 
+
+
 	/**
 	 * @return string
 	 */

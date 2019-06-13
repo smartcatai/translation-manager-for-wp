@@ -14,20 +14,17 @@ namespace SmartCAT\WP\DB\Repository;
 use SmartCAT\WP\DB\Entity\Task;
 
 /** Репозиторий таблицы обмена */
-class TaskRepository extends RepositoryAbstract
-{
+class TaskRepository extends RepositoryAbstract {
 	const TABLE_NAME = 'tasks';
 
-	public function get_table_name()
-	{
+	public function get_table_name() {
 		return $this->prefix . self::TABLE_NAME;
 	}
 
 	/**
 	 * @return Task[]
 	 */
-	public function get_new_task()
-	{
+	public function get_new_task() {
 		return $this->get_tasks_by_status( Task::STATUS_NEW );
 	}
 
@@ -35,8 +32,7 @@ class TaskRepository extends RepositoryAbstract
 	 * @param $status string|array
 	 * @return Task[]
 	 */
-	public function get_tasks_by_status( $status )
-	{
+	public function get_tasks_by_status( $status ) {
 		$table_name = $this->get_table_name();
 
 		if ( is_array( $status ) ) {
@@ -59,8 +55,7 @@ class TaskRepository extends RepositoryAbstract
 	 *
 	 * @return bool
 	 */
-	public function task_new_post_id_exists( $post_id )
-	{
+	public function task_new_post_id_exists( $post_id ) {
 		$table_name = $this->get_table_name();
 
 		$query = sprintf(
@@ -75,8 +70,7 @@ class TaskRepository extends RepositoryAbstract
 		return ( count( $this->prepare_result( $results ) ) > 0 );
 	}
 
-	public function add( Task $task )
-	{
+	public function add( Task $task ) {
 		$table_name = $this->get_table_name();
 		$wpdb	   = $this->get_wp_db();
 
@@ -102,8 +96,7 @@ class TaskRepository extends RepositoryAbstract
 		return false;
 	}
 
-	public function update( Task $task )
-	{
+	public function update( Task $task ) {
 		$table_name = $this->get_table_name();
 		$wpdb	   = $this->get_wp_db();
 
@@ -112,7 +105,7 @@ class TaskRepository extends RepositoryAbstract
 				'sourceLanguage'  => $task->get_source_language(),
 				'targetLanguages' => serialize( $task->get_target_languages() ),
 				'status'		  => $task->get_status(),
-				'projectID'	   => $task->get_project_d(),
+				'projectID'	      => $task->get_project_d(),
 				'postID'		  => $task->get_post_id()
 			];
 			//TODO: м.б. заменить на try-catch
@@ -124,8 +117,7 @@ class TaskRepository extends RepositoryAbstract
 		return false;
 	}
 
-	protected function do_flush( array $persists )
-	{
+	protected function do_flush( array $persists ) {
 		/* @var Task[] $persists */
 		foreach ( $persists as $task ) {
 			if ( get_class( $task ) === 'SmartCAT\WP\DB\Entity\Task' ) {
@@ -140,8 +132,7 @@ class TaskRepository extends RepositoryAbstract
 		}
 	}
 
-	protected function to_entity( $row )
-	{
+	protected function to_entity( $row ) {
 		$result = new Task();
 
 		if ( isset( $row->id ) ) {
@@ -176,13 +167,7 @@ class TaskRepository extends RepositoryAbstract
 	 *
 	 * @return Task|null
 	 */
-	public function get_one_by_id( $id )
-	{
-		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
-
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table_name WHERE id=%d", $id ) );
-
-		return $row ? $this->to_entity( $row ) : null;
+	public function get_one_by_id( $id ) {
+		return parent::get_one_by_id( $id );
 	}
 }
