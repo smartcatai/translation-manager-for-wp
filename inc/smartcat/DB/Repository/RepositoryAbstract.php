@@ -104,4 +104,22 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 
 		return $row ? $this->to_entity( $row ) : null;
 	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return bool
+	 */
+	public function delete_by_id( $id ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+
+		if ( ! empty( $id ) ) {
+			if ( $wpdb->delete( $table_name, [ 'id' => $id ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

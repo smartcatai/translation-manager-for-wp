@@ -43,13 +43,27 @@ final class Menu implements InitInterface {
 			'dashicons-translation'
 		);
 
-		add_submenu_page(
+		$dashboard_hook = add_submenu_page(
 			'sc-dashboard',
 			__( 'Dashboard', 'translation-connectors' ),
 			__( 'Dashboard', 'translation-connectors' ),
 			'edit_pages',
 			'sc-dashboard',
 			[ Dashboard::class, 'render' ]
+		);
+
+		add_action(
+			"load-$dashboard_hook",
+			function () {
+				add_screen_option(
+					'per_page',
+					[
+						'label'   => __( 'Show per page', 'translation-connectors' ),
+						'default' => 20,
+						'option'  => 'sc_dashboard_per_page',
+					]
+				);
+			}
 		);
 
 		$profiles_hook = add_submenu_page(

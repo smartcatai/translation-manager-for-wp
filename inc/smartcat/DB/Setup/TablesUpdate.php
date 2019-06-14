@@ -23,6 +23,11 @@ use SmartCAT\WP\Helpers\Language\LanguageConverter;
  * @package SmartCAT\WP\DB\Setup
  */
 class TablesUpdate extends DbAbstract implements SetupInterface {
+	/**
+	 * Database prefix
+	 *
+	 * @var string
+	 */
 	private $prefix = '';
 
 	/**
@@ -33,6 +38,9 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 		$this->prefix = $this->get_wp_db()->get_blog_prefix();
 	}
 
+	/**
+	 * Main update function
+	 */
 	public function install() {
 		if ( version_compare( $this->get_plugin_version(), '1.3.0', '<' ) ) {
 			$this->v130();
@@ -55,11 +63,18 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 			/** @var LanguageConverter $language_converter */
 			$language_converter = $container->get( 'language.converter' );
 
+			$target_langs = array_map(
+				function ( $locale ) use ( $language_converter ) {
+					return $language_converter->get_sc_code_by_wp( $locale )->get_sc_code();
+				},
+				$language_converter->get_polylang_locales_supported_by_sc()
+			);
+
 			$profile = new Profile();
 			$profile
 				->set_name( 'Migrated from settings' )
 				->set_source_language( $language_converter->get_default_language_sc_code() )
-				->set_target_languages( $language_converter->get_polylang_locales_supported_by_sc() )
+				->set_target_languages( $target_langs )
 				->set_auto_send( false )
 				->set_auto_update( false )
 				->set_workflow_stages( get_option( $param_prefix . 'smartcat_workflow_stages' ) )
@@ -81,6 +96,9 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 		}
 	}
 
+	/**
+	 * Main rollback function
+	 */
 	public function uninstall() {
 	}
 }

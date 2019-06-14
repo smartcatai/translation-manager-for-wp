@@ -50,6 +50,9 @@ stream_wrapper_register( 'smartcat', 'SmartCAT\WP\VariableStream' );
 $connector   = new SmartCAT\WP\Connector();
 $plugin_data = get_file_data( __FILE__, [ 'Version' => 'Version' ] );
 
+$default_priority = 10;
+$accepted_args    = 3;
+
 SmartCAT\WP\Connector::$plugin_version = $plugin_data['Version'];
 
 add_action( 'plugins_loaded', [ $connector, 'plugin_load' ], 99 );
@@ -67,14 +70,14 @@ if ( ! $connector::check_dependency() ) {
 	add_filter(
 		'set-screen-option',
 		function( $status, $option, $value ) {
-			return ( $option === 'sc_profiles_per_page' ) ? (int) $value : $status;
+			return ( in_array( $option, [ 'sc_profiles_per_page', 'sc_dashboard_per_page' ], true ) ) ? (int) $value : $status;
 		},
-		10,
-		3
+		$default_priority,
+		$accepted_args
 	);
 	add_action( 'admin_menu', [ Menu::class, 'add_admin_menu' ] );
 	add_action( 'admin_init', [ Settings::class, 'make_page' ] );
-	add_action( 'post_updated', [ $connector, 'post_update_hook' ], 10, 3 );
+	add_action( 'post_updated', [ $connector, 'post_update_hook' ], $default_priority, $accepted_args );
 	register_activation_hook( __FILE__, [ $connector, 'plugin_activate' ] );
 	register_deactivation_hook( __FILE__, [ $connector, 'plugin_deactivate' ] );
 }

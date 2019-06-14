@@ -82,10 +82,16 @@ class ProfileEdit extends PageAbstract {
 	 * @return array
 	 */
 	private static function get_texts( $profile ) {
+		if ( empty( $profile ) ) {
+			$title = __( 'New Profile', 'translation-connectors' );
+		} else {
+			$title = __( 'Edit Profile', 'translation-connectors' ) . " '{$profile['name']}'";
+		}
+
 		return [
 			'empty'                   => __( 'Profiles not found', 'translation-connectors' ),
 			'pages'                   => __( 'Pages', 'translation-connectors' ),
-			'title'                   => $GLOBALS['title'],
+			'title'                   => $title,
 			'profile_name'            => __( 'Name', 'translation-connectors' ),
 			'profile_vendor'          => __( 'Vendor', 'translation-connectors' ),
 			'profile_source_lang'     => __( 'Source Language', 'translation-connectors' ),
@@ -98,6 +104,11 @@ class ProfileEdit extends PageAbstract {
 		];
 	}
 
+	/**
+	 * @param $profile
+	 *
+	 * @return array
+	 */
 	private static function get_workflow_stages( $profile ) {
 		return [
 			[
@@ -118,6 +129,13 @@ class ProfileEdit extends PageAbstract {
 		];
 	}
 
+	/**
+	 * @param $profile
+	 * @param $key
+	 *
+	 * @return array
+	 * @throws \Exception
+	 */
 	private static function get_languages( $profile, $key) {
 		$languages = [];
 		$container = self::get_container();
@@ -138,7 +156,7 @@ class ProfileEdit extends PageAbstract {
 			}
 
 			$languages[] = [
-				'value'    => $locale,
+				'value'    => $language_converter->get_sc_code_by_wp( $locale )->get_sc_code(),
 				'name'     => $name,
 				'selected' => in_array( $locale, $search_array, true ),
 			];
@@ -163,9 +181,12 @@ class ProfileEdit extends PageAbstract {
 		}
 	}
 
+	/**
+	 * @param array $profile
+	 *
+	 * @return array
+	 */
 	private static function get_vendors( $profile ) {
-		$container = self::get_container();
-
 		$vendors = [
 			[
 				'value'    => '',
@@ -175,10 +196,12 @@ class ProfileEdit extends PageAbstract {
 		];
 
 		try {
-			/** @var SmartCAT $smartcat */
-			$smartcat = $container->get( 'smartcat' );
+			$vendor_list = wp_cache_get( 'vendor_list', 'translation-connectors' );
 
-			$vendor_list = $smartcat->getDirectoriesManager()->directoriesGet( [ 'type' => 'vendor' ] )->getItems();
+			if ( ! $vendor_list ) {
+				$vendor_list = self::get_smartcat()->getDirectoriesManager()->directoriesGet( [ 'type' => 'vendor' ] )->getItems();
+				wp_cache_set( 'vendor_list', $vendor_list, 'translation-connectors', 3600 );
+			}
 
 			foreach ( $vendor_list as $vendor ) {
 				$vendors = array_merge(
@@ -187,13 +210,13 @@ class ProfileEdit extends PageAbstract {
 						[
 							'value'    => $vendor->getId(),
 							'name'     => $vendor->getName(),
-							'selected' => $vendor->getId() === $profile['vendor'] ?? '',
+							'selected' => $vendor->getId() === ( $profile['vendor'] ?? '' ),
 						],
 					]
 				);
 			}
 		} catch ( \Exception $e ) {
-			Logger::warning( "Can't load vendors. Reason: {$e->getMessage()}" );
+			Logger::warning( "Can't load vendors", "Reason: {$e->getMessage()}" );
 		}
 
 		return $vendors;
@@ -214,6 +237,26 @@ class ProfileEdit extends PageAbstract {
 		}
 	}
 
+	/**
+	 * Get Smartcat client service
+	 *
+	 * @return SmartCAT|null
+	 */
+	private static function get_smartcat() {
+		$container = self::get_container();
+
+		try {
+			return $container->get( 'smartcat' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
+	}
+
+	/**
+	 * Create or update profile
+	 *
+	 * @param array $data Post array data.
+	 */
 	private static function edit_post( $data ) {
 		$profiles_repo = self::get_repository();
 
@@ -226,12 +269,30 @@ class ProfileEdit extends PageAbstract {
 		$profile
 			->set_name( $data['profile_name'] )
 			->set_vendor( $data['profile_vendor'] )
+			->set_vendor_name( __( 'Translate internally', 'translation-connectors' ) )
 			->set_source_language( $data['profile_source_lang'] )
 			->set_target_languages( $data['profile_target_langs'] )
 			->set_project_id( $data['profile_project_id'] )
 			->set_workflow_stages( $data['profile_workflow_stages'] )
 			->set_auto_update( $data['profile_auto_update'] ?? false )
 			->set_auto_send( $data['profile_auto_send'] ?? false );
+
+		try {
+			$vendor_list = wp_cache_get( 'vendor_list', 'translation-connectors' );
+
+			if ( ! $vendor_list ) {
+				$vendor_list = self::get_smartcat()->getDirectoriesManager()->directoriesGet( [ 'type' => 'vendor' ] )->getItems();
+				wp_cache_set( 'vendor_list', $vendor_list, 'translation-connectors', 3600 );
+			}
+
+			foreach ( $vendor_list as $vendor ) {
+				if ( $data['profile_vendor'] === $vendor->getId() ) {
+					$profile->set_vendor_name( $vendor->getName() );
+				}
+			}
+		} catch ( \Exception $e ) {
+			Logger::warning( "Can't set vendor name", "Reason: {$e->getMessage()}" );
+		}
 
 		$profiles_repo->save( $profile );
 	}

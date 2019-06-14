@@ -7,11 +7,13 @@
     <hr class="wp-header-end" />
 
     {{# statistic_result }}
+    <form action="" method="POST">
         {{& statistic_table }}
         <div class="pagination">
             <span class="title">{{ texts.pages }}:</span>
             {{& paginator }}
         </div>
+    </form>
     {{/ statistic_result }}
 
     {{^ statistic_result }}

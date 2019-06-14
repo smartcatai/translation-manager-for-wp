@@ -13,22 +13,50 @@ namespace SmartCAT\WP\Admin\Tables;
 
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Statistics;
+use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\Helpers\Utils;
 
+/**
+ * Class StatisticsTable
+ *
+ * @package SmartCAT\WP\Admin\Tables
+ */
 class StatisticsTable extends TableAbstract {
+	/**
+	 * StatisticsTable constructor.
+	 */
+	public function __construct() {
+		parent::__construct(
+			[
+				'singular' => 'statistic',
+				'plural'   => 'statistics',
+				'ajax'     => false,
+			]
+		);
+
+		$this->bulk_action_handler();
+	}
+
+	/**
+	 * @param object $item
+	 */
+	public function column_cb ( $item ) {
+		echo "<input type='checkbox' name='{$this->_args['plural']}[]' id='cb-select-{$item->get_id()}' value='{$item->get_id()}' />";
+	}
+
 	/**
 	 * @return array
 	 */
 	public function get_columns() {
 		$columns = [
+			'cb'                 => '<input type="checkbox" />',
 			'title'              => __( 'Title', 'translation-connectors' ),
 			'sourceLang'         => __( 'Source language', 'translation-connectors' ),
 			'targetLang'         => __( 'Target language', 'translation-connectors' ),
 			'wordsCount'         => __( 'Words count', 'translation-connectors' ),
+			'progress'           => __( 'Progress', 'translation-connectors' ),
 			'status'             => __( 'Status', 'translation-connectors' ),
-			'smartcat_project'   => __( 'Smartcat project', 'translation-connectors' ),
-			'editPost'           => __( 'Edit post', 'translation-connectors' ),
-			'refresh'            => __( 'Update translation', 'translation-connectors' ),
+			'actions'            => __( 'Additional actions', 'translation-connectors' ),
 		];
 
 		return $columns;
@@ -83,22 +111,8 @@ class StatisticsTable extends TableAbstract {
 				$words_count = ( ! empty( $item->get_words_count() ) ) ? $item->get_words_count() : '-';
 
 				return $words_count;
-			/*case 'progress':
-				return $item->getProgress();*/
-			case 'smartcat_project':
-				$status = $item->get_status();
-
-				$message = __( 'Go to Smartcat', 'translation-connectors' );
-
-				if ( in_array( $status, [ 'sended', 'export', 'completed' ], true ) && ! empty( $item->get_document_id() ) ) {
-					$document_id = $item->get_document_id();
-					$url         = $utils->get_url_to_smartcat_by_document_id( $document_id );
-					$message     = "<a href='{$url}' target='_blank'>{$message}</a>";
-
-					return $message;
-				}
-
-				return '-';
+			case 'progress':
+				return $item->get_progress();
 			case 'status':
 				switch ( $item->get_status() ) {
 					case 'new':
@@ -111,26 +125,119 @@ class StatisticsTable extends TableAbstract {
 				}
 
 				return ucfirst( $item->get_status() );
-			case 'editPost':
-				$message = '-';
+			case 'actions':
+				$message = '';
+				$status  = $item->get_status();
 
 				if ( ! empty( $item->get_target_post_id() ) ) {
-					$post_id = $item->get_target_post_id();
-					$url     = $utils->get_url_to_post_by_post_id( $post_id );
-					$message = "<a href='{$url}' target='_blank'>" . __( 'Edit post', 'translation-connectors' ) . '</a>';
+					$url      = $utils->get_url_to_post_by_post_id( $item->get_target_post_id() );
+					$message .= "<p><a href='{$url}' target='_blank'>" . __( 'Edit post', 'translation-connectors' ) . '</a></p>';
 				}
 
-				return $message;
-			case 'refresh':
-				$message = '-';
-
-				if ( ! empty( $item->get_target_post_id() && $item->get_status() === 'completed' ) ) {
-					$message = "<a href='javascript:void( 0 );'  class='refresh_stat_button' data-bind='{$item->get_id()}'>" . __( 'Check updates', 'translation-connectors' ) . '</a>';
+				if ( in_array( $status, [ 'sended', 'export', 'completed' ], true ) && ! empty( $item->get_document_id() ) ) {
+					$url      = $utils->get_url_to_smartcat_by_document_id( $item->get_document_id() );
+					$message .= "<p><a href='{$url}' target='_blank'>" . __( 'Go to Smartcat', 'translation-connectors' ) . '</a></p>';
 				}
 
 				return $message;
 			default:
 				return null;
+		}
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function get_bulk_actions() {
+		$actions = [
+			'bulk-cancel-' . $this->_args['plural'] => __( 'Force cancel', 'translation-connectors' ),
+			'bulk-delete-' . $this->_args['plural'] => __( 'Delete', 'translation-connectors' ) ,
+		];
+
+		return $actions;
+	}
+
+	/**
+	 * Bulk actions handler
+	 */
+	private function bulk_action_handler() {
+		if ( empty( $_POST[ $this->_args['plural'] ] ) || empty( $_POST['_wpnonce'] ) ) {
+			return;
+		}
+
+		$action       = $this->current_action();
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ) ),
+			'bulk-' . $this->_args['plural']
+		);
+
+		if ( ! $action || ! $verify_nonce ) {
+			return;
+		}
+
+		$post           = sanitize_post( $_POST, 'db' );
+		$statistic_repo = self::get_repository();
+
+		switch ( $action ) {
+			case 'bulk-delete-' . $this->_args['plural']:
+				foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
+					$statistic_repo->delete_by_id( $statistic_id );
+				}
+				break;
+			case 'bulk-cancel-' . $this->_args['plural']:
+				foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
+					$statistic = $statistic_repo->get_one_by_id( $statistic_id );
+					$statistic->set_status( 'cancelled' );
+					$statistic_repo->update( $statistic );
+				}
+				break;
+		}
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function get_default_primary_column_name() {
+		return 'title';
+	}
+
+	/**
+	 * @param Statistics $item
+	 * @param string $column_name
+	 * @param string $primary
+	 *
+	 * @return string
+	 */
+	protected function handle_row_actions( $item, $column_name, $primary ) {
+		if ( $primary !== $column_name ) {
+			return '';
+		}
+
+		$actions = [
+			'check_update' => sprintf(
+				'<a href="javascript:void( 0 );" class="refresh_stat_button" data-bind="%d">%s</a>',
+				$item->get_id(),
+				__( 'Check updates', 'translation-connectors' )
+			),
+			'cancel'       => sprintf( '<a href="%s">%s</a>', '#', __( 'Cancel', 'translation-connectors' ) ),
+			'delete'       => sprintf( '<a href="%s">%s</a>', '#', __( 'Delete', 'translation-connectors' ) ),
+		];
+
+		return $this->row_actions( $actions );
+	}
+
+	/**
+	 * Get errors repository
+	 *
+	 * @return StatisticRepository|null
+	 */
+	private static function get_repository() {
+		$container = Connector::get_container();
+
+		try {
+			return $container->get( 'entity.repository.statistic' );
+		} catch ( \Exception $e ) {
+			return null;
 		}
 	}
 }

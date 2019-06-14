@@ -11,7 +11,9 @@
 
 namespace SmartCAT\WP\Admin\Tables;
 
+use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
+use SmartCAT\WP\DB\Repository\ProfileRepository;
 
 /**
  * Class ProfilesTable
@@ -19,8 +21,10 @@ use SmartCAT\WP\DB\Entity\Profile;
  * @package SmartCAT\WP\Admin\Tables
  */
 class ProfilesTable extends TableAbstract {
-
-	function __construct() {
+	/**
+	 * ProfilesTable constructor.
+	 */
+	public function __construct() {
 		parent::__construct(
 			[
 				'singular' => 'profile',
@@ -32,6 +36,9 @@ class ProfilesTable extends TableAbstract {
 		$this->bulk_action_handler();
 	}
 
+	/**
+	 * @param object $item
+	 */
 	public function column_cb ( $item ) {
 		echo "<input type='checkbox' name='{$this->_args['plural']}[]' id='cb-select-{$item->get_id()}' value='{$item->get_id()}' />";
 	}
@@ -59,7 +66,6 @@ class ProfilesTable extends TableAbstract {
 	 * @param string $column_name
 	 *
 	 * @return mixed
-	 * @throws \Exception
 	 */
 	public function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
@@ -91,14 +97,17 @@ class ProfilesTable extends TableAbstract {
 	 */
 	protected function get_bulk_actions() {
 		$actions = [
-			'bulk-delete-' . $this->_args['plural'] => 'Delete',
+			'bulk-delete-' . $this->_args['plural'] => __( 'Delete', 'translation-connectors' ),
 		];
 
 		return $actions;
 	}
 
+	/**
+	 * Bulk actions handler
+	 */
 	private function bulk_action_handler() {
-		if ( empty( $_POST['profiles'] ) || empty( $_POST['_wpnonce'] ) ) {
+		if ( empty( $_POST[ $this->_args['plural'] ] ) || empty( $_POST['_wpnonce'] ) ) {
 			return;
 		}
 
@@ -116,25 +125,57 @@ class ProfilesTable extends TableAbstract {
 
 		switch ( $action ) {
 			case 'bulk-delete-' . $this->_args['plural']:
-				// delete
+				$profile_repo = self::get_repository();
+				foreach ( $post[ $this->_args['plural'] ] as $profile_id ) {
+					$profile_repo->delete_by_id( $profile_id );
+				}
 				break;
 		}
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function get_default_primary_column_name() {
 		return 'name';
 	}
 
+	/**
+	 * @param Profile $item
+	 * @param string $column_name
+	 * @param string $primary
+	 *
+	 * @return string
+	 */
 	protected function handle_row_actions( $item, $column_name, $primary ) {
 		if ( $primary !== $column_name ) {
 			return '';
 		}
 
 		$actions = [
-			'edit'   => sprintf( '<a href="admin.php?page=sc-edit-profile%s">%s</a>', '&profile=' . $item->get_id(), __('Edit', 'translation-connectors') ),
-			'delete' => sprintf( '<a href="%s">%s</a>', '#', __('Delete', 'translation-connectors') ),
+			'edit'   => sprintf(
+				'<a href="admin.php?page=sc-edit-profile%s">%s</a>',
+				'&profile=' . $item->get_id(),
+				__( 'Edit', 'translation-connectors' )
+			),
+			'delete' => sprintf( '<a href="%s">%s</a>', '#', __( 'Delete', 'translation-connectors' ) ),
 		];
 
 		return $this->row_actions( $actions );
+	}
+
+	/**
+	 * Get errors repository
+	 *
+	 * @return ProfileRepository|null
+	 */
+	private static function get_repository() {
+		$container = Connector::get_container();
+
+		try {
+			return $container->get( 'entity.repository.profile' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
 	}
 }
