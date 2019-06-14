@@ -4,7 +4,7 @@
     <hr class="wp-header-end" />
 
     <div class="form-wrap">
-        <form method="post" action="">
+        <form class="edit-profile-form" method="post" action="">
             <input type="hidden" name="action" value="{{ action }}"/>
             <input type="hidden" id="sc_profile_wpnonce" name="sc_profile_wpnonce" value="{{ sc_nonce }}"/>
             <input type="hidden" name="_wp_http_referer" value="/wp-admin/admin.php?page=sc-profiles"/>
@@ -93,7 +93,7 @@
                 </tr>
             </table>
             <p class="submit">
-                <input type="submit" class="button-primary" value="{{ texts.save_button }}"/>
+                <input type="submit" class="button-primary edit-profile-submit" value="{{ texts.save_button }}" />
             </p>
         </form>
     </div>

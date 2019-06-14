@@ -39,6 +39,7 @@ class ProfileEdit extends PageAbstract {
 			if ( $verify_nonce ) {
 				$sanitized_post = sanitize_post( $_POST, 'db' );
 				self::edit_post( $sanitized_post );
+				wp_die();
 			}
 		}
 

@@ -11,7 +11,7 @@ function notice( message, nclass = 'success') {
         var id = revisedRandId();
         $('.notice.notice-' + nclass + '.is-dismissible.shake-shake-baby').remove();
         var $div = $(document.createElement('div'));
-        $div.attr('class', 'notice notice-error is-dismissible shake-shake-baby');
+        $div.attr('class', 'notice notice-' + nclass + ' is-dismissible shake-shake-baby');
         $div.attr('id', id);
         var $p = $(document.createElement('p'));
         $p.html(message);
@@ -206,28 +206,52 @@ jQuery(function ($) {
     });
 
     /*
+     * Save profile action.
+     * P.S. WordPress must die! Getting instances by #ID DID NOT WORK!
+     */
+    $('.smartcat-connector form.edit-profile-form').submit(function (event) {
+        var $this = $(this);
+        var formData = $this.serialize();
+
+        $('input.edit-profile-submit').prop('disabled', true);
+        $.ajax({
+            type: "POST",
+            url: window.location.href,
+            data: formData,
+            success: function (responseText) {
+                window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-profiles';
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError('An a error occurred: ' + responseJSON.message);
+                $('input.edit-profile-submit').prop('disabled', false);
+            }
+        });
+
+        event.preventDefault();
+        return false;
+    });
+
+    /*
      * Обработчик самого модала
      */
 
     $modalWindow.find('form').first().submit(function (event) {
-        var $this = $(this); //форма
+        var $this = $(this);
         var formData = $this.serialize();
         formData = add_action_to_serialized_data(
             formData, SmartcatFrontend.smartcat_table_prefix + 'send_to_smartcat');
-        cl(formData);
 
         $.ajax({
             type: "POST",
             url: ajaxurl,
             data: formData,
             success: function (responseText) {
-                //cl('success');
-                //cl(responseText);
                 $this.parent().dialog('close');
                 printSuccess('Items successfully sended.')
             },
             error: function (responseObject) {
-                //cl('error');
+                $this.parent().dialog('close');
                 var responseJSON = JSON.parse(responseObject.responseText);
                 printError('An a error occurred: ' + responseJSON.message);
             }
@@ -260,8 +284,6 @@ jQuery(function ($) {
                 if (! isActive) {
                     clearInterval(intervalTimer);
                     isStatWasStarted = false;
-                    //refreshStatButton.prop('disabled', false);
-                    //window.location.reload();
                 }
             },
             error: function (responseObject) {
@@ -362,7 +384,6 @@ jQuery(function ($) {
         if (!isStatWasStarted) {
             pageIntervalReload = setInterval(function () {
                 if (isStatWasStarted) {
-                    event.preventDefault();
                     return false;
                 }
 
@@ -373,7 +394,6 @@ jQuery(function ($) {
                 updateStatistics();
 
                 location.reload();
-                event.preventDefault();
             }, 1000 * 60);
         }
     }
