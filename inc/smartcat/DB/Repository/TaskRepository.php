@@ -13,10 +13,18 @@ namespace SmartCAT\WP\DB\Repository;
 
 use SmartCAT\WP\DB\Entity\Task;
 
-/** Репозиторий таблицы обмена */
+/**
+ * Class TaskRepository
+ *
+ * @method Task get_one_by_id( int $id )
+ * @package SmartCAT\WP\DB\Repository
+ */
 class TaskRepository extends RepositoryAbstract {
 	const TABLE_NAME = 'tasks';
 
+	/**
+	 * @return string
+	 */
 	public function get_table_name() {
 		return $this->prefix . self::TABLE_NAME;
 	}
@@ -43,7 +51,7 @@ class TaskRepository extends RepositoryAbstract {
 			"SELECT * FROM %s WHERE status='%s'",
 			$table_name,
 			$status
-		 );
+		);
 
 		$results = $this->get_wp_db()->get_results( $query );
 
@@ -51,42 +59,25 @@ class TaskRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param $post_id int
+	 * @param Task $task
 	 *
-	 * @return bool
+	 * @return bool|int
 	 */
-	public function task_new_post_id_exists( $post_id ) {
-		$table_name = $this->get_table_name();
-
-		$query = sprintf(
-			"SELECT * FROM %s WHERE status='%s' AND postID=%d",
-			$table_name,
-			Task::STATUS_NEW,
-			$post_id
-		);
-
-		$results = $this->get_wp_db()->get_results( $query );
-
-		return ( count( $this->prepare_result( $results ) ) > 0 );
-	}
-
-	public function add( Task $task ) {
+	public function add( $task ) {
 		$table_name = $this->get_table_name();
 		$wpdb	   = $this->get_wp_db();
 
 		$data = [
 			'sourceLanguage'  => $task->get_source_language(),
 			'targetLanguages' => serialize( $task->get_target_languages() ),
-			'status'		  => $task->get_status(),
-			'projectID'	   => $task->get_project_d(),
-			'postID'		  => $task->get_post_id()
+			'status'          => $task->get_status(),
+			'projectID'       => $task->get_project_id(),
+			'profileID'       => intval( $task->get_profile_id() ),
 		];
 
 		if ( ! empty( $task->get_id() ) ) {
 			$data['id'] = $task->get_id();
 		}
-
-		//TODO: м.б. заменить на try-catch
 
 		if ( $wpdb->insert( $table_name, $data ) ) {
 			$task->set_id( $wpdb->insert_id );
@@ -96,7 +87,12 @@ class TaskRepository extends RepositoryAbstract {
 		return false;
 	}
 
-	public function update( Task $task ) {
+	/**
+	 * @param Task $task
+	 *
+	 * @return bool
+	 */
+	public function update( $task ) {
 		$table_name = $this->get_table_name();
 		$wpdb	   = $this->get_wp_db();
 
@@ -105,10 +101,10 @@ class TaskRepository extends RepositoryAbstract {
 				'sourceLanguage'  => $task->get_source_language(),
 				'targetLanguages' => serialize( $task->get_target_languages() ),
 				'status'		  => $task->get_status(),
-				'projectID'	      => $task->get_project_d(),
-				'postID'		  => $task->get_post_id()
+				'projectID'	      => $task->get_project_id(),
+				'profileID'       => intval( $task->get_profile_id() ),
 			];
-			//TODO: м.б. заменить на try-catch
+
 			if ( $wpdb->update( $table_name, $data, [ 'id' => $task->get_id() ] ) ) {
 				return true;
 			}
@@ -117,6 +113,11 @@ class TaskRepository extends RepositoryAbstract {
 		return false;
 	}
 
+	/**
+	 * @param array $persists
+	 *
+	 * @return mixed|void
+	 */
 	protected function do_flush( array $persists ) {
 		/* @var Task[] $persists */
 		foreach ( $persists as $task ) {
@@ -132,6 +133,11 @@ class TaskRepository extends RepositoryAbstract {
 		}
 	}
 
+	/**
+	 * @param $row
+	 *
+	 * @return mixed|Task
+	 */
 	protected function to_entity( $row ) {
 		$result = new Task();
 
@@ -147,10 +153,6 @@ class TaskRepository extends RepositoryAbstract {
 			$result->set_target_languages( unserialize( $row->targetLanguages ) );
 		}
 
-		if ( isset( $row->postID ) ) {
-			$result->set_post_id( intval( $row->postID ) );
-		}
-
 		if ( isset( $row->status ) ) {
 			$result->set_status( $row->status );
 		}
@@ -163,11 +165,15 @@ class TaskRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param array $criterias
+	 * @param Task $task
 	 *
-	 * @return Task|null
+	 * @return mixed|void
 	 */
-	public function get_one_by_id( $id ) {
-		return parent::get_one_by_id( $id );
+	public function save( $task ) {
+		if ( $task->get_id() ) {
+			$this->update( $task );
+		} else {
+			$this->add( $task );
+		}
 	}
 }

@@ -15,6 +15,7 @@ use Http\Client\Common\Exception\ClientErrorException;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Entity\Task;
+use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\DITrait;
@@ -45,12 +46,12 @@ final class Ajax implements HookInterface {
 		}
 
 		$container = self::get_container();
-		$prefix	= $container->getParameter( 'plugin.table.prefix' );
+		$prefix    = $container->getParameter( 'plugin.table.prefix' );
 
 		$data = [ 'isActive' => SmartCAT::is_active() ];
 
 		$required_parameters = [ $prefix . 'smartcat_api_login', $prefix . 'smartcat_api_password' ];
-		$parameters = $_POST;
+		$parameters          = $_POST;
 
 		$login = $password = '';
 		/** @var Utils $utils */
@@ -64,10 +65,10 @@ final class Ajax implements HookInterface {
 		$server = $parameters[ $prefix . 'smartcat_api_server' ];
 
 		/** @var Options $options */
-		$options		   = $container->get( 'core.options' );
-		$previous_login	= $options->get_and_decrypt( 'smartcat_api_login' );
+		$options           = $container->get( 'core.options' );
+		$previous_login    = $options->get_and_decrypt( 'smartcat_api_login' );
 		$previous_password = $options->get_and_decrypt( 'smartcat_api_password' );
-		$previous_server  = $options->get( 'smartcat_api_server' );
+		$previous_server   = $options->get( 'smartcat_api_server' );
 
 		if ( $password === '******' ) {
 			$password = $previous_password; //упрощаю логику, иначе выходил уже набор костылей
@@ -76,9 +77,9 @@ final class Ajax implements HookInterface {
 		//проверка, что с кредами все ок
 		$account_info = null;
 		try {
-			$api		  = new \SmartCat\Client\SmartCAT( $login, $password, $server );
+			$api          = new \SmartCat\Client\SmartCAT( $login, $password, $server );
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
-			$is_ok		= ( bool ) $account_info->getId();
+			$is_ok        = ( bool ) $account_info->getId();
 			if ( ! $is_ok ) {
 				throw new Exception( 'Invalid username or password' );
 			}
@@ -109,7 +110,7 @@ final class Ajax implements HookInterface {
 				$ajax_response->send_error(
 					__( 'Problem with deleting of previous callback', 'translation-connectors' ),
 					$data
-				 );
+				);
 			}
 		}
 
@@ -154,14 +155,14 @@ final class Ajax implements HookInterface {
 			wp_die();
 		}
 
-		$data = [ 'isActive' => SmartCAT::is_active() ];
+		$data      = [ 'isActive' => SmartCAT::is_active() ];
 		$container = self::get_container();
 
 		/** @var StatisticRepository $statistic_repository */
 		$statistic_repository = $container->get( 'entity.repository.statistic' );
 
-		if ( !empty( $_POST['stat_id'] ) && intval( $_POST['stat_id'] ) ) {
-			$statistic = $statistic_repository->get_one_by( ['id' => intval( $_POST['stat_id'] )] );
+		if ( ! empty( $_POST['stat_id'] ) && intval( $_POST['stat_id'] ) ) {
+			$statistic = $statistic_repository->get_one_by( [ 'id' => intval( $_POST['stat_id'] ) ] );
 			if ( $statistic->get_target_post_id() ) {
 				$statistic->set_status( 'sended' );
 				$statistic_repository->update( $statistic );
@@ -181,104 +182,85 @@ final class Ajax implements HookInterface {
 		wp_die();
 	}
 
+	/**
+	 * Create tasks for smartcat
+	 *
+	 * @throws \Exception
+	 */
 	static public function send_to_smartcat() {
 		$ajax_response = new AjaxResponse();
-		if ( ! current_user_can( 'publish_posts' ) ) {
+		$verify_nonce  = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['sc_send_nonce'] ?? null ) ),
+			'sc_send_nonce'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
+			die();
 		}
 
-		$target_languages   = array_unique( $_POST['sc-target-lang'] );
-		$empty_language_key = array_search( '', $target_languages );
-		if ( $empty_language_key !== false ) {
-			unset( $target_languages[ $empty_language_key ] );
-		}
-
-		! empty( $target_languages ) || $ajax_response->send_error( __( 'Target languages are empty',
-			'translation-connectors' ) );
+		$post = sanitize_post( $_POST );
 
 		$container = self::get_container();
 		/** @var TaskRepository $task_repository */
 		$task_repository = $container->get( 'entity.repository.task' );
 		/** @var StatisticRepository $statistics_repository */
 		$statistics_repository = $container->get( 'entity.repository.statistic' );
-		/** @var LanguageConverter $languages_converter */
-		$languages_converter = $container->get( 'language.converter' );
+		/** @var ProfileRepository $profiles_repository */
+		$profiles_repository = $container->get( 'entity.repository.profile' );
 
-		$posts = explode( ',', $_POST['posts'] );
+		$posts   = explode( ',', $post['posts'] );
+		$profile = $profiles_repository->get_one_by_id( $post['sc-profile'] );
 
-		$data = [
-			'posts'	 => $posts,
-			'languages' => $target_languages
-		];
+		if ( empty( $posts ) || empty( $profile ) ) {
+			$ajax_response->send_error( __( 'Incorrrect request', 'translation-connectors' ), [], 403 );
+			die();
+		}
 
-		$is_new_task_created = false;
+		$task = new Task();
+		$task->set_source_language( $profile->get_source_language() )
+			->set_target_languages( $profile->get_target_languages() )
+			->set_status( Task::STATUS_NEW )
+			->set_project_id( $profile->get_project_id() ?? null );
+
+		$task_id = $task_repository->add( $task );
 
 		foreach ( $posts as $post_id ) {
-			//$post = get_post( $postId );
-			/** @noinspection PhpUndefinedFunctionInspection */
-			$post_language = pll_get_post_language( $post_id, 'locale' );
+			if ( $task_id ) {
+				$stat = new Statistics();
+				$stat->set_task_id( $task_id )
+					->set_post_id( $post_id )
+					->set_source_language( $profile->get_source_language() )
+					->set_progress( 0 )
+					->set_words_count( null )
+					->set_target_post_id( null )
+					->set_document_id( null )
+					->set_status( Statistics::STATUS_NEW );
 
-			$available_languages = array_keys( $languages_converter->get_polylang_languages_supported_by_sc() );
-			if ( ! in_array( $post_language, $available_languages ) ) {
-				continue; //source язык запрещён, дальнейшую обработку пропускаем
-			}
+				$data['stats'] = [];
 
-			$post_target_languages = $target_languages;
-			if ( in_array( $post_language, $post_target_languages ) ) {
-				$sourceKey = array_search( $post_language, $post_target_languages );
-				unset( $post_target_languages[ $sourceKey ] );
-				$post_target_languages			 = array_values( $post_target_languages ); //сбрасываем ключи
-				$data['same-language'][ $post_id ] = $post_language;
-			}
+				foreach ( $profile->get_target_languages() as $target_language ) {
+					$new_stat = clone $stat;
+					$new_stat->set_target_language( $target_language );
+					$stat_id = $statistics_repository->add( $new_stat );
 
-			if ( ! empty( $post_target_languages ) ) {
-				$task = new Task();
-				$task->set_post_id( $post_id )
-					->set_source_language( $post_language )
-					->set_target_languages( $post_target_languages )
-					->set_status( 'new' )
-					->set_project_id( null );
-
-				$task_id = $task_repository->add( $task );
-
-				if ( $task_id ) {
-					$is_new_task_created = true;
-
-					$stat = new Statistics();
-					$stat->set_task_id( $task_id )
-						->set_post_id( $post_id )
-						->set_source_language( $post_language )
-						->set_progress( 0 )
-						->set_words_count( null )
-						->set_target_post_id( null )
-						->set_document_id( null )
-						->set_status( 'new' );
-
-					$data['stats'] = [];
-
-					foreach ( $post_target_languages as $target_language ) {
-						$newStat = clone $stat;
-						$newStat->set_target_language( $target_language );
-						$stat_id = $statistics_repository->add( $newStat );
-						if ( $stat_id ) {
-							array_push( $data['stats'], $stat_id );
-						} else {
-							array_push( $data['failed-stats'], $stat_id );
-						}
+					if ( $stat_id ) {
+						array_push( $data['stats'], $stat_id );
+					} else {
+						array_push( $data['failed-stats'], $stat_id );
 					}
-
-					if ( count( $data['stats'] ) != count( $post_target_languages ) ) {
-						$ajax_response->send_error( __( 'Not all stats was created', 'translation-connectors' ) );
-					}
-				} else {
-					$data['task'] = $task;
-					$ajax_response->send_error( __( 'Task was not created', 'translation-connectors' ), $data );
 				}
+
+				if ( count( $data['stats'] ) !== count( $profile->get_target_languages() ) ) {
+					$ajax_response->send_error( __( 'Not all stats was created', 'translation-connectors' ) );
+				}
+			} else {
+				$data['task'] = $task;
+				$ajax_response->send_error( __( 'Task was not created', 'translation-connectors' ), $data );
 			}
 		}
 
-		if ( $is_new_task_created ) {
+		if ( $task_id ) {
 			$ajax_response->send_success( 'ok', $data );
 		} else {
 			$ajax_response->send_error( 'Task was not created', $data );
@@ -286,7 +268,7 @@ final class Ajax implements HookInterface {
 
 		spawn_cron();
 
-		wp_die();
+		die();
 	}
 
 	/**

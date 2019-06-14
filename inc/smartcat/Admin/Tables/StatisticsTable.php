@@ -14,6 +14,7 @@ namespace SmartCAT\WP\Admin\Tables;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
+use SmartCAT\WP\Helpers\Language\LanguageConverter;
 use SmartCAT\WP\Helpers\Utils;
 
 /**
@@ -75,42 +76,28 @@ class StatisticsTable extends TableAbstract {
 		/** @var Utils $utils */
 		$utils = $container->get( 'utils' );
 
+		/** @var LanguageConverter $language_converter */
+		$language_converter = $container->get( 'language.converter' );
+
 		switch ( $column_name ) {
 			case 'title':
 				$title = get_the_title( $item->get_post_id() );
 
 				$is_post_deleted = ! $title || empty( $title );
-				if ( $is_post_deleted ) {
-					$title = '-';
-				}
 
 				$post_id = $item->get_post_id();
 				$url     = $utils->get_url_to_post_by_post_id( $post_id );
 				$title   = $is_post_deleted
-					? $title
+					? '--'
 					: "<a href='{$url}' target='_blank'>{$title}</a>";
 
 				return $title;
 			case 'sourceLang':
-				$languages = $utils->get_pll_languages();
-
-				$source_language = isset( $languages[ $item->get_source_language() ] )
-					? $languages[ $item->get_source_language() ]
-					: $item->get_source_language();
-
-				return $source_language;
+				return $language_converter->get_sc_code_by_wp( $item->get_source_language() )->get_wp_name();
 			case 'targetLang':
-				$languages = $utils->get_pll_languages();
-
-				$target_language = isset( $languages[ $item->get_target_language() ] )
-					? $languages[ $item->get_target_language() ]
-					: $item->get_target_language();
-
-				return $target_language;
+				return $language_converter->get_sc_code_by_wp( $item->get_target_language() )->get_wp_name();
 			case 'wordsCount':
-				$words_count = ( ! empty( $item->get_words_count() ) ) ? $item->get_words_count() : '-';
-
-				return $words_count;
+				return ( ! empty( $item->get_words_count() ) ) ? $item->get_words_count() : '-';
 			case 'progress':
 				return $item->get_progress();
 			case 'status':
@@ -126,23 +113,38 @@ class StatisticsTable extends TableAbstract {
 
 				return ucfirst( $item->get_status() );
 			case 'actions':
-				$message = '';
-				$status  = $item->get_status();
-
-				if ( ! empty( $item->get_target_post_id() ) ) {
-					$url      = $utils->get_url_to_post_by_post_id( $item->get_target_post_id() );
-					$message .= "<p><a href='{$url}' target='_blank'>" . __( 'Edit post', 'translation-connectors' ) . '</a></p>';
-				}
-
-				if ( in_array( $status, [ 'sended', 'export', 'completed' ], true ) && ! empty( $item->get_document_id() ) ) {
-					$url      = $utils->get_url_to_smartcat_by_document_id( $item->get_document_id() );
-					$message .= "<p><a href='{$url}' target='_blank'>" . __( 'Go to Smartcat', 'translation-connectors' ) . '</a></p>';
-				}
-
-				return $message;
+				return $this->get_additional_actions( $item );
 			default:
 				return null;
 		}
+	}
+
+	/**
+	 * @param Statistics $item
+	 *
+	 * @return string
+	 * @throws \Exception
+	 */
+	private function get_additional_actions( $item ) {
+		$container = Connector::get_container();
+
+		/** @var Utils $utils */
+		$utils = $container->get( 'utils' );
+
+		$message = '';
+		$status  = $item->get_status();
+
+		if ( ! empty( $item->get_target_post_id() ) ) {
+			$url      = $utils->get_url_to_post_by_post_id( $item->get_target_post_id() );
+			$message .= "<p><a href='{$url}' target='_blank'>" . __( 'Edit target post', 'translation-connectors' ) . '</a></p>';
+		}
+
+		if ( in_array( $status, [ 'sended', 'export', 'completed' ], true ) && ! empty( $item->get_document_id() ) ) {
+			$url      = $utils->get_url_to_smartcat_by_document_id( $item->get_document_id() );
+			$message .= "<p><a href='{$url}' target='_blank'>" . __( 'Go to Smartcat', 'translation-connectors' ) . '</a></p>';
+		}
+
+		return $message;
 	}
 
 	/**
@@ -214,14 +216,22 @@ class StatisticsTable extends TableAbstract {
 		}
 
 		$actions = [
-			'check_update' => sprintf(
-				'<a href="javascript:void( 0 );" class="refresh_stat_button" data-bind="%d">%s</a>',
-				$item->get_id(),
-				__( 'Check updates', 'translation-connectors' )
-			),
-			'cancel'       => sprintf( '<a href="%s">%s</a>', '#', __( 'Cancel', 'translation-connectors' ) ),
-			'delete'       => sprintf( '<a href="%s">%s</a>', '#', __( 'Delete', 'translation-connectors' ) ),
+			'cancel' => sprintf( '<a href="%s">%s</a>', '#', __( 'Cancel', 'translation-connectors' ) ),
+			'delete' => sprintf( '<a href="%s">%s</a>', '#', __( 'Delete', 'translation-connectors' ) ),
 		];
+
+		if ( in_array( $item->get_status(), [ Statistics::STATUS_COMPLETED ] ) ) {
+			$actions = array_merge(
+				[
+					'check_update' => sprintf(
+						'<a href="javascript:void( 0 );" class="refresh_stat_button" data-bind="%d">%s</a>',
+						$item->get_id(),
+						__( 'Check updates', 'translation-connectors' )
+					),
+				],
+				$actions
+			);
+		}
 
 		return $this->row_actions( $actions );
 	}

@@ -11,7 +11,42 @@
 
 namespace SmartCAT\WP\DB\Entity;
 
+/**
+ * Class Statistics
+ *
+ * @package SmartCAT\WP\DB\Entity
+ */
 class Statistics {
+	const STATUS_NEW       = 'new';
+	const STATUS_FAILED    = 'failed';
+	const STATUS_CREATED   = 'created';
+	const STATUS_SENDED    = 'sended';
+	const STATUS_EXPORT    = 'export';
+	const STATUS_COMPLETED = 'completed';
+
+	/** @var  integer */
+	private $id;
+	/** @var  integer */
+	private $task_id;
+	/** @var  integer */
+	private $post_id;
+	/** @var  string */
+	private $source_language;
+	/** @var  string */
+	private $target_language;
+	/** @var  float */
+	private $progress;
+	/** @var  integer */
+	private $words_count;
+	/** @var  integer */
+	private $target_post_ID;
+	/** @var  string */
+	private $document_id;
+	/** @var  string */
+	private $status;
+	/** @var  integer */
+	private $error_count = 0;
+
 	/**
 	 * @return int
 	 */
@@ -191,29 +226,6 @@ class Statistics {
 
 		return $this;
 	}
-
-	/** @var  integer */
-	private $id;
-	/** @var  integer */
-	private $task_id;
-	/** @var  integer */
-	private $post_id;
-	/** @var  string */
-	private $source_language;
-	/** @var  string */
-	private $target_language;
-	/** @var  float */
-	private $progress;
-	/** @var  integer */
-	private $words_count;
-	/** @var  integer */
-	private $target_post_ID;
-	/** @var  string */
-	private $document_id;
-	/** @var  string */
-	private $status;
-	/** @var  integer */
-	private $error_count = 0;
 
 	/**
 	 * @return int

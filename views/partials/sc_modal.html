@@ -1,0 +1,27 @@
+<div id="smartcat-modal-window" style="display:none;">
+    <div class="smartcat-source-language-error"></div>
+    <form method="POST">
+        <table class="wp-list-table widefat fixed striped languages">
+            <thead>
+                <tr>
+                    <td>{{ texts.title }}</td>
+                    <td>{{ texts.author }}</td>
+                    <td>{{ texts.status }}</td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="sc-select-language-block">
+            <div> <b>{{ texts.select_profile }}:</b>
+                <select name="sc-profile" id="sc-profile" style="min-width: 150px">
+                    {{# profiles }}<option value="{{ value }}">{{ name }}</option>{{/ profiles }}
+                </select>
+            </div>
+        </div>
+
+        <input type="submit" style="float: right" class="button-primary" value="{{ texts.submit }}"/>
+        <input type="hidden" name="posts" id="smartcat-modal-window-posts" value=""/>
+        <input type="hidden" name="sc_send_nonce" id="sc_send_nonce" value="{{ sc_send_nonce }}"/>
+    </form>
+</div>

@@ -1,3 +1,36 @@
+function printError(message) {
+    notice(message, 'error');
+}
+
+function printSuccess(message) {
+    notice(message, 'success');
+}
+
+function notice( message, nclass = 'success') {
+    jQuery(function ($) {
+        var id = revisedRandId();
+        $('.notice.notice-' + nclass + '.is-dismissible.shake-shake-baby').remove();
+        var $div = $(document.createElement('div'));
+        $div.attr('class', 'notice notice-error is-dismissible shake-shake-baby');
+        $div.attr('id', id);
+        var $p = $(document.createElement('p'));
+        $p.html(message);
+        $div.append($p);
+        $div.append('<button type="button" class="notice-dismiss" onclick="dismissById(\'' + id + '\')"><span class="screen-reader-text">Dismiss this notice.</span></button>');
+        $('div.wrap h1').first().after($div);
+    });
+}
+
+function revisedRandId() {
+    return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(2, 15);
+}
+
+function dismissById( $id ) {
+    jQuery(function ($) {
+        $('#' + $id).remove();
+    });
+}
+
 jQuery(function ($) {
     function cl(message) {
         console.log(message);
@@ -9,16 +42,6 @@ jQuery(function ($) {
         } else {
             return 'action= ' + action;
         }
-    }
-
-    function printError(message) {
-        $('.notice.notice-error.is-dismissible.shake-shake-baby').remove();
-        var $div = $(document.createElement('div'));
-        $div.attr('class', 'notice notice-error is-dismissible shake-shake-baby');
-        var $p = $(document.createElement('p'));
-        $p.html(message);
-        $div.append($p);
-        $('div.wrap h1').first().after($div);
     }
 
     /*
@@ -36,8 +59,6 @@ jQuery(function ($) {
 
         var author = $translation_connectors_column.attr('data-author');
         var status = $inlineElement.find('._status').first().text();
-        var sourceLangName = $translation_connectors_column.attr('data-source-language-name');
-        var sourceLangSlug = $translation_connectors_column.attr('data-source-language-slug');
 
         var translation_slugs = $translation_connectors_column.attr('data-translation-slugs');
         var pll_slugs = $translation_connectors_column.attr('data-post-pll-slugs');
@@ -45,20 +66,8 @@ jQuery(function ($) {
 
         var $tr;
         if (!isPostHaveAllTranslates) {
-            // noinspection JSUnresolvedVariable
-            var isFound = $.inArray(sourceLangSlug + "", SmartcatFrontend.pll_languages_supported_by_sc);
-
-            if (isFound <= - 1) {
-                cl(sourceLangSlug);
-                cl(SmartcatFrontend.pll_languages_supported_by_sc);
-
-                sourceLangError.push('<b>' + title + '</b>');
-                //sourceLang не находится в списке допустимых, выделяем title красным
-                title = '<span style="color: red">' + title + '</span>';
-            }
-
             $tr = $(document.createElement('tr'));
-            $tr.html('<td>' + title + '</td><td>' + author + '</td><td>' + status + '</td><td>' + sourceLangName + '</td>');
+            $tr.html('<td>' + title + '</td><td>' + author + '</td><td>' + status + '</td>');
             addedToModal++;
         } else {
             $tr = '';
@@ -78,19 +87,6 @@ jQuery(function ($) {
         $mwPosts.val(posts.join(','));
     }
 
-    function checkSourceLanguageError() {
-        cl(sourceLangError);
-        if (sourceLangError.length > 0) {
-            var $modal = $("#smartcat-modal-window");
-            var $errorDiv = $modal.find('.smartcat-source-language-error').first();
-
-            $errorDiv.html('');
-            $errorDiv.html(sourceLangError.join(', ') + ' ' + SmartcatFrontend.sourceLanguageNotSupported);
-            $errorDiv.css('display', 'block');
-            sourceLangError = [];
-        }
-    }
-
     function modalWindowHandler(event) {
         addedToModal = 0;
         var $info = $("#smartcat-modal-window");
@@ -98,6 +94,7 @@ jQuery(function ($) {
         $mwPosts.val('');
 
         $info.dialog({
+            title: SmartcatFrontend.dialogTitle,
             dialogClass: 'wp-dialog',
             height: "auto",
             width: 700,
@@ -126,7 +123,6 @@ jQuery(function ($) {
             var $tr = prepareInfo(postNumber);
             $tbody.append($tr);
 
-            checkSourceLanguageError();
             $info.dialog('open');
         } else {
             $('tbody th.check-column input[type="checkbox"]').each(function () {
@@ -144,13 +140,10 @@ jQuery(function ($) {
 
             if (isChecked) {
                 if (addedToModal) {
-                    checkSourceLanguageError();
                     $info.dialog('open');
                 } else {
                     printError(SmartcatFrontend.postsAreAlreadyTranslated);
                 }
-
-
             } else {
                 printError(SmartcatFrontend.postsAreNotChoosen);
             }
@@ -175,60 +168,6 @@ jQuery(function ($) {
             return false;
         }
     });
-
-    /*
-     * Обработчик "Возможность выбора нескольких языков"
-     */
-
-    var addLanguagesCount = 1;
-
-    // noinspection JSUnusedLocalSymbols
-    function add_language_handler(event) {
-        var $this = $(this);
-        var $div = $this.parent();
-
-        var $clone = $div.clone();
-
-        $this.removeClass('add-language');
-        $this.addClass('remove-language');
-        $this.unbind('click');
-        $this.click(remove_language_handler);
-
-        if (SmartcatFrontend.totalLanguages - 1 > addLanguagesCount) {
-            $clone.find('.add-language').first().click(add_language_handler);
-            addLanguagesCount ++;
-        } else {
-            $clone.find('.add-language').first().remove();
-        }
-
-        $div.after($clone);
-    }
-
-    // noinspection JSUnusedLocalSymbols
-    function remove_language_handler(event) {
-        var $this = $(this);
-        var $div = $this.parent();
-        var $selectLanguagesBlock = $this.parent().parent();
-
-        addLanguagesCount --;
-        var $lastDiv = $selectLanguagesBlock.last();
-
-        var isAddLanguage = $lastDiv.find('.add-language').length;
-
-        if (! isAddLanguage) {
-            //alert(111);
-            var $addLanguageElement = $(document.createElement('div'));
-            $addLanguageElement.addClass('add-language');
-            $addLanguageElement.click(add_language_handler);
-            $lastDiv.find('select').last().after($addLanguageElement);
-            addLanguagesCount ++;
-        }
-
-        $div.remove();
-    }
-
-    $('.add-language').click(add_language_handler);
-    $('.remove-language').click(remove_language_handler);
 
     var $modalWindow = $('#smartcat-modal-window');
 
@@ -282,16 +221,15 @@ jQuery(function ($) {
             url: ajaxurl,
             data: formData,
             success: function (responseText) {
-                cl('success');
-                cl(responseText);
+                //cl('success');
+                //cl(responseText);
                 $this.parent().dialog('close');
-                //window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-translation-progress';
+                printSuccess('Items successfully sended.')
             },
             error: function (responseObject) {
-                cl('error');
+                //cl('error');
                 var responseJSON = JSON.parse(responseObject.responseText);
-                printError(responseJSON.message);
-                alert(responseJSON.message);
+                printError('An a error occurred: ' + responseJSON.message);
             }
         });
 

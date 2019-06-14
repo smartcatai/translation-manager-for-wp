@@ -16,6 +16,7 @@ use SmartCAT\WP\DB\Entity\Profile;
 /**
  * Class ProfileRepository
  *
+ * @method Profile get_one_by_id( int $id )
  * @package SmartCAT\WP\DB\Repository
  */
 class ProfileRepository extends RepositoryAbstract {
@@ -124,7 +125,7 @@ class ProfileRepository extends RepositoryAbstract {
 	 * @param Profile $profile Profile object.
 	 * @return bool|int
 	 */
-	public function add( Profile $profile ) {
+	public function add( $profile ) {
 		$wpdb = $this->get_wp_db();
 
 		$data = [
@@ -135,8 +136,8 @@ class ProfileRepository extends RepositoryAbstract {
 			'workflow_stages'  => wp_json_encode( $profile->get_workflow_stages() ),
 			'vendor'           => $profile->get_vendor(),
 			'vendor_name'      => $profile->get_vendor_name(),
-			'auto_send'        => $profile->is_auto_send(),
-			'auto_update'      => $profile->is_auto_update(),
+			'auto_send'        => boolval( $profile->is_auto_send() ),
+			'auto_update'      => boolval( $profile->is_auto_update() ),
 		];
 
 		if ( ! empty( $profile->get_id() ) ) {
@@ -151,7 +152,12 @@ class ProfileRepository extends RepositoryAbstract {
 		return false;
 	}
 
-	public function save( Profile $profile ) {
+	/**
+	 * @param Profile $profile
+	 *
+	 * @return mixed|void
+	 */
+	public function save( $profile ) {
 		if ( $profile->get_id() ) {
 			$this->update( $profile );
 		} else {
@@ -165,7 +171,7 @@ class ProfileRepository extends RepositoryAbstract {
 	 * @param Profile $profile Profile object.
 	 * @return bool
 	 */
-	public function update( Profile $profile ) {
+	public function update( $profile ) {
 		$wpdb = $this->get_wp_db();
 
 		if ( ! empty( $profile->get_id() ) ) {
@@ -177,8 +183,8 @@ class ProfileRepository extends RepositoryAbstract {
 				'workflow_stages'  => wp_json_encode( $profile->get_workflow_stages() ),
 				'vendor'           => $profile->get_vendor(),
 				'vendor_name'      => $profile->get_vendor_name(),
-				'auto_send'        => $profile->is_auto_send(),
-				'auto_update'      => $profile->is_auto_update(),
+				'auto_send'        => boolval( $profile->is_auto_send() ),
+				'auto_update'      => boolval( $profile->is_auto_update() ),
 			];
 
 			if ( $wpdb->update( $this->get_table_name(), $data, [ 'id' => $profile->get_id() ] ) ) {
@@ -187,14 +193,5 @@ class ProfileRepository extends RepositoryAbstract {
 		}
 
 		return false;
-	}
-
-	/**
-	 * @param array $criterias
-	 *
-	 * @return Profile|null
-	 */
-	public function get_one_by_id( $id ) {
-		return parent::get_one_by_id( $id );
 	}
 }

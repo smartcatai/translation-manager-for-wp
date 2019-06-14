@@ -16,6 +16,7 @@ use SmartCAT\WP\DB\Entity\Error;
 /**
  * Class ErrorRepository
  *
+ * @method Error get_one_by_id( int $id )
  * @package SmartCAT\WP\DB\Repository
  */
 class ErrorRepository extends RepositoryAbstract {
@@ -56,7 +57,7 @@ class ErrorRepository extends RepositoryAbstract {
 	 * @param Error $error
 	 * @return bool|int
 	 */
-	public function add( Error $error ) {
+	public function add( $error ) {
 		$table_name = $this->get_table_name();
 		$wpdb	  = $this->get_wp_db();
 
@@ -80,7 +81,12 @@ class ErrorRepository extends RepositoryAbstract {
 		return false;
 	}
 
-	public function update( Error $error ) {
+	/**
+	 * @param $error
+	 *
+	 * @return bool|mixed
+	 */
+	public function update( $error ) {
 		$table_name = $this->get_table_name();
 		$wpdb	  = $this->get_wp_db();
 
@@ -100,6 +106,11 @@ class ErrorRepository extends RepositoryAbstract {
 		return false;
 	}
 
+	/**
+	 * @param array $persists
+	 *
+	 * @return mixed|void
+	 */
 	protected function do_flush( array $persists ) {
 		/* @var Error[] $persists */
 		foreach ( $persists as $error ) {
@@ -115,6 +126,11 @@ class ErrorRepository extends RepositoryAbstract {
 		}
 	}
 
+	/**
+	 * @param $row
+	 *
+	 * @return mixed|Error
+	 */
 	protected function to_entity( $row ) {
 		$result = new Error();
 
@@ -139,5 +155,18 @@ class ErrorRepository extends RepositoryAbstract {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param Error $error
+	 *
+	 * @return mixed|void
+	 */
+	public function save( $error ) {
+		if ( $error->get_id() ) {
+			$this->update( $error );
+		} else {
+			$this->add( $error );
+		}
 	}
 }

@@ -14,6 +14,7 @@ namespace SmartCAT\WP\Admin\Tables;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Repository\ProfileRepository;
+use SmartCAT\WP\Helpers\Language\LanguageConverter;
 
 /**
  * Class ProfilesTable
@@ -68,25 +69,27 @@ class ProfilesTable extends TableAbstract {
 	 * @return mixed
 	 */
 	public function column_default( $item, $column_name ) {
+		$language_converter = self::get_language_converter();
+
 		switch ( $column_name ) {
 			case 'name':
 				return $item->get_name();
 			case 'source_language':
-				return $item->get_source_language();
+				return $language_converter->get_sc_code_by_wp( $item->get_source_language() )->get_wp_name();
 			case 'target_languages':
-				return implode( ',', $item->get_target_languages() );
+				$languages = [];
+				foreach ( $item->get_target_languages() as $wp_locale ) {
+					$languages[] = $language_converter->get_sc_code_by_wp( $wp_locale )->get_wp_name();
+				}
+				return implode( ', ', $languages );
 			case 'vendor_name':
 				return $item->get_vendor_name();
 			case 'workflow_stages':
-				return implode( ',', $item->get_workflow_stages() );
+				return implode( ', ', $item->get_workflow_stages() );
 			case 'auto_send':
-				$message = $item->is_auto_send() ? 'Yes' : 'No';
-
-				return $message;
+				return $item->is_auto_send() ? 'Yes' : 'No';
 			case 'auto_update':
-				$message = $item->is_auto_update() ? 'Yes' : 'No';
-
-				return $message;
+				return $item->is_auto_update() ? 'Yes' : 'No';
 			default:
 				return null;
 		}
@@ -174,6 +177,21 @@ class ProfilesTable extends TableAbstract {
 
 		try {
 			return $container->get( 'entity.repository.profile' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
+	}
+
+	/**
+	 * Get errors repository
+	 *
+	 * @return LanguageConverter|null
+	 */
+	private static function get_language_converter() {
+		$container = Connector::get_container();
+
+		try {
+			return $container->get( 'language.converter' );
 		} catch ( \Exception $e ) {
 			return null;
 		}

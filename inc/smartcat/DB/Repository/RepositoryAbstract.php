@@ -78,6 +78,13 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 	protected abstract function to_entity( $row );
 
 	/**
+	 * @param $entity
+	 *
+	 * @return mixed
+	 */
+	protected abstract function save( $entity );
+
+	/**
 	 * @param $rows
 	 *
 	 * @return array

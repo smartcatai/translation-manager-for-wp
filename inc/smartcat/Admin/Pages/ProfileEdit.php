@@ -92,6 +92,7 @@ class ProfileEdit extends PageAbstract {
 			'empty'                   => __( 'Profiles not found', 'translation-connectors' ),
 			'pages'                   => __( 'Pages', 'translation-connectors' ),
 			'title'                   => $title,
+			'save_button'             => empty( $profile ) ? __( 'Create profile', 'translation-connectors' ) : __( 'Save profile', 'translation-connectors' ),
 			'profile_name'            => __( 'Name', 'translation-connectors' ),
 			'profile_vendor'          => __( 'Vendor', 'translation-connectors' ),
 			'profile_source_lang'     => __( 'Source Language', 'translation-connectors' ),
@@ -134,7 +135,6 @@ class ProfileEdit extends PageAbstract {
 	 * @param $key
 	 *
 	 * @return array
-	 * @throws \Exception
 	 */
 	private static function get_languages( $profile, $key) {
 		$languages = [];
@@ -156,7 +156,7 @@ class ProfileEdit extends PageAbstract {
 			}
 
 			$languages[] = [
-				'value'    => $language_converter->get_sc_code_by_wp( $locale )->get_sc_code(),
+				'value'    => $locale,
 				'name'     => $name,
 				'selected' => in_array( $locale, $search_array, true ),
 			];
@@ -264,6 +264,11 @@ class ProfileEdit extends PageAbstract {
 			$profile = $profiles_repo->get_one_by_id( $data['profile_id'] );
 		} else {
 			$profile = new Profile();
+		}
+
+		if ( empty( $data['profile_name'] ) ) {
+			$targets = implode( ', ', $data['profile_target_langs'] );
+			$data['profile_name'] = __( 'Translation:', 'translation-connectors' ) . " {$data['profile_source_lang']} -> {$targets}";
 		}
 
 		$profile

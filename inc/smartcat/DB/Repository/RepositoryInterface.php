@@ -11,7 +11,13 @@
 
 namespace SmartCAT\WP\DB\Repository;
 
+use SmartCAT\WP\DB\DbAbstract;
 
+/**
+ * Interface RepositoryInterface
+ *
+ * @package SmartCAT\WP\DB\Repository
+ */
 interface RepositoryInterface {
 	/**
 	 * RepositoryInterface constructor.
@@ -20,9 +26,34 @@ interface RepositoryInterface {
 	 */
 	public function __construct( $prefix );
 
+	/**
+	 * @return mixed
+	 */
 	public function get_table_name();
 
+	/**
+	 * @param $o
+	 *
+	 * @return mixed
+	 */
 	public function persist( $o );
 
+	/**
+	 * @return mixed
+	 */
 	public function flush();
+
+	/**
+	 * @param mixed $entity
+	 *
+	 * @return mixed
+	 */
+	public function update( $entity );
+
+	/**
+	 * @param mixed $entity
+	 *
+	 * @return mixed
+	 */
+	public function add( $entity );
 }

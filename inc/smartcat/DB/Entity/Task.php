@@ -39,6 +39,11 @@ class Task {
 	/** @var  string */
 	private $status;
 
+	/**
+	 * @var int
+	 */
+	private $profile_id;
+
 	/** @var  string */
 	private $project_id = null;
 
@@ -97,24 +102,6 @@ class Task {
 	}
 
 	/**
-	 * @return int
-	 */
-	public function get_post_id() {
-		return $this->post_id;
-	}
-
-	/**
-	 * @param int $post_id
-	 *
-	 * @return Task
-	 */
-	public function set_post_id( $post_id ) {
-		$this->post_id = $post_id;
-
-		return $this;
-	}
-
-	/**
 	 * @return string
 	 */
 	public function get_status() {
@@ -135,7 +122,7 @@ class Task {
 	/**
 	 * @return string|null
 	 */
-	public function get_project_d() {
+	public function get_project_id() {
 		return $this->project_id;
 	}
 
@@ -146,6 +133,24 @@ class Task {
 	 */
 	public function set_project_id( $project_id ) {
 		$this->project_id = $project_id;
+
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function get_profile_id() {
+		return $this->profile_id;
+	}
+
+	/**
+	 * @param int $profile_id
+	 *
+	 * @return Task
+	 */
+	public function set_profile_id( $profile_id ) {
+		$this->profile_id = $profile_id;
 
 		return $this;
 	}

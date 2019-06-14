@@ -234,11 +234,6 @@ class Connector {
 		/** @var StatisticRepository $statistics_repository */
 		$statistics_repository = $container->get( 'entity.repository.statistic' );
 
-		// На случай если сохраняются часто, а крон еще не прошел и не отправил предыдущие
-		if ( $task_repository->task_new_post_id_exists( $post_id ) ) {
-			return;
-		}
-
 		$task = new Task();
 		$task->set_post_id( $post_id )
 			 ->set_source_language( $default_language )
