@@ -242,16 +242,19 @@ jQuery(function ($) {
         formData = add_action_to_serialized_data(
             formData, SmartcatFrontend.smartcat_table_prefix + 'send_to_smartcat');
 
+        $('input.sc-send-button').prop('disabled', true);
         $.ajax({
             type: "POST",
             url: ajaxurl,
             data: formData,
             success: function (responseText) {
                 $this.parent().dialog('close');
-                printSuccess('Items successfully sended.')
+                printSuccess('Items successfully sended.');
+                $('input.sc-send-button').prop('disabled', false);
             },
             error: function (responseObject) {
                 $this.parent().dialog('close');
+                $('input.sc-send-button').prop('disabled', false);
                 var responseJSON = JSON.parse(responseObject.responseText);
                 printError('An a error occurred: ' + responseJSON.message);
             }

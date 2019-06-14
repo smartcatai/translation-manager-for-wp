@@ -56,7 +56,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			$container    = Connector::get_container();
 			$param_prefix = $container->getParameter( 'plugin.table.prefix' );
 
-			if ( get_option( $param_prefix . 'plugin.table.prefix', false ) ) {
+			if ( get_option( $param_prefix . 'smartcat_debug_mode', false ) ) {
 				$date = ( new \DateTime( 'now' ) )->format( '[Y-m-d H:i:s]' );
 				if ( constant( 'SMARTCAT_DEBUG_LOG' ) ) {
 					file_put_contents( constant( 'SMARTCAT_DEBUG_LOG' ), "{$date} {$message}" . PHP_EOL, FILE_APPEND );
@@ -72,7 +72,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 * @param Profile $profile
 	 * @return ProjectModel
 	 */
-	public function createProject( $file, $profile ) {
+	public function create_project( $file, $profile ) {
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
 
@@ -85,7 +85,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		);
 
 		$project_model = new CreateProjectWithFilesModel();
-		$project_model->setName( self::filter_chars( self::getTaskNameFromStream( $file ) ) );
+		$project_model->setName( self::filter_chars( self::get_task_name_from_stream( $file ) ) );
 		$project_model->setSourceLanguage( $source_language );
 		$project_model->setTargetLanguages( $target_languages );
 		$project_model->setWorkflowStages( $profile->get_workflow_stages() );
@@ -99,7 +99,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 
 		$project_model->setDescription( 'WordPress Smartcat Connector' );
 		$project_model->setExternalTag( 'source:WPPL' );
-		$project_model->attacheFile( $file, self::filter_chars( self::getTaskNameFromStream( $file, true ) ) );
+		$project_model->attacheFile( $file, self::filter_chars( self::get_task_name_from_stream( $file, true ) ) );
 
 		$smartcat_project = $this->getProjectManager()->projectCreateProjectWithFiles( $project_model );
 
@@ -112,7 +112,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 *
 	 * @return \Psr\Http\Message\ResponseInterface|\SmartCat\Client\Model\DocumentModel
 	 */
-	public function updateProject( $document_model, $task ) {
+	public function update_project( $document_model, $task ) {
 		/** @var ProjectModel $sc_project */
 		$sc_project = $this->getProjectManager()->projectGet( $task->get_project_id() );
 
@@ -162,8 +162,8 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 * @param $file
 	 * @return CreateDocumentPropertyWithFilesModel
 	 */
-	public function createDocument( $file ) {
-		$filename = self::getTaskNameFromStream( $file, true );
+	public function create_document( $file ) {
+		$filename = self::get_task_name_from_stream( $file, true );
 
 		$bilingual_file_import_settings = new BilingualFileImportSettingsModel();
 		$bilingual_file_import_settings
@@ -183,7 +183,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 *
 	 * @return string|string[]|null
 	 */
-	public static function getTaskNameFromStream( $file, $with_extension = false ) {
+	public static function get_task_name_from_stream( $file, $with_extension = false ) {
 		$meta_data = stream_get_meta_data( $file );
 		$filename  = basename( $meta_data['uri'] );
 

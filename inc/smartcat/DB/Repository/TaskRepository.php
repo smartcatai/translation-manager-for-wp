@@ -161,6 +161,10 @@ class TaskRepository extends RepositoryAbstract {
 			$result->set_project_id( $row->projectID );
 		}
 
+		if ( isset( $row->profileID ) ) {
+			$result->set_profile_id( $row->profileID );
+		}
+
 		return $result;
 	}
 
