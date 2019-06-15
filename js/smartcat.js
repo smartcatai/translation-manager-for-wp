@@ -249,7 +249,8 @@ jQuery(function ($) {
                 }
             },
             error: function (responseObject) {
-                cl('ERROR');
+                var responseJSON = JSON.parse(responseText);
+                printError('An a error occurred: ' + responseJSON.message);
             }
         });
     }
@@ -371,7 +372,7 @@ jQuery(function ($) {
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseText);
-                printError(responseJSON.message);
+                printError('An a error occurred: ' + responseJSON.message);
             }
         });
     }
@@ -401,7 +402,7 @@ jQuery(function ($) {
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseText);
-                printError(responseJSON.message);
+                printError('An a error occurred: ' + responseJSON.message);
             }
         });
     }
@@ -424,14 +425,14 @@ jQuery(function ($) {
             success: function (responseText) {
                 var responseJSON = JSON.parse(responseText);
                 if (responseJSON.message === "ok") {
-                    printSuccess("Item successfully deleted.");
+                    printSuccess("Item successfully cancelled.");
                     element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
                     element.closest("span").remove();
                 }
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseText);
-                printError(responseJSON.message);
+                printError('An a error occurred: ' + responseJSON.message);
             }
         });
     }
