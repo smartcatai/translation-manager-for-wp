@@ -24,7 +24,7 @@
                         <label for="profile_vendor">{{ texts.profile_vendor }}</label>
                     </th>
                     <td>
-                        <select id="profile_vendor" name="profile_vendor">
+                        <select id="profile_vendor" name="profile_vendor" style="min-width: 200px;">
                             {{# vendors }}
                                 <option value="{{ value }}" {{# selected }} selected="selected" {{/ selected }}>{{ name }}</option>
                             {{/ vendors }}
@@ -36,7 +36,7 @@
                         <label for="profile_source_lang">{{ texts.profile_source_lang }}*</label>
                     </th>
                     <td>
-                        <select id="profile_source_lang" name="profile_source_lang" required="required">
+                        <select id="profile_source_lang" name="profile_source_lang" required="required" style="min-width: 200px;">
                             {{# source_lang }}
                             <option value="{{ value }}" {{# selected }} selected="selected" {{/ selected }}>{{ name }}</option>
                             {{/ source_lang }}
@@ -48,7 +48,7 @@
                         <label for="profile_target_langs">{{ texts.profile_target_langs }}*</label>
                     </th>
                     <td>
-                        <select id="profile_target_langs" name="profile_target_langs[]" multiple="multiple" size="5" required="required">
+                        <select id="profile_target_langs" name="profile_target_langs[]" multiple="multiple" size="5" required="required" style="min-width: 200px;">
                             {{# target_langs }}
                             <option value="{{ value }}" {{# selected }} selected="selected" {{/ selected }}>{{ name }}</option>
                             {{/ target_langs }}
@@ -60,7 +60,7 @@
                         <label for="profile_workflow_stages">{{ texts.profile_workflow_stages }}*</label>
                     </th>
                     <td>
-                        <select id="profile_workflow_stages" name="profile_workflow_stages[]" multiple="multiple" size="5" required="required">
+                        <select id="profile_workflow_stages" name="profile_workflow_stages[]" multiple="multiple" size="5" required="required" style="min-width: 200px;">
                             {{# workflow_stages }}
                             <option value="{{ value }}" {{# selected }} selected="selected" {{/ selected }}>{{ name }}</option>
                             {{/ workflow_stages }}

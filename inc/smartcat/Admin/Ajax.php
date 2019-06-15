@@ -254,6 +254,20 @@ final class Ajax implements HookInterface {
 			unset( $data['profile_target_langs'][ $key ] );
 		}
 
+		try {
+			if ( ! empty( $data['profile_project_id'] ) ) {
+				$sc_project = $smartcat->getProjectManager()->projectGet( $data['profile_project_id'] );
+				$sc_project->getId();
+			}
+		} catch ( \Exception $e ) {
+			$ajax_response->send_error(
+				sprintf(__( 'Project "%s" does not exists', 'translation-connectors'), $data['profile_project_id'] ),
+				[],
+				404
+			);
+			wp_die();
+		}
+
 		$profile
 			->set_name( $data['profile_name'] )
 			->set_vendor( $data['profile_vendor'] )
