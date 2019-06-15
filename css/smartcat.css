@@ -134,22 +134,22 @@
     }
 }
 
-table.localization_page_sc-errors #id {
+table.wp-list-table.errors #id {
     width: 5%;
 }
 
-table.localization_page_sc-errors #date {
+table.wp-list-table.errors #date {
     width: 10%;
 }
 
-table.localization_page_sc-errors #type {
+table.wp-list-table.errors #type {
     width: 5%;
 }
 
-table.localization_page_sc-errors #shortMessage {
+table.wp-list-table.errors #shortMessage {
     width: 30%;
 }
 
-table.localization_page_sc-errors #message {
+table.wp-list-table.errors #message {
     width: auto;
 }

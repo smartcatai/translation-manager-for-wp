@@ -27,7 +27,7 @@ use SmartCAT\WP\WP\Options;
  */
 final class Menu implements InitInterface {
 	/**
-	 * Render menu in sidebar
+	 * Render menu in sidebar and adding pages to system
 	 */
 	public static function add_admin_menu() {
 		$container = Connector::get_container();
@@ -99,13 +99,27 @@ final class Menu implements InitInterface {
 		);
 
 		if ( $options->get( 'smartcat_debug_mode' ) ) {
-			add_submenu_page(
+			$errors_hook = add_submenu_page(
 				'sc-dashboard',
 				__( 'Errors', 'translation-connectors' ),
 				__( 'Errors', 'translation-connectors' ),
 				'edit_pages',
 				'sc-errors',
 				[ Errors::class, 'render' ]
+			);
+
+			add_action(
+				"load-$errors_hook",
+				function () {
+					add_screen_option(
+						'per_page',
+						[
+							'label'   => __( 'Show per page', 'translation-connectors' ),
+							'default' => 20,
+							'option'  => 'sc_errors_per_page',
+						]
+					);
+				}
 			);
 		}
 

@@ -24,22 +24,13 @@ class Errors extends PageAbstract {
 	 * Render errors page
 	 */
 	public static function render() {
-		$errors_repo = self::get_repository();
-
-		$limit = 100;
-
-		$statistics_table  = new ErrorsTable();
-		$max_page          = ceil( $errors_repo->get_count() / $limit );
-		$page              = self::get_page( $max_page );
-		$statistics_result = $errors_repo->get_all( $limit * ( $page - 1 ), $limit );
+		$errors_table = new ErrorsTable();
 
 		echo self::get_renderer()->render(
 			'errors',
 			[
-				'errors_result'    => $statistics_result ? true : false,
-				'errors_table'     => self::get_table_code( $statistics_table, $statistics_result ),
+				'errors_table'     => $errors_table->display(),
 				'texts'            => self::get_texts(),
-				'paginator'        => self::get_paginator_code( 'sc-errors', $max_page, $page ),
 			]
 		);
 	}
@@ -52,24 +43,7 @@ class Errors extends PageAbstract {
 	private static function get_texts() {
 		return [
 			'refresh' => __( 'Refresh statistics', 'translation-connectors' ),
-			'pages'   => __( 'Pages', 'translation-connectors' ),
-			'empty'   => __( 'Statistics is empty', 'translation-connectors' ),
 			'title'   => $GLOBALS['title'],
 		];
-	}
-
-	/**
-	 * Get errors repository
-	 *
-	 * @return ErrorRepository|null
-	 */
-	private static function get_repository() {
-		$container = self::get_container();
-
-		try {
-			return $container->get( 'entity.repository.error' );
-		} catch ( \Exception $e ) {
-			return null;
-		}
 	}
 }

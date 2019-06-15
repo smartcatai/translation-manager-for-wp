@@ -4,17 +4,7 @@
 
     <hr class="wp-header-end" />
 
-    {{# profiles_result }}
     <form action="" method="POST">
         {{& profiles_table }}
-        <div class="pagination">
-            <span class="title">{{ texts.pages }}:</span>
-            {{& paginator }}
-        </div>
     </form>
-    {{/ profiles_result }}
-
-    {{^ profiles_result }}
-    <div> {{ texts.empty }} </div>
-    {{/ profiles_result }}
 </div>

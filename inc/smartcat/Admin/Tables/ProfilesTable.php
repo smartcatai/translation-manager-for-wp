@@ -38,10 +38,28 @@ class ProfilesTable extends TableAbstract {
 	}
 
 	/**
-	 * @param object $item
+	 * Prepare items for display
 	 */
-	public function column_cb ( $item ) {
-		echo "<input type='checkbox' name='{$this->_args['plural']}[]' id='cb-select-{$item->get_id()}' value='{$item->get_id()}' />";
+	public function prepare_items() {
+		$profiles_repository = self::get_repository();
+		$per_page            = get_user_meta( get_current_user_id(), 'sc_profiles_per_page', true ) ?: 20;
+
+		$this->set_pagination_args(
+			[
+				'total_items' => $profiles_repository->get_count(),
+				'per_page'    => intval( $per_page ),
+			]
+		);
+
+		$cur_page = (int) $this->get_pagenum();
+		$items    = $profiles_repository->get_all(
+			intval( $per_page ) * ( $cur_page - 1 ),
+			intval( $per_page )
+		);
+
+		$this->set_data( $items );
+
+		parent::prepare_items();
 	}
 
 	/**

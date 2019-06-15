@@ -43,7 +43,7 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 	 */
 	public function get_count() {
 		$table_name = $this->get_table_name();
-		$count	    = $this->get_wp_db()->get_var( "SELECT COUNT( * ) FROM $table_name" );
+		$count      = $this->get_wp_db()->get_var( "SELECT COUNT( * ) FROM $table_name" );
 
 		return $count;
 	}

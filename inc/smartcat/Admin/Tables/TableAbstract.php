@@ -11,8 +11,6 @@
 
 namespace SmartCAT\WP\Admin\Tables;
 
-use SmartCAT\WP\Admin\Statistics;
-
 /**
  * Class TableAbstract
  *
@@ -40,6 +38,13 @@ abstract class TableAbstract extends \WP_List_Table {
 	}
 
 	/**
+	 * @param object $item
+	 */
+	public function column_cb ( $item ) {
+		echo "<input type='checkbox' name='{$this->_args['plural']}[]' id='cb-select-{$item->get_id()}' value='{$item->get_id()}' />";
+	}
+
+	/**
 	 * Prepare items for display
 	 */
 	public function prepare_items() {
@@ -62,7 +67,7 @@ abstract class TableAbstract extends \WP_List_Table {
 	/**
 	 * Setter for table data
 	 *
-	 * @param Statistics[] $data Statistic data to set in.
+	 * @param mixed $data Statistic data to set in.
 	 * @return $this
 	 */
 	public function set_data( $data ) {

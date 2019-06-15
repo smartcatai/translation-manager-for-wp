@@ -24,22 +24,13 @@ class Profiles extends PageAbstract {
 	 * Render profiles page
 	 */
 	public static function render() {
-		$profiles_repo = self::get_repository();
-
-		$limit = 100;
-
-		$profiles_table  = new ProfilesTable();
-		$max_page        = ceil( $profiles_repo->get_count() / $limit );
-		$page            = self::get_page( $max_page );
-		$profiles_result = $profiles_repo->get_all( $limit * ( $page - 1 ), $limit );
+		$profiles_table = new ProfilesTable();
 
 		echo self::get_renderer()->render(
 			'profiles',
 			[
 				'texts'           => self::get_texts(),
-				'profiles_result' => $profiles_result ? true : false,
-				'profiles_table'  => self::get_table_code( $profiles_table, $profiles_result ),
-				'paginator'       => self::get_paginator_code( 'sc-profiles', $max_page, $page ),
+				'profiles_table'  => $profiles_table->display(),
 			]
 		);
 	}
@@ -52,24 +43,8 @@ class Profiles extends PageAbstract {
 	private static function get_texts() {
 		return [
 			'add_profile' => __( 'New profile', 'translation-connectors' ),
-			'empty'       => __( 'Profiles not found', 'translation-connectors' ),
 			'pages'       => __( 'Pages', 'translation-connectors' ),
 			'title'       => $GLOBALS['title'],
 		];
-	}
-
-	/**
-	 * Get errors repository
-	 *
-	 * @return ProfileRepository|null
-	 */
-	private static function get_repository() {
-		$container = self::get_container();
-
-		try {
-			return $container->get( 'entity.repository.profile' );
-		} catch ( \Exception $e ) {
-			return null;
-		}
 	}
 }

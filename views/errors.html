@@ -3,15 +3,6 @@
 
     <hr class="wp-header-end" />
 
-    {{# errors_result }}
         {{& errors_table }}
-        <div class="pagination">
-            <span class="title">{{ texts.pages }}:</span>
-            {{& paginator }}
-        </div>
-    {{/ errors_result }}
 
-    {{^ errors_result }}
-        <div> {{ texts.empty }} </div>
-    {{/ errors_result }}
 </div>
