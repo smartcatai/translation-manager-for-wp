@@ -27,8 +27,8 @@ class ProfileEdit extends PageAbstract {
 	 * Render profiles page
 	 */
 	public static function render() {
-		$profile = [];
-		self::set_core_parameters();
+		$profile    = [];
+		$profile_db = null;
 
 		if ( ! empty( $_POST ) ) {
 			$verify_nonce = wp_verify_nonce(
@@ -66,13 +66,13 @@ class ProfileEdit extends PageAbstract {
 		echo self::get_renderer()->render(
 			'profile_edit',
 			[
-				'texts'           => self::get_texts( $profile ),
+				'texts'           => self::get_texts( $profile_db ),
 				'profile'         => $profile,
 				'sc_nonce'        => wp_create_nonce( 'sc_profile_edit' ),
-				'workflow_stages' => self::get_workflow_stages( $profile ),
-				'source_lang'     => self::get_languages( $profile, 'source_lang' ),
-				'target_langs'    => self::get_languages( $profile, 'target_langs' ),
-				'vendors'         => self::get_vendors( $profile ),
+				'workflow_stages' => self::get_workflow_stages( $profile_db ),
+				'source_lang'     => self::get_languages( $profile_db, 'source_language' ),
+				'target_langs'    => self::get_languages( $profile_db, 'target_languages' ),
+				'vendors'         => self::get_vendors( $profile_db ),
 			]
 		);
 	}
@@ -80,20 +80,21 @@ class ProfileEdit extends PageAbstract {
 	/**
 	 * Get texts array for render
 	 *
+	 * @param Profile $profile Set a profile if is editing page.
 	 * @return array
 	 */
-	private static function get_texts( $profile ) {
-		if ( empty( $profile ) ) {
+	private static function get_texts( $profile = null ) {
+		if ( ! $profile ) {
 			$title = __( 'New Profile', 'translation-connectors' );
 		} else {
-			$title = __( 'Edit Profile', 'translation-connectors' ) . " '{$profile['name']}'";
+			$title = __( 'Edit Profile', 'translation-connectors' ) . " '{$profile->get_name()}'";
 		}
 
 		return [
 			'empty'                   => __( 'Profiles not found', 'translation-connectors' ),
 			'pages'                   => __( 'Pages', 'translation-connectors' ),
 			'title'                   => $title,
-			'save_button'             => empty( $profile ) ? __( 'Create profile', 'translation-connectors' ) : __( 'Save profile', 'translation-connectors' ),
+			'save_button'             => $profile ? __( 'Create profile', 'translation-connectors' ) : __( 'Save profile', 'translation-connectors' ),
 			'profile_name'            => __( 'Name', 'translation-connectors' ),
 			'profile_vendor'          => __( 'Vendor', 'translation-connectors' ),
 			'profile_source_lang'     => __( 'Source Language', 'translation-connectors' ),
@@ -107,55 +108,50 @@ class ProfileEdit extends PageAbstract {
 	}
 
 	/**
-	 * @param $profile
+	 * Get workflow stages array
 	 *
+	 * @param Profile $profile Set a profile if is editing page.
 	 * @return array
 	 */
-	private static function get_workflow_stages( $profile ) {
+	private static function get_workflow_stages( $profile = null ) {
+		$workflow_stages = $profile ? $profile->get_workflow_stages() : [];
+
 		return [
 			[
 				'value'    => 'Translation',
 				'name'     => __( 'Translation', 'translation-connectors' ),
-				'selected' => ! empty( $profile ) ? in_array( 'Translation', $profile['workflow_stages'] ?? [], true ) : true,
+				'selected' => $profile ? in_array( 'Translation', $workflow_stages, true ) : true,
 			],
 			[
 				'value'    => 'Editing',
 				'name'     => __( 'Editing', 'translation-connectors' ),
-				'selected' => in_array( 'Editing', $profile['workflow_stages'] ?? [], true ),
+				'selected' => in_array( 'Editing', $workflow_stages, true ),
 			],
 			[
 				'value'    => 'Proofreading',
 				'name'     => __( 'Proofreading', 'translation-connectors' ),
-				'selected' => in_array( 'Proofreading', $profile['workflow_stages'] ?? [], true ),
+				'selected' => in_array( 'Proofreading', $workflow_stages, true ),
 			],
 		];
 	}
 
 	/**
-	 * @param $profile
-	 * @param $key
+	 * Get languages array
 	 *
+	 * @param Profile $profile Set a profile if is editing page.
+	 * @param string  $key Key for getter.
 	 * @return array
 	 */
-	private static function get_languages( $profile, $key) {
-		$languages = [];
-		$container = self::get_container();
+	private static function get_languages( $profile, $key ) {
+		$languages      = [];
+		$search_array   = [];
+		$polylang_langs = self::get_language_converter()->get_polylang_languages_supported_by_sc();
 
-		/** @var LanguageConverter $language_converter */
-		$language_converter = $container->get( 'language.converter' );
-		$polylang_langs     = $language_converter->get_polylang_languages_supported_by_sc();
+		if ( $profile ) {
+			$search_array = is_array( $profile->{"get_{$key}"}() ) ? $profile->{"get_{$key}"}() : [ $profile->{"get_{$key}"}() ];
+		}
 
 		foreach ( $polylang_langs as $locale => $name ) {
-			if ( is_array( $profile[ $key ] ?? null ) ) {
-				$search_array = $profile[ $key ];
-			} else {
-				if ( ! empty( $profile[ $key ] ) ) {
-					$search_array = [ $profile[ $key ] ];
-				} else {
-					$search_array = [];
-				}
-			}
-
 			$languages[] = [
 				'value'    => $locale,
 				'name'     => $name,
@@ -167,27 +163,12 @@ class ProfileEdit extends PageAbstract {
 	}
 
 	/**
-	 * WTF?! Why I can't use Connector::set_core_parameters WordPress?! TELL ME!!!
-	 */
-	private static function set_core_parameters() {
-		$container = self::get_container();
-
-		try {
-			$options = $container->get( 'core.options' );
-			$container->setParameter( 'smartcat.api.login', $options->get_and_decrypt( 'smartcat_api_login' ) );
-			$container->setParameter( 'smartcat.api.password', $options->get_and_decrypt( 'smartcat_api_password' ) );
-			$container->setParameter( 'smartcat.api.server', $options->get( 'smartcat_api_server' ) );
-		} catch ( \Exception $e ) {
-			Logger::warning( "Can't set core parameters in {$e->getFile()}:{$e->getLine()}" );
-		}
-	}
-
-	/**
-	 * @param array $profile
+	 * Get vendors array
 	 *
+	 * @param Profile $profile Set a profile if is editing page.
 	 * @return array
 	 */
-	private static function get_vendors( $profile ) {
+	private static function get_vendors( $profile = null ) {
 		$vendors = [
 			[
 				'value'    => '',
@@ -211,7 +192,7 @@ class ProfileEdit extends PageAbstract {
 						[
 							'value'    => $vendor->getId(),
 							'name'     => $vendor->getName(),
-							'selected' => $vendor->getId() === ( $profile['vendor'] ?? '' ),
+							'selected' => $vendor->getId() === ( $profile ? $profile->get_vendor() : '' ),
 						],
 					]
 				);
@@ -240,6 +221,7 @@ class ProfileEdit extends PageAbstract {
 
 	/**
 	 * Get Smartcat client service
+	 * WTF?! Why I can't use Connector::set_core_parameters WordPress?! TELL ME!!!
 	 *
 	 * @return SmartCAT|null
 	 */
@@ -247,7 +229,31 @@ class ProfileEdit extends PageAbstract {
 		$container = self::get_container();
 
 		try {
+			$options = $container->get( 'core.options' );
+			$container->setParameter( 'smartcat.api.login', $options->get_and_decrypt( 'smartcat_api_login' ) );
+			$container->setParameter( 'smartcat.api.password', $options->get_and_decrypt( 'smartcat_api_password' ) );
+			$container->setParameter( 'smartcat.api.server', $options->get( 'smartcat_api_server' ) );
+		} catch ( \Exception $e ) {
+			Logger::warning( "Can't set core parameters", "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+		}
+
+		try {
 			return $container->get( 'smartcat' );
+		} catch ( \Exception $e ) {
+			return null;
+		}
+	}
+
+	/**
+	 * Get Language converter
+	 *
+	 * @return LanguageConverter|null
+	 */
+	private static function get_language_converter() {
+		$container = self::get_container();
+
+		try {
+			return $container->get( 'language.converter' );
 		} catch ( \Exception $e ) {
 			return null;
 		}
@@ -268,8 +274,13 @@ class ProfileEdit extends PageAbstract {
 		}
 
 		if ( empty( $data['profile_name'] ) ) {
-			$targets = implode( ', ', $data['profile_target_langs'] );
+			$targets              = implode( ', ', $data['profile_target_langs'] );
 			$data['profile_name'] = __( 'Translation:', 'translation-connectors' ) . " {$data['profile_source_lang']} -> {$targets}";
+		}
+
+		$key = array_search( $data['profile_source_lang'], $data['profile_target_langs'], true );
+		if ( false !== $key ) {
+			unset( $data['profile_target_langs'][ $key ] );
 		}
 
 		$profile

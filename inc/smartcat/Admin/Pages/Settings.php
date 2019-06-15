@@ -32,10 +32,11 @@ class Settings extends PageAbstract {
 		echo $renderer->render(
 			'settings',
 			[
-				'texts'    => self::get_texts(),
-				'saved'    => isset( $_GET['settings-updated'] ),
-				'fields'   => $renderer->ob_to_string( 'settings_fields', 'smartcat' ),
-				'sections' => $renderer->ob_to_string( 'do_settings_sections', 'smartcat' ),
+				'texts'             => self::get_texts(),
+				'saved'             => isset( $_GET['settings-updated'] ),
+				'fields'            => $renderer->ob_to_string( 'settings_fields', 'smartcat' ),
+				'sections'          => $renderer->ob_to_string( 'do_settings_sections', 'smartcat' ),
+				'sc_validate_nonce' => wp_create_nonce( 'sc_validate_settings' ),
 			]
 		);
 	}
@@ -122,7 +123,7 @@ class Settings extends PageAbstract {
 				'label_for'   => $password,
 				'option_name' => $password,
 				'type'        => 'password',
-				'hint' => '<a href="https://help.smartcat.ai/hc/en-us/articles/115002475012" target="_blank">Learn more</a> how to get Smartcat API credentials.'
+				'hint'        => '<a href="https://help.smartcat.ai/hc/en-us/articles/115002475012" target="_blank">Learn more</a> how to get Smartcat API credentials.'
 			]
 		);
 
@@ -145,7 +146,7 @@ class Settings extends PageAbstract {
 	 * @return string
 	 */
 	public static function pre_update_password( $new_value ) {
-		if ( $new_value == '******' ) {
+		if ( '******' === $new_value ) {
 			$options = self::get_options();
 
 			$new_value = $options->get_and_decrypt( 'smartcat_api_password' );
@@ -155,26 +156,12 @@ class Settings extends PageAbstract {
 	}
 
 	/**
-	 * @param $new_value
-	 *
-	 * @return |null
-	 */
-	public static function pre_update_vendor_id( $new_value ) {
-		if ( $new_value === 0 ) {
-			return null;
-		}
-
-		return $new_value;
-	}
-
-	/**
 	 * Apply filters
 	 */
 	public static function apply_filters_to_settings() {
 		$container = self::get_container();
-		$prefix	= $container->getParameter( 'plugin.table.prefix' );
+		$prefix    = $container->getParameter( 'plugin.table.prefix' );
 
-		add_filter( "pre_update_option_{$prefix}smartcat_vendor_id", [ self::class, 'pre_update_vendor_id' ] );
 		add_filter( "pre_update_option_{$prefix}smartcat_api_login", [ Cryptographer::class, 'encrypt' ] );
 		add_filter( "pre_update_option_{$prefix}smartcat_api_password", [ self::class, 'pre_update_password' ] );
 		add_filter( "option_{$prefix}smartcat_api_login", [ Cryptographer::class, 'decrypt' ] );

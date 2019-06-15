@@ -17,7 +17,11 @@ namespace SmartCAT\WP\Helpers;
  * @package SmartCAT\WP\Helpers
  */
 class Cryptographer {
+	const ENCRYPTION = 'AES-256-CBC';
+
 	/**
+	 * Get salt from WordPress
+	 *
 	 * @return mixed|void
 	 */
 	private static function get_salt() {
@@ -25,30 +29,34 @@ class Cryptographer {
 	}
 
 	/**
+	 * Get IV
+	 *
 	 * @return bool|string
 	 */
 	private static function get_iv() {
-		$iv_len = openssl_cipher_iv_length( 'AES-256-CBC' );
+		$iv_len = openssl_cipher_iv_length( self::ENCRYPTION );
 		$key    = hash( 'sha512', wp_salt( 'secure_auth' ), PASSWORD_DEFAULT );
 
 		return substr( $key, - $iv_len );
 	}
 
 	/**
-	 * @param $text
+	 * Encrypt text
 	 *
+	 * @param string $text Text to encrypt.
 	 * @return string
 	 */
 	public static function encrypt( $text ) {
-		return openssl_encrypt( $text, 'AES-256-CBC', self::get_salt(), 0, self::get_iv() );
+		return openssl_encrypt( $text, self::ENCRYPTION, self::get_salt(), 0, self::get_iv() );
 	}
 
 	/**
-	 * @param $text
+	 * Decrypt text
 	 *
+	 * @param string $text Text to decrypt.
 	 * @return string
 	 */
 	public static function decrypt( $text ) {
-		return openssl_decrypt( $text, 'AES-256-CBC', self::get_salt(), 0, self::get_iv() );
+		return openssl_decrypt( $text, self::ENCRYPTION, self::get_salt(), 0, self::get_iv() );
 	}
 }

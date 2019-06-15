@@ -11,17 +11,24 @@
 
 namespace SmartCAT\WP\Admin\Tables;
 
+use SmartCAT\WP\Admin\Statistics;
+
 /**
  * Class TableAbstract
  *
  * @package SmartCAT\WP\Admin\Tables
  */
 abstract class TableAbstract extends \WP_List_Table {
+	/**
+	 * Data for render
+	 *
+	 * @var array
+	 */
 	protected $data = [];
 
-
-
 	/**
+	 * Get HTML code to render
+	 *
 	 * @return string
 	 */
 	public function display() {
@@ -33,7 +40,7 @@ abstract class TableAbstract extends \WP_List_Table {
 	}
 
 	/**
-	 *
+	 * Prepare items for display
 	 */
 	public function prepare_items() {
 		$columns               = $this->get_columns();
@@ -44,6 +51,8 @@ abstract class TableAbstract extends \WP_List_Table {
 	}
 
 	/**
+	 * Getter for table data
+	 *
 	 * @return array
 	 */
 	public function get_data() {
@@ -51,8 +60,9 @@ abstract class TableAbstract extends \WP_List_Table {
 	}
 
 	/**
-	 * @param $data
+	 * Setter for table data
 	 *
+	 * @param Statistics[] $data Statistic data to set in.
 	 * @return $this
 	 */
 	public function set_data( $data ) {

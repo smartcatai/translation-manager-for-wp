@@ -19,7 +19,6 @@ use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\DITrait;
-use SmartCAT\WP\Helpers\Language\LanguageConverter;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
@@ -35,12 +34,19 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 final class Ajax implements HookInterface {
 	use DITrait;
 
-	static public function validate_settings() {
-		// валидация на js страницы с настройками
-		// в общем виде - проверка на стороне смартката правильности логина и пароля
-
+	/**
+	 * Validating settings before save on Smartcat side
+	 *
+	 * @throws \Exception
+	 */
+	public static function validate_settings() {
 		$ajax_response = new AjaxResponse();
-		if ( ! current_user_can( 'publish_posts' ) ) {
+		$verify_nonce  = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['sc_validate_nonce'] ?? null ) ),
+			'sc_validate_settings'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
 			wp_die();
 		}
@@ -51,7 +57,7 @@ final class Ajax implements HookInterface {
 		$data = [ 'isActive' => SmartCAT::is_active() ];
 
 		$required_parameters = [ $prefix . 'smartcat_api_login', $prefix . 'smartcat_api_password' ];
-		$parameters          = $_POST;
+		$parameters          = sanitize_post( $_POST );
 
 		$login = $password = '';
 		/** @var Utils $utils */
@@ -71,15 +77,15 @@ final class Ajax implements HookInterface {
 		$previous_server   = $options->get( 'smartcat_api_server' );
 
 		if ( $password === '******' ) {
-			$password = $previous_password; //упрощаю логику, иначе выходил уже набор костылей
+			$password = $previous_password;
 		}
 
-		//проверка, что с кредами все ок
+		// Testing login to Smartcat
 		$account_info = null;
 		try {
 			$api          = new \SmartCat\Client\SmartCAT( $login, $password, $server );
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
-			$is_ok        = ( bool ) $account_info->getId();
+			$is_ok        = (bool) $account_info->getId();
 			if ( ! $is_ok ) {
 				throw new Exception( 'Invalid username or password' );
 			}
@@ -91,7 +97,7 @@ final class Ajax implements HookInterface {
 			}
 		}
 
-		//согласно требованиям - если коллбэк уже висел, нужно сперва его дропнуть
+		// If callback already exists - drop needed.
 		if ( ! empty( $previous_login ) && ! empty( $previous_password ) && ! empty( $previous_server ) ) {
 			try {
 				$sc = new SmartCAT( $previous_login, $previous_password, $previous_server );
@@ -132,7 +138,6 @@ final class Ajax implements HookInterface {
 			$ajax_response->send_error( __( 'Problem with setting of new callback', 'translation-connectors' ), $data );
 		}
 
-		//сохраняем account_name
 		if ( $account_info && $account_info->getName() ) {
 			/** @var Options $options */
 			$options = $container->get( 'core.options' );
@@ -150,25 +155,32 @@ final class Ajax implements HookInterface {
 	 */
 	public function refresh_translation() {
 		$ajax_response = new AjaxResponse();
-		if ( ! current_user_can( 'publish_posts' ) ) {
+
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ?? null ) ),
+			'bulk-statistics'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
 			wp_die();
 		}
 
 		$data      = [ 'isActive' => SmartCAT::is_active() ];
 		$container = self::get_container();
+		$post      = sanitize_post( $_POST );
 
 		/** @var StatisticRepository $statistic_repository */
 		$statistic_repository = $container->get( 'entity.repository.statistic' );
 
-		if ( ! empty( $_POST['stat_id'] ) && intval( $_POST['stat_id'] ) ) {
-			$statistic = $statistic_repository->get_one_by( [ 'id' => intval( $_POST['stat_id'] ) ] );
+		if ( ! empty( $post['stat_id'] ) && intval( $post['stat_id'] ) ) {
+			$statistic = $statistic_repository->get_one_by_id( intval( $post['stat_id'] ) );
 			if ( $statistic->get_target_post_id() ) {
-				$statistic->set_status( 'sended' );
+				$statistic->set_status( Statistics::STATUS_SENDED );
 				$statistic_repository->update( $statistic );
 
-				$data["statistic"] = [
-					'status' => __( 'In progress', 'translation-connectors' )
+				$data['statistic'] = [
+					'status' => __( 'In progress', 'translation-connectors' ),
 				];
 
 				$ajax_response->send_success( 'ok', $data );
@@ -187,7 +199,7 @@ final class Ajax implements HookInterface {
 	 *
 	 * @throws \Exception
 	 */
-	static public function send_to_smartcat() {
+	public static function send_to_smartcat() {
 		$ajax_response = new AjaxResponse();
 		$verify_nonce  = wp_verify_nonce(
 			wp_unslash( sanitize_key( $_POST['sc_send_nonce'] ?? null ) ),
@@ -196,7 +208,7 @@ final class Ajax implements HookInterface {
 
 		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			die();
+			wp_die();
 		}
 
 		$post = sanitize_post( $_POST );
@@ -214,7 +226,7 @@ final class Ajax implements HookInterface {
 
 		if ( empty( $posts ) || empty( $profile ) ) {
 			$ajax_response->send_error( __( 'Incorrrect request', 'translation-connectors' ), [], 403 );
-			die();
+			wp_die();
 		}
 
 		$task = new Task();
@@ -268,8 +280,7 @@ final class Ajax implements HookInterface {
 		}
 
 		spawn_cron();
-
-		die();
+		wp_die();
 	}
 
 	/**

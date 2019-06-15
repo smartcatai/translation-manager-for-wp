@@ -26,10 +26,11 @@ class ErrorsTable extends TableAbstract {
 	 */
 	public function get_columns() {
 		$columns = [
+			'id'           => __( 'ID', 'translation-connectors' ),
 			'date'         => __( 'Date', 'translation-connectors' ),
 			'type'         => __( 'Type', 'translation-connectors' ),
 			'shortMessage' => __( 'Short message', 'translation-connectors' ),
-			// 'message'      => __( 'Message', 'translation-connectors' ),
+			'message'      => __( 'Message', 'translation-connectors' ),
 		];
 
 		return $columns;
@@ -45,10 +46,12 @@ class ErrorsTable extends TableAbstract {
 	 */
 	public function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
+			case 'id':
+				return $item->get_id();
 			case 'date':
 				return $item->get_date()->format( 'Y-m-d H:i:s' );
 			case 'type':
-				return $item->get_type();
+				return ucfirst( $item->get_type() );
 			case 'shortMessage':
 				return $item->get_short_message();
 			case 'message':

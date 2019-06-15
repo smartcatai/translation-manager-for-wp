@@ -23,17 +23,12 @@ class TaskRepository extends RepositoryAbstract {
 	const TABLE_NAME = 'tasks';
 
 	/**
+	 * Get table name
+	 *
 	 * @return string
 	 */
 	public function get_table_name() {
 		return $this->prefix . self::TABLE_NAME;
-	}
-
-	/**
-	 * @return Task[]
-	 */
-	public function get_new_task() {
-		return $this->get_tasks_by_status( Task::STATUS_NEW );
 	}
 
 	/**
@@ -60,12 +55,11 @@ class TaskRepository extends RepositoryAbstract {
 
 	/**
 	 * @param Task $task
-	 *
 	 * @return bool|int
 	 */
 	public function add( $task ) {
 		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
+		$wpdb       = $this->get_wp_db();
 
 		$data = [
 			'sourceLanguage'  => $task->get_source_language(),
@@ -94,14 +88,14 @@ class TaskRepository extends RepositoryAbstract {
 	 */
 	public function update( $task ) {
 		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
+		$wpdb       = $this->get_wp_db();
 
 		if ( ! empty( $task->get_id() ) ) {
 			$data = [
 				'sourceLanguage'  => $task->get_source_language(),
 				'targetLanguages' => serialize( $task->get_target_languages() ),
-				'status'		  => $task->get_status(),
-				'projectID'	      => $task->get_project_id(),
+				'status'          => $task->get_status(),
+				'projectID'       => $task->get_project_id(),
 				'profileID'       => intval( $task->get_profile_id() ),
 			];
 
@@ -114,16 +108,16 @@ class TaskRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param array $persists
+	 * @param Task[] $persists
 	 *
 	 * @return mixed|void
 	 */
 	protected function do_flush( array $persists ) {
-		/* @var Task[] $persists */
 		foreach ( $persists as $task ) {
-			if ( get_class( $task ) === 'SmartCAT\WP\DB\Entity\Task' ) {
+			if ( $task instanceof Task ) {
 				if ( empty( $task->get_id() ) ) {
-					if ( $res = $this->add( $task ) ) {
+					$res = $this->add( $task );
+					if ( $res ) {
 						$task->set_id( $res );
 					}
 				} else {

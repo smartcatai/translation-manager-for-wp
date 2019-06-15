@@ -186,10 +186,6 @@ jQuery(function ($) {
             url: ajaxurl,
             data: formData,
             success: function (responseText) {
-                //var responseJSON = JSON.parse(responseText);
-                cl('SUCCESS');
-
-                //в противном случае уходило в бесконечную рекурсию
                 $this.unbind('submit');
                 $this.submit();
             },
@@ -280,7 +276,6 @@ jQuery(function ($) {
                 action: SmartcatFrontend.smartcat_table_prefix + 'check_statistic'
             },
             success: function (responseText) {
-                cl('SUCCESS');
                 var responseJSON = JSON.parse(responseText);
                 var isActive = responseJSON.data.statistic_queue_active;
 
@@ -311,10 +306,7 @@ jQuery(function ($) {
                 action: SmartcatFrontend.smartcat_table_prefix + 'start_statistic'
             },
             success: function (responseText) {
-                cl('SUCCESS');
                 var responseJSON = JSON.parse(responseText);
-                cl(responseJSON);
-
                 if (responseJSON.message === 'ok') {
                     checkStatistics();
                 }
@@ -332,13 +324,13 @@ jQuery(function ($) {
             type: "POST",
             url: ajaxurl,
             data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
                 stat_id: element.data('bind'),
                 action: SmartcatFrontend.smartcat_table_prefix + 'refresh_translation'
             },
             success: function (responseText) {
                 var responseJSON = JSON.parse(responseText);
-                cl(responseJSON);
-                if (responseJSON.message == "ok") {
+                if (responseJSON.message === "ok") {
                     element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
                     element.parent().html("-");
                     updateStatistics();

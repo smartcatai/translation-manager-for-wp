@@ -41,7 +41,7 @@ class StatisticsTable extends TableAbstract {
 	/**
 	 * @param object $item
 	 */
-	public function column_cb ( $item ) {
+	public function column_cb( $item ) {
 		echo "<input type='checkbox' name='{$this->_args['plural']}[]' id='cb-select-{$item->get_id()}' value='{$item->get_id()}' />";
 	}
 
@@ -153,7 +153,7 @@ class StatisticsTable extends TableAbstract {
 	protected function get_bulk_actions() {
 		$actions = [
 			'bulk-cancel-' . $this->_args['plural'] => __( 'Force cancel', 'translation-connectors' ),
-			'bulk-delete-' . $this->_args['plural'] => __( 'Delete', 'translation-connectors' ) ,
+			'bulk-delete-' . $this->_args['plural'] => __( 'Delete', 'translation-connectors' ),
 		];
 
 		return $actions;
@@ -220,7 +220,7 @@ class StatisticsTable extends TableAbstract {
 			'delete' => sprintf( '<a href="%s">%s</a>', '#', __( 'Delete', 'translation-connectors' ) ),
 		];
 
-		if ( in_array( $item->get_status(), [ Statistics::STATUS_COMPLETED ] ) ) {
+		if ( in_array( $item->get_status(), [ Statistics::STATUS_COMPLETED ], true ) ) {
 			$actions = array_merge(
 				[
 					'check_update' => sprintf(

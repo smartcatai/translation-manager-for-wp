@@ -34,8 +34,10 @@ class TemplateEngine extends \Mustache_Engine {
 	}
 
 	/**
-	 * @param $function
-	 * @param mixed ...$args
+	 * Return every ECHO function into string
+	 *
+	 * @param callable $function Function to call.
+	 * @param mixed    ...$args Function arguments if needed.
 	 *
 	 * @return bool|false|string
 	 */
@@ -45,7 +47,7 @@ class TemplateEngine extends \Mustache_Engine {
 			call_user_func_array( $function, $args );
 			return ob_get_clean();
 		} catch ( \Throwable $e ) {
-			Logger::warning( "Can't call user func to string. {$e->getMessage()}" );
+			Logger::warning( "Can't call user func to string.", "Reason: {$e->getMessage()}" );
 		}
 
 		return false;

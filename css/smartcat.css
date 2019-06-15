@@ -133,3 +133,23 @@
         transform: translate3d(4px, 0, 0);
     }
 }
+
+table.localization_page_sc-errors #id {
+    width: 5%;
+}
+
+table.localization_page_sc-errors #date {
+    width: 10%;
+}
+
+table.localization_page_sc-errors #type {
+    width: 5%;
+}
+
+table.localization_page_sc-errors #shortMessage {
+    width: 30%;
+}
+
+table.localization_page_sc-errors #message {
+    width: auto;
+}
