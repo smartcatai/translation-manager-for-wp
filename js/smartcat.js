@@ -183,7 +183,8 @@ jQuery(function ($) {
         formData = add_action_to_serialized_data(
             formData, SmartcatFrontend.smartcat_table_prefix + 'validate_settings');
 
-        // noinspection JSUnusedLocalSymbols
+        $('.submit button.button-primary').prop("disabled", true);
+        $(".sc-spinner").show();
         $.ajax({
             type: "POST",
             url: ajaxurl,
@@ -195,6 +196,8 @@ jQuery(function ($) {
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseObject.responseText);
                 printError(responseJSON.message);
+                $(".sc-spinner").hide();
+                $('.submit button.button-primary').prop("disabled", false);
             }
         });
 
@@ -212,7 +215,9 @@ jQuery(function ($) {
         formData = add_action_to_serialized_data(
             formData, SmartcatFrontend.smartcat_table_prefix + 'create_profile');
 
-        $('input.edit-profile-submit').prop('disabled', true);
+        $('button.edit-profile-submit').prop('disabled', true);
+        $(".sc-spinner").show();
+
         $.ajax({
             type: "POST",
             url: ajaxurl,
@@ -223,7 +228,8 @@ jQuery(function ($) {
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseObject.responseText);
                 printError('An a error occurred: ' + responseJSON.message);
-                $('input.edit-profile-submit').prop('disabled', false);
+                $('button.edit-profile-submit').prop('disabled', false);
+                $(".sc-spinner").hide();
             }
         });
 
@@ -271,7 +277,8 @@ jQuery(function ($) {
         formData = add_action_to_serialized_data(
             formData, SmartcatFrontend.smartcat_table_prefix + 'send_to_smartcat');
 
-        $('input.sc-send-button').prop('disabled', true);
+        $('button.sc-send-button').prop('disabled', true);
+        $(".sc-spinner").show();
         $.ajax({
             type: "POST",
             url: ajaxurl,
@@ -279,13 +286,15 @@ jQuery(function ($) {
             success: function (responseText) {
                 $this.parent().dialog('close');
                 printSuccess('Items successfully sended.');
-                $('input.sc-send-button').prop('disabled', false);
+                $('button.sc-send-button').prop('disabled', false);
+                $(".sc-spinner").hide();
             },
             error: function (responseObject) {
                 $this.parent().dialog('close');
-                $('input.sc-send-button').prop('disabled', false);
+                $('button.sc-send-button').prop('disabled', false);
                 var responseJSON = JSON.parse(responseObject.responseText);
                 printError('An a error occurred: ' + responseJSON.message);
+                $(".sc-spinner").hide();
             }
         });
 

@@ -153,3 +153,15 @@ table.wp-list-table.errors #shortMessage {
 table.wp-list-table.errors #message {
     width: auto;
 }
+
+.sc-spinner {
+    background: url('/wp-admin/images/wpspin_light.gif') no-repeat;
+    background-size: 16px 16px;
+    display: none;
+    float: left;
+    opacity: .7;
+    filter: alpha(opacity=70);
+    width: 16px;
+    height: 16px;
+    margin: 5px 5px 0;
+}

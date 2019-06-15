@@ -13,7 +13,7 @@
             {{& fields }}
             {{& sections }}
             <p class="submit">
-                <input type="submit" class="button-primary" value="{{ texts.save_changes }}" />
+                <button type="submit" class="button-primary"><div class="sc-spinner"></div>{{ texts.save_changes }}</button>
                 <input type="hidden" name="sc_validate_settings_nonce" value="{{ sc_validate_nonce }}" />
             </p>
         </form>
