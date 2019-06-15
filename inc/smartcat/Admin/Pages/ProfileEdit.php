@@ -30,19 +30,6 @@ class ProfileEdit extends PageAbstract {
 		$profile    = [];
 		$profile_db = null;
 
-		if ( ! empty( $_POST ) ) {
-			$verify_nonce = wp_verify_nonce(
-				wp_unslash( sanitize_key( $_POST['sc_profile_wpnonce'] ?? null ) ),
-				'sc_profile_edit'
-			);
-
-			if ( $verify_nonce ) {
-				$sanitized_post = sanitize_post( $_POST, 'db' );
-				self::edit_post( $sanitized_post );
-				wp_die();
-			}
-		}
-
 		$sanitized_id = intval( sanitize_key( $_GET['profile'] ?? null ) );
 
 		if ( $sanitized_id ) {
@@ -94,13 +81,14 @@ class ProfileEdit extends PageAbstract {
 			'empty'                   => __( 'Profiles not found', 'translation-connectors' ),
 			'pages'                   => __( 'Pages', 'translation-connectors' ),
 			'title'                   => $title,
-			'save_button'             => $profile ? __( 'Create profile', 'translation-connectors' ) : __( 'Save profile', 'translation-connectors' ),
+			'save_button'             => ! $profile ? __( 'Create profile', 'translation-connectors' ) : __( 'Save profile', 'translation-connectors' ),
 			'profile_name'            => __( 'Name', 'translation-connectors' ),
 			'profile_vendor'          => __( 'Vendor', 'translation-connectors' ),
 			'profile_source_lang'     => __( 'Source Language', 'translation-connectors' ),
 			'profile_target_langs'    => __( 'Target Languages', 'translation-connectors' ),
 			'profile_workflow_stages' => __( 'Workflow Stages', 'translation-connectors' ),
 			'profile_project_id'      => __( 'Project id', 'translation-connectors' ),
+			'profile_project_id_note' => __( 'Enter here a Smartcat project ID to send all ongiong tasks to one specific project.', 'translation-connectors' ),
 			'profile_name_note'       => __( 'Leave this field blank for automatic name generation', 'translation-connectors' ),
 			'profile_auto_update'     => __( 'Auto update edited post', 'translation-connectors' ),
 			'profile_auto_send'       => __( 'Auto send created post', 'translation-connectors' ),
@@ -257,60 +245,5 @@ class ProfileEdit extends PageAbstract {
 		} catch ( \Exception $e ) {
 			return null;
 		}
-	}
-
-	/**
-	 * Create or update profile
-	 *
-	 * @param array $data Post array data.
-	 */
-	private static function edit_post( $data ) {
-		$profiles_repo = self::get_repository();
-
-		if ( ! empty( $data['profile_id'] ) ) {
-			$profile = $profiles_repo->get_one_by_id( $data['profile_id'] );
-		} else {
-			$profile = new Profile();
-		}
-
-		if ( empty( $data['profile_name'] ) ) {
-			$targets              = implode( ', ', $data['profile_target_langs'] );
-			$data['profile_name'] = __( 'Translation:', 'translation-connectors' ) . " {$data['profile_source_lang']} -> {$targets}";
-		}
-
-		$key = array_search( $data['profile_source_lang'], $data['profile_target_langs'], true );
-		if ( false !== $key ) {
-			unset( $data['profile_target_langs'][ $key ] );
-		}
-
-		$profile
-			->set_name( $data['profile_name'] )
-			->set_vendor( $data['profile_vendor'] )
-			->set_vendor_name( __( 'Translate internally', 'translation-connectors' ) )
-			->set_source_language( $data['profile_source_lang'] )
-			->set_target_languages( $data['profile_target_langs'] )
-			->set_project_id( $data['profile_project_id'] )
-			->set_workflow_stages( $data['profile_workflow_stages'] )
-			->set_auto_update( $data['profile_auto_update'] ?? false )
-			->set_auto_send( $data['profile_auto_send'] ?? false );
-
-		try {
-			$vendor_list = wp_cache_get( 'vendor_list', 'translation-connectors' );
-
-			if ( ! $vendor_list ) {
-				$vendor_list = self::get_smartcat()->getDirectoriesManager()->directoriesGet( [ 'type' => 'vendor' ] )->getItems();
-				wp_cache_set( 'vendor_list', $vendor_list, 'translation-connectors', 3600 );
-			}
-
-			foreach ( $vendor_list as $vendor ) {
-				if ( $data['profile_vendor'] === $vendor->getId() ) {
-					$profile->set_vendor_name( $vendor->getName() );
-				}
-			}
-		} catch ( \Exception $e ) {
-			Logger::warning( "Can't set vendor name", "Reason: {$e->getMessage()}" );
-		}
-
-		$profiles_repo->save( $profile );
 	}
 }

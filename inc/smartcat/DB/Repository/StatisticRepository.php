@@ -382,9 +382,9 @@ class StatisticRepository extends RepositoryAbstract {
 	 */
 	public function save( $statistic ) {
 		if ( $statistic->get_id() ) {
-			$this->update( $statistic );
+			return $this->update( $statistic );
 		} else {
-			$this->add( $statistic );
+			return $this->add( $statistic );
 		}
 	}
 }

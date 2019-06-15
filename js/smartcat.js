@@ -17,7 +17,7 @@ function notice( message, nclass = 'success') {
         $p.html(message);
         $div.append($p);
         $div.append('<button type="button" class="notice-dismiss" onclick="dismissById(\'' + id + '\')"><span class="screen-reader-text">Dismiss this notice.</span></button>');
-        $('div.wrap h1').first().after($div);
+        $('hr.wp-header-end').first().after($div);
     });
 }
 
@@ -27,7 +27,7 @@ function revisedRandId() {
 
 function dismissById( $id ) {
     jQuery(function ($) {
-        $('#' + $id).remove();
+        $('#' + $id).hide('slow', function(){ $('#' + $id).remove(); });
     });
 }
 
@@ -37,10 +37,14 @@ jQuery(function ($) {
     }
 
     function add_action_to_serialized_data(data, action) {
+         return add_key_to_serialized_data(data, 'action', action);
+    }
+
+    function add_key_to_serialized_data(data, key, value) {
         if (data.length > 0) {
-            return data + '&action=' + action;
+            return data + '&' + key + '=' + value;
         } else {
-            return 'action= ' + action;
+            return key + '=' + value;
         }
     }
 
@@ -48,7 +52,6 @@ jQuery(function ($) {
      * Модальное окно и работа с ним
      */
 
-    var sourceLangError = [];
     var addedToModal = 0;
 
     function prepareInfo(postNumber) {
@@ -192,8 +195,6 @@ jQuery(function ($) {
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseObject.responseText);
                 printError(responseJSON.message);
-                cl('ERROR');
-                cl(responseObject);
             }
         });
 
@@ -208,11 +209,13 @@ jQuery(function ($) {
     $('.smartcat-connector form.edit-profile-form').submit(function (event) {
         var $this = $(this);
         var formData = $this.serialize();
+        formData = add_action_to_serialized_data(
+            formData, SmartcatFrontend.smartcat_table_prefix + 'create_profile');
 
         $('input.edit-profile-submit').prop('disabled', true);
         $.ajax({
             type: "POST",
-            url: window.location.href,
+            url: ajaxurl,
             data: formData,
             success: function (responseText) {
                 window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-profiles';
@@ -226,6 +229,35 @@ jQuery(function ($) {
 
         event.preventDefault();
         return false;
+    });
+
+    function deleteProfile(element) {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                profile_id: element.data('bind'),
+                action: SmartcatFrontend.smartcat_table_prefix + 'delete_profile'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                if (responseJSON.message === "ok") {
+                    printSuccess("Profile successfully deleted.");
+                    var $td = element.closest("tr");
+                    $td.hide('slow', function(){ $td.remove(); });
+                }
+            },
+            error: function (responseObject) {
+                cl('ERROR');
+            }
+        });
+    }
+
+    $('table.profiles .sc-profile-delete').each(function () {
+        $(this).on('click', function () {
+            deleteProfile($(this));
+        });
     });
 
     /*
@@ -319,7 +351,7 @@ jQuery(function ($) {
         });
     }
 
-    function refreshTranslation(element) {
+    function refreshStatistics(element) {
         $.ajax({
             type: "POST",
             url: ajaxurl,
@@ -331,21 +363,82 @@ jQuery(function ($) {
             success: function (responseText) {
                 var responseJSON = JSON.parse(responseText);
                 if (responseJSON.message === "ok") {
+                    printSuccess("Item successfully sended on update.");
                     element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
                     element.parent().html("-");
                     updateStatistics();
                 }
             },
             error: function (responseObject) {
-                cl('ERROR');
+                var responseJSON = JSON.parse(responseText);
+                printError(responseJSON.message);
             }
         });
     }
 
-    $('.refresh_stat_button').each(function () {
+    $('table.statistics .refresh_stat_button').each(function () {
         $(this).on('click', function () {
-            refreshTranslation($(this));
-            //location.reload();
+            refreshStatistics($(this));
+        });
+    });
+
+    function deleteStatistics(element) {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                stat_id: element.data('bind'),
+                action: SmartcatFrontend.smartcat_table_prefix + 'delete_statistics'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                if (responseJSON.message === "ok") {
+                    printSuccess("Item successfully deleted.");
+                    var $td = element.closest("tr");
+                    $td.hide('slow', function(){ $td.remove(); });
+                }
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseText);
+                printError(responseJSON.message);
+            }
+        });
+    }
+
+    $('table.statistics .delete_stat_button').each(function () {
+        $(this).on('click', function () {
+            deleteStatistics($(this));
+        });
+    });
+
+    function cancelStatistics(element) {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                stat_id: element.data('bind'),
+                action: SmartcatFrontend.smartcat_table_prefix + 'cancel_statistics'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                if (responseJSON.message === "ok") {
+                    printSuccess("Item successfully deleted.");
+                    element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
+                    element.closest("span").remove();
+                }
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseText);
+                printError(responseJSON.message);
+            }
+        });
+    }
+
+    $('table.statistics .cancel_stat_button').each(function () {
+        $(this).on('click', function () {
+            cancelStatistics($(this));
         });
     });
 

@@ -164,9 +164,9 @@ class ErrorRepository extends RepositoryAbstract {
 	 */
 	public function save( $error ) {
 		if ( $error->get_id() ) {
-			$this->update( $error );
+			return $this->update( $error );
 		} else {
-			$this->add( $error );
+			return $this->add( $error );
 		}
 	}
 }

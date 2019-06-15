@@ -23,6 +23,7 @@ class Statistics {
 	const STATUS_SENDED    = 'sended';
 	const STATUS_EXPORT    = 'export';
 	const STATUS_COMPLETED = 'completed';
+	const STATUS_CANCELLED = 'cancelled';
 
 	/** @var  integer */
 	private $id;

@@ -18,6 +18,7 @@
         <exclude name="WordPress.Files.FileName"/>
         <exclude name="WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition"/>
         <exclude name="WordPress.Security.EscapeOutput.OutputNotEscaped"/>
+        <exclude name="Generic.Commenting.DocComment.MissingShort"/>
     </rule>
 
     <!-- Enforce PSR1 compatible namespaces. -->

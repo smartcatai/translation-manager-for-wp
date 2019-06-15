@@ -32,6 +32,8 @@ class ErrorsTable extends TableAbstract {
 				'ajax'     => false,
 			]
 		);
+
+		$this->bulk_action_handler();
 	}
 
 	/**
@@ -66,6 +68,7 @@ class ErrorsTable extends TableAbstract {
 	 */
 	public function get_columns() {
 		$columns = [
+			'cb'           => '<input type="checkbox" />',
 			'id'           => __( 'ID', 'translation-connectors' ),
 			'date'         => __( 'Date', 'translation-connectors' ),
 			'type'         => __( 'Type', 'translation-connectors' ),
@@ -98,6 +101,47 @@ class ErrorsTable extends TableAbstract {
 				return $item->get_message();
 			default:
 				return null;
+		}
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function get_bulk_actions() {
+		$actions = [
+			'bulk-delete-' . $this->_args['plural'] => __( 'Delete', 'translation-connectors' ),
+		];
+
+		return $actions;
+	}
+
+	/**
+	 * Bulk actions handler
+	 */
+	private function bulk_action_handler() {
+		if ( empty( $_POST[ $this->_args['plural'] ] ) || empty( $_POST['_wpnonce'] ) ) {
+			return;
+		}
+
+		$action       = $this->current_action();
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ) ),
+			'bulk-' . $this->_args['plural']
+		);
+
+		if ( ! $action || ! $verify_nonce ) {
+			return;
+		}
+
+		$post        = sanitize_post( $_POST, 'db' );
+		$errors_repo = self::get_repository();
+
+		switch ( $action ) {
+			case 'bulk-delete-' . $this->_args['plural']:
+				foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
+					$errors_repo->delete_by_id( $statistic_id );
+				}
+				break;
 		}
 	}
 

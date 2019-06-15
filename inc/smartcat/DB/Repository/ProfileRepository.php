@@ -159,9 +159,9 @@ class ProfileRepository extends RepositoryAbstract {
 	 */
 	public function save( $profile ) {
 		if ( $profile->get_id() ) {
-			$this->update( $profile );
+			return $this->update( $profile );
 		} else {
-			$this->add( $profile );
+			return $this->add( $profile );
 		}
 	}
 

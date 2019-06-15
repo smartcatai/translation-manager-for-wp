@@ -169,9 +169,9 @@ class TaskRepository extends RepositoryAbstract {
 	 */
 	public function save( $task ) {
 		if ( $task->get_id() ) {
-			$this->update( $task );
+			return $this->update( $task );
 		} else {
-			$this->add( $task );
+			return $this->add( $task );
 		}
 	}
 }

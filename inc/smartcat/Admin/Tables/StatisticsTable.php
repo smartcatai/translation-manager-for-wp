@@ -207,8 +207,10 @@ class StatisticsTable extends TableAbstract {
 			case 'bulk-cancel-' . $this->_args['plural']:
 				foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
 					$statistic = $statistic_repo->get_one_by_id( $statistic_id );
-					$statistic->set_status( 'cancelled' );
-					$statistic_repo->update( $statistic );
+					if ( ! in_array( $statistic->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELLED ], true ) ) {
+						$statistic->set_status( 'cancelled' );
+						$statistic_repo->save( $statistic );
+					}
 				}
 				break;
 		}
@@ -234,9 +236,25 @@ class StatisticsTable extends TableAbstract {
 		}
 
 		$actions = [
-			'cancel' => sprintf( '<a href="%s">%s</a>', '#', __( 'Cancel', 'translation-connectors' ) ),
-			'delete' => sprintf( '<a href="%s">%s</a>', '#', __( 'Delete', 'translation-connectors' ) ),
+			'delete' => sprintf(
+				'<a href="javascript:void( 0 );" class="delete_stat_button" data-bind="%d">%s</a>',
+				$item->get_id(),
+				__( 'Delete', 'translation-connectors' )
+			),
 		];
+
+		if ( ! in_array( $item->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELLED ], true ) ) {
+			$actions = array_merge(
+				[
+					'cancel' => sprintf(
+						'<a href="javascript:void( 0 );" class="cancel_stat_button" data-bind="%d">%s</a>',
+						$item->get_id(),
+						__( 'Cancel', 'translation-connectors' )
+					),
+				],
+				$actions
+			);
+		}
 
 		if ( in_array( $item->get_status(), [ Statistics::STATUS_COMPLETED ], true ) ) {
 			$actions = array_merge(

@@ -179,7 +179,11 @@ class ProfilesTable extends TableAbstract {
 				'&profile=' . $item->get_id(),
 				__( 'Edit', 'translation-connectors' )
 			),
-			'delete' => sprintf( '<a href="%s">%s</a>', '#', __( 'Delete', 'translation-connectors' ) ),
+			'delete' => sprintf(
+				'<a href="javascript:void( 0 );" class="sc-profile-delete" data-bind="%d">%s</a>',
+				$item->get_id(),
+				__( 'Delete', 'translation-connectors' )
+			),
 		];
 
 		return $this->row_actions( $actions );
