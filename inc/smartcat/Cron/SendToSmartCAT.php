@@ -83,6 +83,10 @@ class SendToSmartCAT extends CronAbstract {
 			$task_name = $smartcat::get_task_name_from_stream( $file );
 
 			try {
+				if ( ! $profile ) {
+					throw new \Exception( 'Profile does not exists' );
+				}
+
 				if ( ! empty( $task->get_project_id() ) ) {
 					SmartCAT::debug( "Sending '{$task_name}'" );
 

@@ -74,7 +74,7 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 			$profile = new Profile();
 			$profile
 				->set_name( 'Migrated from settings' )
-				->set_source_language( $language_converter->get_default_language_sc_code() )
+				->set_source_language( pll_default_language( 'locale' ) )
 				->set_target_languages( $target_langs )
 				->set_auto_send( false )
 				->set_auto_update( false )
