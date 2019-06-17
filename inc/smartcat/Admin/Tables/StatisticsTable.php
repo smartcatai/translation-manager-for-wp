@@ -119,17 +119,13 @@ class StatisticsTable extends TableAbstract {
 			case 'progress':
 				return $item->get_progress();
 			case 'status':
-				switch ( $item->get_status() ) {
-					case 'new':
-						return __( 'Submitted', 'translation-connectors' );
-					case 'sended':
-					case 'export':
-						return __( 'In progress', 'translation-connectors' );
-					case 'completed':
-						return __( 'Completed', 'translation-connectors' );
-				}
+				$statuses = Statistics::get_all_statuses();
 
-				return ucfirst( $item->get_status() );
+				if ( isset( $statuses[ $item->get_status() ] ) ) {
+					return $statuses[ $item->get_status() ];
+				} else {
+					return ucfirst( $item->get_status() );
+				}
 			case 'actions':
 				return $this->get_additional_actions( $item );
 			default:
@@ -170,7 +166,7 @@ class StatisticsTable extends TableAbstract {
 	 */
 	protected function get_bulk_actions() {
 		$actions = [
-			'bulk-cancel-' . $this->_args['plural'] => __( 'Force cancel', 'translation-connectors' ),
+			'bulk-cancel-' . $this->_args['plural'] => __( 'Cancel', 'translation-connectors' ),
 			'bulk-delete-' . $this->_args['plural'] => __( 'Delete', 'translation-connectors' ),
 		];
 

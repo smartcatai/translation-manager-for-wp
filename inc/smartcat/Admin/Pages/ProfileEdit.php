@@ -90,8 +90,8 @@ class ProfileEdit extends PageAbstract {
 			'profile_project_id'      => __( 'Project id', 'translation-connectors' ),
 			'profile_project_id_note' => __( 'Enter here a Smartcat project ID to send all ongiong tasks to one specific project.', 'translation-connectors' ),
 			'profile_name_note'       => __( 'Leave this field blank for automatic name generation', 'translation-connectors' ),
-			'profile_auto_update'     => __( 'Auto update edited post', 'translation-connectors' ),
-			'profile_auto_send'       => __( 'Auto send created post', 'translation-connectors' ),
+			'profile_auto_update'     => __( 'Auto update edited post/page', 'translation-connectors' ),
+			'profile_auto_send'       => __( 'Auto send created post/page', 'translation-connectors' ),
 		];
 	}
 

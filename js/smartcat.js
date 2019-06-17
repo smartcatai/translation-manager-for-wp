@@ -248,11 +248,11 @@ jQuery(function ($) {
             },
             success: function (responseText) {
                 var responseJSON = JSON.parse(responseText);
-                if (responseJSON.message === "ok") {
-                    printSuccess("Profile successfully deleted.");
-                    var $td = element.closest("tr");
-                    $td.hide('slow', function(){ $td.remove(); });
-                }
+                printSuccess(responseJSON.message);
+
+                var $td = element.closest("tr");
+                $td.hide('slow', function(){ $td.remove(); });
+
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseText);

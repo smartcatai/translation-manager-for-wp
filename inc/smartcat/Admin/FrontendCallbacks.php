@@ -70,8 +70,8 @@ class FrontendCallbacks {
 			$options[] = [
 				'option_name'    => $args['option_name'] ?? false,
 				'checkbox_value' => $checkbox_value,
-				'checkbox_text'  => __( $checkbox_text, 'translation-connectors' ),
-				'checked'        => in_array( $checkbox_value, ! $option ? [ 'Translation' ] : $option, true ) ? 'checked' : '',
+				'checkbox_text'  => $checkbox_text,
+				'checked'        => in_array( $checkbox_value, ! $option ? [ $args['default'] ] : $option, true ) ? 'checked' : '',
 			];
 		}
 

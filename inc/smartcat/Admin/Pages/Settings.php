@@ -123,7 +123,9 @@ class Settings extends PageAbstract {
 				'label_for'   => $password,
 				'option_name' => $password,
 				'type'        => 'password',
-				'hint'        => '<a href="https://help.smartcat.ai/hc/en-us/articles/115002475012" target="_blank">Learn more</a> how to get Smartcat API credentials.'
+				'hint'        => '<a href="https://help.smartcat.ai/hc/en-us/articles/115002475012" target="_blank">'
+								. __( 'Learn more', 'translation-connectors' ) . '</a> '
+								. __( 'how to get Smartcat API credentials.', 'translation-connectors' ),
 			]
 		);
 

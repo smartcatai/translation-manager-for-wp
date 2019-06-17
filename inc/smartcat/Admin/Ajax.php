@@ -25,7 +25,6 @@ use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\Options;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Class Ajax
@@ -76,8 +75,10 @@ final class Ajax implements HookInterface {
 
 		if ( ! $utils->is_array_in_array( $required_parameters, array_keys( $parameters ) ) ) {
 			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
+			wp_die();
 		} elseif ( empty( $login = $parameters[ $prefix . 'smartcat_api_login' ] ) || empty( $password = $parameters[ $prefix . 'smartcat_api_password' ] ) ) {
 			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
+			wp_die();
 		}
 
 		$server = $parameters[ $prefix . 'smartcat_api_server' ];
@@ -95,16 +96,9 @@ final class Ajax implements HookInterface {
 		try {
 			$api          = new \SmartCat\Client\SmartCAT( $login, $password, $server );
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
-			$is_ok        = (bool) $account_info->getId();
-			if ( ! $is_ok ) {
-				throw new Exception( 'Invalid username or password' );
-			}
 		} catch ( \Exception $e ) {
-			if ( $e->getMessage() === 'Invalid username or password' ) {
-				$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
-			} else {
-				$ajax_response->send_error( 'nok', $data );
-			}
+			$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
+			wp_die();
 		}
 
 		// If callback already exists - drop needed.
@@ -152,7 +146,7 @@ final class Ajax implements HookInterface {
 			$options->set( 'smartcat_account_name', $account_info->getName() );
 		}
 
-		$ajax_response->send_success( 'ok', $data );
+		$ajax_response->send_success( __( 'Settings successfully saved', 'translation-connectors' ), $data );
 		wp_die();
 	}
 
@@ -196,14 +190,13 @@ final class Ajax implements HookInterface {
 					'status' => __( 'In progress', 'translation-connectors' ),
 				];
 
-				$ajax_response->send_success( 'ok', $data );
+				$ajax_response->send_success( __( 'Item successfully sended on update', 'translation-connectors' ), $data );
 			}
 
 			wp_die();
 		}
 
-		$ajax_response->send_error( 'Incorrect request', $data );
-
+		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), $data );
 		wp_die();
 	}
 
@@ -246,7 +239,7 @@ final class Ajax implements HookInterface {
 
 		if ( empty( $data['profile_name'] ) ) {
 			$targets              = implode( ', ', $data['profile_target_langs'] );
-			$data['profile_name'] = __( 'Translation:', 'translation-connectors' ) . " {$data['profile_source_lang']} -> {$targets}";
+			$data['profile_name'] = sprintf(  __( 'Translation: %s', 'translation-connectors' ), "{$data['profile_source_lang']} -> {$targets}" );
 		}
 
 		$key = array_search( $data['profile_source_lang'], $data['profile_target_langs'], true );
@@ -261,7 +254,7 @@ final class Ajax implements HookInterface {
 			}
 		} catch ( \Exception $e ) {
 			$ajax_response->send_error(
-				sprintf(__( 'Project "%s" does not exists', 'translation-connectors'), $data['profile_project_id'] ),
+				sprintf( __( 'Project "%s" does not exists', 'translation-connectors' ), $data['profile_project_id'] ),
 				[],
 				404
 			);
@@ -297,9 +290,9 @@ final class Ajax implements HookInterface {
 		}
 
 		if ( $profiles_repo->save( $profile ) ) {
-			$ajax_response->send_success( 'ok', $data );
+			$ajax_response->send_success( __( 'Item successfully created', 'translation-connectors' ), $data );
 		} else {
-			$ajax_response->send_error( 'Profile was not created', $data );
+			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
 		}
 
 		wp_die();
@@ -336,12 +329,12 @@ final class Ajax implements HookInterface {
 
 		if ( $data['profile_id'] ) {
 			if ( $profiles_repo->delete_by_id( $data['profile_id'] ) ) {
-				$ajax_response->send_success( 'ok', $data );
+				$ajax_response->send_success( __( 'Item successfully deleted', 'translation-connectors' ), $data );
 				wp_die();
 			}
 		}
 
-		$ajax_response->send_error( 'Incorrect request', [], 400 );
+		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
 		wp_die();
 	}
 
@@ -376,12 +369,12 @@ final class Ajax implements HookInterface {
 
 		if ( $data['stat_id'] ) {
 			if ( $statistics_repo->delete_by_id( $data['stat_id'] ) ) {
-				$ajax_response->send_success( 'ok', $data );
+				$ajax_response->send_success( __( 'Item successfully deleted', 'translation-connectors' ), $data );
 				wp_die();
 			}
 		}
 
-		$ajax_response->send_error( 'Incorrect request', [], 400 );
+		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
 		wp_die();
 	}
 
@@ -423,13 +416,13 @@ final class Ajax implements HookInterface {
 					$data['statistic'] = [
 						'status' => __( 'Cancelled', 'translation-connectors' ),
 					];
-					$ajax_response->send_success( 'ok', $data );
+					$ajax_response->send_success( __( 'Item was successfully cancelled', 'translation-connectors' ), $data );
 					wp_die();
 				}
 			}
 		}
 
-		$ajax_response->send_error( 'Incorrect request', [], 400 );
+		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
 		wp_die();
 	}
 
@@ -442,7 +435,7 @@ final class Ajax implements HookInterface {
 		$statistics_repository = null;
 		$profiles_repository   = null;
 
-		$verify_nonce  = wp_verify_nonce(
+		$verify_nonce = wp_verify_nonce(
 			wp_unslash( sanitize_key( $_POST['sc_send_nonce'] ?? null ) ),
 			'sc_send_nonce'
 		);
@@ -472,7 +465,7 @@ final class Ajax implements HookInterface {
 		$profile = $profiles_repository->get_one_by_id( $post['sc-profile'] );
 
 		if ( empty( $posts ) || empty( $profile ) ) {
-			$ajax_response->send_error( __( 'Incorrrect request', 'translation-connectors' ), [], 403 );
+			$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 403 );
 			wp_die();
 		}
 
@@ -511,18 +504,18 @@ final class Ajax implements HookInterface {
 				}
 
 				if ( count( $data['stats'] ) !== count( $profile->get_target_languages() ) ) {
-					$ajax_response->send_error( __( 'Not all stats was created', 'translation-connectors' ) );
+					$ajax_response->send_error( __( 'Not all items was created', 'translation-connectors' ) );
 				}
 			} else {
 				$data['task'] = $task;
-				$ajax_response->send_error( __( 'Task was not created', 'translation-connectors' ), $data );
+				$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
 			}
 		}
 
 		if ( $task_id ) {
 			$ajax_response->send_success( 'ok', $data );
 		} else {
-			$ajax_response->send_error( 'Task was not created', $data );
+			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
 		}
 
 		spawn_cron();

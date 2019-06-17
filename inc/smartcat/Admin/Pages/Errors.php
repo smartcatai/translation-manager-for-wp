@@ -29,8 +29,8 @@ class Errors extends PageAbstract {
 		echo self::get_renderer()->render(
 			'errors',
 			[
-				'errors_table'     => $errors_table->display(),
-				'texts'            => self::get_texts(),
+				'errors_table' => $errors_table->display(),
+				'texts'        => self::get_texts(),
 			]
 		);
 	}

@@ -24,8 +24,7 @@ class Dashboard extends PageAbstract {
 	 * Render dasboard page
 	 */
 	public static function render() {
-		$is_cookie = isset( $_COOKIE['regform'] );
-		$options   = self::get_options();
+		$options = self::get_options();
 
 		$statistics_table           = new StatisticsTable();
 		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
@@ -35,7 +34,6 @@ class Dashboard extends PageAbstract {
 		echo self::get_renderer()->render(
 			'dashboard',
 			[
-				'isCookie'         => $is_cookie,
 				'button_status'    => $is_statistics_queue_active,
 				'statistic_table'  => $statistics_table->display(),
 				'texts'            => self::get_texts(),

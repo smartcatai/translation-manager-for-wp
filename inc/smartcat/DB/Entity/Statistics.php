@@ -48,6 +48,21 @@ class Statistics {
 	/** @var  integer */
 	private $error_count = 0;
 
+
+	/**
+	 * @return array
+	 */
+	public static function get_all_statuses() {
+		return [
+			self::STATUS_NEW       => __( 'Submitted', 'translation-connectors' ),
+			self::STATUS_FAILED    => __( 'Failed', 'translation-connectors' ),
+			self::STATUS_CREATED   => __( 'In Progress', 'translation-connectors' ),
+			self::STATUS_SENDED    => __( 'Sended', 'translation-connectors' ),
+			self::STATUS_EXPORT    => __( 'In Progress', 'translation-connectors' ),
+			self::STATUS_COMPLETED => __( 'Completed', 'translation-connectors' ),
+			self::STATUS_CANCELLED => __( 'Cancelled', 'translation-connectors' ),
+		];
+	}
 	/**
 	 * @return int
 	 */
