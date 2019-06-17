@@ -42,21 +42,22 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	 * Main update function
 	 */
 	public function install() {
-		if ( version_compare( $this->get_plugin_version(), '1.3.0', '<' ) ) {
-			$this->v130();
+		if ( version_compare( $this->get_plugin_version(), '2.0.0', '<' ) ) {
+			$this->v200();
 		}
 	}
 
 	/**
-	 * Update to version 1.3.0
+	 * Update to version 2.0.0
 	 */
-	private function v130() {
+	private function v200() {
 		$container    = Connector::get_container();
 		$param_prefix = $container->getParameter( 'plugin.table.prefix' );
 
 		$tasks_table_name = $this->prefix . 'smartcat_connector_tasks';
 		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN profileID BIGINT( 20 ) UNSIGNED NOT NULL;" );
 		$this->exec( "ALTER TABLE {$tasks_table_name} DROP COLUMN postID;" );
+		$this->exec( "ALTER TABLE {$tasks_table_name} DROP COLUMN status;" );
 
 		if ( get_option( $param_prefix . 'smartcat_workflow_stages', false ) ) {
 			/** @var ProfileRepository $profile_repo */
@@ -64,18 +65,20 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 			/** @var LanguageConverter $language_converter */
 			$language_converter = $container->get( 'language.converter' );
 
-			$target_langs = array_map(
-				function ( $locale ) use ( $language_converter ) {
-					return $language_converter->get_sc_code_by_wp( $locale )->get_sc_code();
-				},
-				$language_converter->get_polylang_locales_supported_by_sc()
+			$default_language = pll_default_language( 'locale' );
+
+			$target_languages = array_filter(
+				$language_converter->get_polylang_locales_supported_by_sc(),
+				function ( $locale ) use ( $default_language ) {
+					return $default_language !== $locale;
+				}
 			);
 
 			$profile = new Profile();
 			$profile
-				->set_name( 'Migrated from settings' )
-				->set_source_language( pll_default_language( 'locale' ) )
-				->set_target_languages( $target_langs )
+				->set_name( 'Migrated from v1.*.* settings' )
+				->set_source_language( $default_language )
+				->set_target_languages( $target_languages )
 				->set_auto_send( false )
 				->set_auto_update( false )
 				->set_workflow_stages( get_option( $param_prefix . 'smartcat_workflow_stages' ) )

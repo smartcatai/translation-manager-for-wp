@@ -17,6 +17,9 @@ use SmartCAT\WP\DB\Entity\Profile;
  * Class ProfileRepository
  *
  * @method Profile get_one_by_id( int $id )
+ * @method Profile[] get_all_by( array $criterias )
+ * @method Profile[] get_one_by( array $criterias )
+ * @method Profile[] get_all( $from = 0, $limit = 0 )
  * @package SmartCAT\WP\DB\Repository
  */
 class ProfileRepository extends RepositoryAbstract {
@@ -72,30 +75,6 @@ class ProfileRepository extends RepositoryAbstract {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * @param int $from
-	 * @param int $limit
-	 *
-	 * @return Profile[]
-	 */
-	public function get_all( $from = 0, $limit = 100 ) {
-		$wpdb  = $this->get_wp_db();
-		$from  = intval( $from );
-		$limit = intval( $limit );
-
-		$from >= 0 || $from = 0;
-
-		$table_name = $this->get_table_name();
-		$results    = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM $table_name LIMIT %d, %d",
-				[ $from, $limit ]
-			)
-		);
-
-		return $this->prepare_result( $results );
 	}
 
 	/**

@@ -22,6 +22,9 @@ use SmartCAT\WP\Helpers\Language\LanguageConverter;
  * Class StatisticRepository
  *
  * @method Statistics get_one_by_id( int $id )
+ * @method Statistics[] get_all_by( array $criterias )
+ * @method Statistics[] get_one_by( array $criterias )
+ * @method Statistics[] get_all( $from = 0, $limit = 0 )
  * @package SmartCAT\WP\DB\Repository
  */
 class StatisticRepository extends RepositoryAbstract {
@@ -32,30 +35,6 @@ class StatisticRepository extends RepositoryAbstract {
 	 */
 	public function get_table_name() {
 		return $this->prefix . self::TABLE_NAME;
-	}
-
-	/**
-	 * @param int $from
-	 * @param int $limit
-	 *
-	 * @return Statistics[]
-	 */
-	public function get_statistics( $from = 0, $limit = 100 ) {
-		$wpdb  = $this->get_wp_db();
-		$from  = intval( $from );
-		$limit = intval( $limit );
-
-		$from >= 0 || $from = 0;
-
-		$table_name = $this->get_table_name();
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM $table_name LIMIT %d, %d",
-				[ $from, $limit ]
-			 )
-		 );
-
-		return $this->prepare_result( $results );
 	}
 
 	/**
@@ -193,26 +172,7 @@ class StatisticRepository extends RepositoryAbstract {
 		$wpdb	   = $this->get_wp_db();
 
 		if ( ! is_null( $post_id ) && ! empty( $post_id ) && is_int( $post_id ) ) {
-			//TODO: м.б. заменить на try-catch
 			if ( $wpdb->delete( $table_name, [ 'postID' => $post_id ] ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param $task_id
-	 *
-	 * @return bool
-	 */
-	public function mark_failed_by_task_id( $task_id ) {
-		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
-
-		if ( ! is_null( $task_id ) && ! empty( $task_id ) && is_int( $task_id ) ) {
-			if ( $wpdb->update( $table_name, ['status' => 'failed'], [ 'taskId' => $task_id ] ) ) {
 				return true;
 			}
 		}
@@ -327,9 +287,9 @@ class StatisticRepository extends RepositoryAbstract {
 		$converter = $container->get( 'language.converter' );
 
 		if ( is_array( $document ) ) {
-			foreach ( $document as $singleDocument ) {
-				if ( $singleDocument instanceof DocumentModel ) {
-					$this->link_to_smartcat_document( $task, $singleDocument );
+			foreach ( $document as $document_model ) {
+				if ( $document_model instanceof DocumentModel ) {
+					$this->link_to_smartcat_document( $task, $document_model );
 				}
 			}
 
@@ -337,42 +297,20 @@ class StatisticRepository extends RepositoryAbstract {
 		}
 
 		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
-		$data	   = [
+		$wpdb       = $this->get_wp_db();
+		$data       = [
 			'documentID' => $document->getId(),
-			'status'	 => 'sended'
+			'status'     => Statistics::STATUS_SENDED,
 		];
 
 		return $wpdb->update(
 			$table_name,
 			$data,
 			[
-				'taskId'		 => $task->get_id(),
-				'targetLanguage' => $converter->get_wp_code_by_sc( $document->getTargetLanguage() )->get_wp_code()
+				'taskId'         => $task->get_id(),
+				'targetLanguage' => $converter->get_wp_code_by_sc( $document->getTargetLanguage() )->get_wp_code(),
 			]
-		 );
-	}
-
-	/**
-	 * @param array $criterias
-	 *
-	 * @return Statistics|null
-	 */
-	public function get_one_by( array $criterias ) {
-		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
-		$query	  = "SELECT * FROM $table_name WHERE ";
-
-		$where = $values = [];
-
-		foreach ( $criterias as $key => $value ) {
-			$where[]  = "$key=%s";
-			$values[] = $value;
-		}
-
-		$row = $wpdb->get_row( $wpdb->prepare( $query . implode( " AND ", $where ), $values ) );
-
-		return $row ? $this->to_entity( $row ) : null;
+		);
 	}
 
 	/**

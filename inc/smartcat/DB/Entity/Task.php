@@ -17,13 +17,6 @@ namespace SmartCAT\WP\DB\Entity;
  * @package SmartCAT\WP\DB\Entity
  */
 class Task {
-	const STATUS_NEW       = 'new';
-	const STATUS_FAILED    = 'failed';
-	const STATUS_CREATED   = 'created';
-	const STATUS_SENDED    = 'sended';
-	const STATUS_EXPORT    = 'export';
-	const STATUS_COMPLETED = 'completed';
-
 	/** @var  integer */
 	private $id;
 
@@ -33,15 +26,7 @@ class Task {
 	/** @var  string[] */
 	private $target_languages;
 
-	/** @var  integer */
-	private $post_id;
-
-	/** @var  string */
-	private $status;
-
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $profile_id;
 
 	/** @var  string */
@@ -97,24 +82,6 @@ class Task {
 	 */
 	public function set_target_languages( $target_languages ) {
 		$this->target_languages = $target_languages;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function get_status() {
-		return $this->status;
-	}
-
-	/**
-	 * @param string $status
-	 *
-	 * @return Task
-	 */
-	public function set_status( $status ) {
-		$this->status = $status;
 
 		return $this;
 	}

@@ -53,7 +53,7 @@ class StatisticsTable extends TableAbstract {
 		);
 
 		$cur_page = (int) $this->get_pagenum();
-		$items    = $statistic_repository->get_statistics(
+		$items    = $statistic_repository->get_all(
 			intval( $per_page ) * ( $cur_page - 1 ),
 			intval( $per_page )
 		);

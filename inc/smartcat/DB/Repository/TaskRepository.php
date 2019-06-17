@@ -17,6 +17,9 @@ use SmartCAT\WP\DB\Entity\Task;
  * Class TaskRepository
  *
  * @method Task get_one_by_id( int $id )
+ * @method Task[] get_all_by( array $criterias )
+ * @method Task[] get_one_by( array $criterias )
+ * @method Task[] get_all( $from = 0, $limit = 0 )
  * @package SmartCAT\WP\DB\Repository
  */
 class TaskRepository extends RepositoryAbstract {
@@ -32,28 +35,6 @@ class TaskRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param $status string|array
-	 * @return Task[]
-	 */
-	public function get_tasks_by_status( $status ) {
-		$table_name = $this->get_table_name();
-
-		if ( is_array( $status ) ) {
-			$status = implode( "', OR status='", $status );
-		}
-
-		$query = sprintf(
-			"SELECT * FROM %s WHERE status='%s'",
-			$table_name,
-			$status
-		);
-
-		$results = $this->get_wp_db()->get_results( $query );
-
-		return $this->prepare_result( $results );
-	}
-
-	/**
 	 * @param Task $task
 	 * @return bool|int
 	 */
@@ -64,7 +45,6 @@ class TaskRepository extends RepositoryAbstract {
 		$data = [
 			'sourceLanguage'  => $task->get_source_language(),
 			'targetLanguages' => serialize( $task->get_target_languages() ),
-			'status'          => $task->get_status(),
 			'projectID'       => $task->get_project_id(),
 			'profileID'       => intval( $task->get_profile_id() ),
 		];
@@ -94,7 +74,6 @@ class TaskRepository extends RepositoryAbstract {
 			$data = [
 				'sourceLanguage'  => $task->get_source_language(),
 				'targetLanguages' => serialize( $task->get_target_languages() ),
-				'status'          => $task->get_status(),
 				'projectID'       => $task->get_project_id(),
 				'profileID'       => intval( $task->get_profile_id() ),
 			];
@@ -145,10 +124,6 @@ class TaskRepository extends RepositoryAbstract {
 
 		if ( isset( $row->targetLanguages ) ) {
 			$result->set_target_languages( unserialize( $row->targetLanguages ) );
-		}
-
-		if ( isset( $row->status ) ) {
-			$result->set_status( $row->status );
 		}
 
 		if ( isset( $row->projectID ) ) {

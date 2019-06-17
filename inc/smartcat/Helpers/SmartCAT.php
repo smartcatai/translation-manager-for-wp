@@ -19,6 +19,7 @@ use SmartCat\Client\Model\ProjectChangesModel;
 use SmartCat\Client\Model\ProjectModel;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
+use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Entity\Task;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
 
@@ -126,7 +127,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 
 		$index = array_search( $document_model->getFile()['fileName'], $sc_document_names );
 
-		if ( $index !== false ) {
+		if ( false !== $index ) {
 			$document = $this->getDocumentManager()->documentUpdate(
 				[
 					'documentId'   => $sc_documents[ $index ]->getId(),
@@ -160,10 +161,15 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 
 	/**
 	 * @param $file
+	 * @param Statistics $statistic
 	 * @return CreateDocumentPropertyWithFilesModel
 	 */
-	public function create_document( $file ) {
+	public function create_document( $file, $statistic ) {
 		$filename = self::get_task_name_from_stream( $file, true );
+		/** @var LanguageConverter $language_converter */
+		$language_converter = Connector::get_container()->get( 'language.converter' );
+
+		$target_language  = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
 
 		$bilingual_file_import_settings = new BilingualFileImportSettingsModel();
 		$bilingual_file_import_settings
@@ -172,6 +178,8 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			->setTargetSubstitutionMode( 'all' );
 		$document_model = new CreateDocumentPropertyWithFilesModel();
 		$document_model->setBilingualFileImportSettings( $bilingual_file_import_settings );
+		$document_model->setExternalId( $statistic->get_id() );
+		$document_model->setTargetLanguages( [ $target_language ] );
 		$document_model->attachFile( $file, self::filter_chars( $filename ) );
 
 		return $document_model;

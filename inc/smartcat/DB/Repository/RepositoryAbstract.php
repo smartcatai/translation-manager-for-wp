@@ -19,13 +19,9 @@ use SmartCAT\WP\DB\DbAbstract;
  * @package SmartCAT\WP\DB\Repository
  */
 abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterface {
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	protected $prefix = '';
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $persists = [];
 
 	/**
@@ -128,5 +124,79 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param array $criterias
+	 *
+	 * @return DbAbstract[]|null
+	 */
+	public function get_all_by( array $criterias ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+		$query      = "SELECT * FROM $table_name WHERE ";
+
+		$where = $values = [];
+
+		foreach ( $criterias as $key => $value ) {
+			$where[]  = "$key=%s";
+			$values[] = $value;
+		}
+
+		$results =
+			$wpdb->get_results(
+				$wpdb->prepare( $query . implode( " AND ", $where ),
+					$values )
+			);
+
+		return $this->prepare_result( $results );
+	}
+
+	/**
+	 * @param array $criterias
+	 *
+	 * @return DbAbstract|null
+	 */
+	public function get_one_by( array $criterias ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+		$query      = "SELECT * FROM $table_name WHERE ";
+
+		$where = $values = [];
+
+		foreach ( $criterias as $key => $value ) {
+			$where[]  = "$key=%s";
+			$values[] = $value;
+		}
+
+		$row = $wpdb->get_row( $wpdb->prepare( $query . implode( " AND ", $where ), $values ) );
+
+		return $row ? $this->to_entity( $row ) : null;
+	}
+
+	/**
+	 * @param int $from
+	 * @param int $limit
+	 *
+	 * @return DbAbstract[]
+	 */
+	public function get_all( $from = 0, $limit = 0 ) {
+		$wpdb  = $this->get_wp_db();
+		$from  = intval( $from );
+		$limit = intval( $limit );
+
+		$table_name = $this->get_table_name();
+		$query      = "SELECT * FROM $table_name";
+
+		if ( $limit > 0 ) {
+			$query = $wpdb->prepare(
+				"SELECT * FROM $table_name LIMIT %d, %d",
+				[ $from, $limit ]
+			);
+		}
+
+		$results = $wpdb->get_results( $query );
+
+		return $this->prepare_result( $results );
 	}
 }

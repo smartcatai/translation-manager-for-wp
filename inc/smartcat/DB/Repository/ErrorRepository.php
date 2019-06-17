@@ -17,6 +17,8 @@ use SmartCAT\WP\DB\Entity\Error;
  * Class ErrorRepository
  *
  * @method Error get_one_by_id( int $id )
+ * @method Error[] get_all_by( array $criterias )
+ * @method Error[] get_one_by( array $criterias )
  * @package SmartCAT\WP\DB\Repository
  */
 class ErrorRepository extends RepositoryAbstract {
@@ -35,20 +37,22 @@ class ErrorRepository extends RepositoryAbstract {
 	 *
 	 * @return Error[]
 	 */
-	public function get_all( $from = 0, $limit = 100 ) {
+	public function get_all( $from = 0, $limit = 0 ) {
 		$wpdb  = $this->get_wp_db();
 		$from  = intval( $from );
 		$limit = intval( $limit );
 
-		$from >= 0 || $from = 0;
-
 		$table_name = $this->get_table_name();
-		$results    = $wpdb->get_results(
-			$wpdb->prepare(
+		$query      = "SELECT * FROM $table_name";
+
+		if ( $limit > 0 ) {
+			$query = $wpdb->prepare(
 				"SELECT * FROM $table_name ORDER BY date DESC LIMIT %d, %d",
 				[ $from, $limit ]
-			)
-		);
+			);
+		}
+
+		$results = $wpdb->get_results( $query );
 
 		return $this->prepare_result( $results );
 	}
@@ -71,8 +75,6 @@ class ErrorRepository extends RepositoryAbstract {
 		if ( ! empty( $error->get_id() ) ) {
 			$data['id'] = $error->get_id();
 		}
-
-		//TODO: м.б. заменить на try-catch
 
 		if ( $wpdb->insert( $table_name, $data ) ) {
 			return $wpdb->insert_id;
@@ -97,7 +99,7 @@ class ErrorRepository extends RepositoryAbstract {
 				'shortMessage' => $error->get_short_message(),
 				'message'	  => $error->get_message()
 			];
-			//TODO: м.б. заменить на try-catch
+
 			if ( $wpdb->update( $table_name, $data, [ 'id' => $error->get_id() ] ) ) {
 				return true;
 			}
@@ -107,12 +109,11 @@ class ErrorRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param array $persists
+	 * @param Error[] $persists
 	 *
 	 * @return mixed|void
 	 */
 	protected function do_flush( array $persists ) {
-		/* @var Error[] $persists */
 		foreach ( $persists as $error ) {
 			if ( get_class( $error ) === 'SmartCAT\WP\DB\Entity\Error' ) {
 				if ( empty( $error->get_id() ) ) {
