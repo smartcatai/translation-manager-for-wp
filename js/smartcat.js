@@ -249,7 +249,6 @@ jQuery(function ($) {
             success: function (responseText) {
                 var responseJSON = JSON.parse(responseText);
                 printSuccess(responseJSON.message);
-
                 var $td = element.closest("tr");
                 $td.hide('slow', function(){ $td.remove(); });
 
@@ -284,8 +283,9 @@ jQuery(function ($) {
             url: ajaxurl,
             data: formData,
             success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
                 $this.parent().dialog('close');
-                printSuccess('Items successfully sended.');
+                printSuccess(responseJSON.message);
                 $('button.sc-send-button').prop('disabled', false);
                 $(".sc-spinner").hide();
             },
@@ -327,7 +327,6 @@ jQuery(function ($) {
                 }
             },
             error: function (responseObject) {
-                cl('ERROR');
                 var responseJSON = JSON.parse(responseObject.responseText);
                 printError(responseJSON.message);
 
@@ -372,12 +371,11 @@ jQuery(function ($) {
             },
             success: function (responseText) {
                 var responseJSON = JSON.parse(responseText);
-                if (responseJSON.message === "ok") {
-                    printSuccess("Item successfully sended on update.");
-                    element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
-                    element.parent().html("-");
-                    updateStatistics();
-                }
+                printSuccess(responseJSON.message);
+                element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
+                element.parent().html("-");
+                updateStatistics();
+
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseText);
@@ -403,11 +401,9 @@ jQuery(function ($) {
             },
             success: function (responseText) {
                 var responseJSON = JSON.parse(responseText);
-                if (responseJSON.message === "ok") {
-                    printSuccess("Item successfully deleted.");
-                    var $td = element.closest("tr");
-                    $td.hide('slow', function(){ $td.remove(); });
-                }
+                printSuccess(responseJSON.message);
+                var $td = element.closest("tr");
+                $td.hide('slow', function(){ $td.remove(); });
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseText);
@@ -433,11 +429,9 @@ jQuery(function ($) {
             },
             success: function (responseText) {
                 var responseJSON = JSON.parse(responseText);
-                if (responseJSON.message === "ok") {
-                    printSuccess("Item successfully cancelled.");
-                    element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
-                    element.closest("span").remove();
-                }
+                printSuccess(responseJSON.message);
+                element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
+                element.closest("span").remove();
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseText);
