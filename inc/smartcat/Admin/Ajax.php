@@ -46,7 +46,6 @@ final class Ajax implements HookInterface {
 
 		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$container = self::get_container();
@@ -70,15 +69,12 @@ final class Ajax implements HookInterface {
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
-			wp_die();
 		}
 
 		if ( ! $utils->is_array_in_array( $required_parameters, array_keys( $parameters ) ) ) {
 			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
-			wp_die();
 		} elseif ( empty( $login = $parameters[ $prefix . 'smartcat_api_login' ] ) || empty( $password = $parameters[ $prefix . 'smartcat_api_password' ] ) ) {
 			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
-			wp_die();
 		}
 
 		$server = $parameters[ $prefix . 'smartcat_api_server' ];
@@ -98,7 +94,6 @@ final class Ajax implements HookInterface {
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
 		} catch ( \Exception $e ) {
 			$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
-			wp_die();
 		}
 
 		// If callback already exists - drop needed.
@@ -146,8 +141,9 @@ final class Ajax implements HookInterface {
 			$options->set( 'smartcat_account_name', $account_info->getName() );
 		}
 
+		wp_cache_set( 'sc_smartcat_access', true, 'translation-connectors' );
+
 		$ajax_response->send_success( __( 'Settings successfully saved', 'translation-connectors' ), $data );
-		wp_die();
 	}
 
 	/**
@@ -164,7 +160,6 @@ final class Ajax implements HookInterface {
 
 		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$data      = [ 'isActive' => SmartCAT::is_active() ];
@@ -177,7 +172,6 @@ final class Ajax implements HookInterface {
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
-			wp_die();
 		}
 
 		if ( ! empty( $post['stat_id'] ) && intval( $post['stat_id'] ) ) {
@@ -192,12 +186,9 @@ final class Ajax implements HookInterface {
 
 				$ajax_response->send_success( __( 'Item successfully sended on update', 'translation-connectors' ), $data );
 			}
-
-			wp_die();
 		}
 
 		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), $data );
-		wp_die();
 	}
 
 	/**
@@ -212,7 +203,6 @@ final class Ajax implements HookInterface {
 
 		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$data          = sanitize_post( $_POST, 'db' );
@@ -228,7 +218,6 @@ final class Ajax implements HookInterface {
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
-			wp_die();
 		}
 
 		if ( ! empty( $data['profile_id'] ) ) {
@@ -258,7 +247,6 @@ final class Ajax implements HookInterface {
 				[],
 				404
 			);
-			wp_die();
 		}
 
 		$profile
@@ -294,8 +282,6 @@ final class Ajax implements HookInterface {
 		} else {
 			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
 		}
-
-		wp_die();
 	}
 
 	/**
@@ -311,7 +297,6 @@ final class Ajax implements HookInterface {
 
 		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$profiles_repo = null;
@@ -324,18 +309,15 @@ final class Ajax implements HookInterface {
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
-			wp_die();
 		}
 
 		if ( $data['profile_id'] ) {
 			if ( $profiles_repo->delete_by_id( $data['profile_id'] ) ) {
 				$ajax_response->send_success( __( 'Item successfully deleted', 'translation-connectors' ), $data );
-				wp_die();
 			}
 		}
 
 		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
-		wp_die();
 	}
 
 	/**
@@ -351,7 +333,6 @@ final class Ajax implements HookInterface {
 
 		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$statistics_repo = null;
@@ -364,18 +345,15 @@ final class Ajax implements HookInterface {
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
-			wp_die();
 		}
 
 		if ( $data['stat_id'] ) {
 			if ( $statistics_repo->delete_by_id( $data['stat_id'] ) ) {
 				$ajax_response->send_success( __( 'Item successfully deleted', 'translation-connectors' ), $data );
-				wp_die();
 			}
 		}
 
 		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
-		wp_die();
 	}
 
 	/**
@@ -391,7 +369,6 @@ final class Ajax implements HookInterface {
 
 		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$statistics_repo = null;
@@ -404,7 +381,6 @@ final class Ajax implements HookInterface {
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
-			wp_die();
 		}
 
 		if ( $data['stat_id'] ) {
@@ -417,13 +393,11 @@ final class Ajax implements HookInterface {
 						'status' => __( 'Cancelled', 'translation-connectors' ),
 					];
 					$ajax_response->send_success( __( 'Item was successfully cancelled', 'translation-connectors' ), $data );
-					wp_die();
 				}
 			}
 		}
 
 		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
-		wp_die();
 	}
 
 	/**
@@ -442,7 +416,6 @@ final class Ajax implements HookInterface {
 
 		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$post = sanitize_post( $_POST );
@@ -458,7 +431,6 @@ final class Ajax implements HookInterface {
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
-			wp_die();
 		}
 
 		$posts   = explode( ',', $post['posts'] );
@@ -466,7 +438,6 @@ final class Ajax implements HookInterface {
 
 		if ( empty( $posts ) || empty( $profile ) ) {
 			$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$task = new Task();
@@ -512,14 +483,13 @@ final class Ajax implements HookInterface {
 			}
 		}
 
+		spawn_cron();
+
 		if ( $task_id ) {
 			$ajax_response->send_success( __( 'Items was successfully sended', 'translation-connectors' ), $data );
 		} else {
 			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
 		}
-
-		spawn_cron();
-		wp_die();
 	}
 
 	/**

@@ -42,6 +42,23 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public static function check_access() {
+		$container = Connector::get_container();
+		Connector::set_core_parameters();
+
+		try {
+			/** @var SmartCAT $smartcat */
+			$smartcat = $container->get( 'smartcat' );
+			$smartcat->getAccountManager()->accountGetAccountInfo();
+			return true;
+		} catch ( \Exception $e ) {
+			return false;
+		}
+	}
+
+	/**
 	 * @param $s
 	 * @return mixed
 	 */

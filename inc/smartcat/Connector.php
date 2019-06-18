@@ -146,15 +146,18 @@ class Connector {
 
 	public function plugin_admin_notice( /** @noinspection PhpUnusedParameterInspection */ $query ) {
 		if ( ! wp_doing_ajax() ) {
+			/** @var Notice $notice */
+			$notice = $this->from_container( 'core.notice' );
 			if ( ! self::check_dependency() ) {
-				/** @var Notice $notice */
-				$notice = $this->from_container( 'core.notice' );
 				$notice->add_error( __( 'You need to activate the plugin Polylang', 'translation-connectors' ), false );
 			}
 
 			if ( ! SmartCAT::is_active() ) {
-				$notice = $this->from_container( 'core.notice' );
 				$notice->add_error( __( 'You must enter API login and password', 'translation-connectors' ), false );
+			} else {
+				if ( ! SmartCAT::check_access() ) {
+					$notice->add_error( __( 'Smartcat credentials are incorrect. Login failed.', 'translation-connectors' ), false );
+				}
 			}
 		}
 	}
