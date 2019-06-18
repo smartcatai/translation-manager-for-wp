@@ -19,7 +19,6 @@ namespace SmartCAT\WP\DB\Entity;
 class Statistics {
 	const STATUS_NEW       = 'new';
 	const STATUS_FAILED    = 'failed';
-	const STATUS_CREATED   = 'created';
 	const STATUS_SENDED    = 'sended';
 	const STATUS_EXPORT    = 'export';
 	const STATUS_COMPLETED = 'completed';
@@ -56,8 +55,7 @@ class Statistics {
 		return [
 			self::STATUS_NEW       => __( 'Submitted', 'translation-connectors' ),
 			self::STATUS_FAILED    => __( 'Failed', 'translation-connectors' ),
-			self::STATUS_CREATED   => __( 'In Progress', 'translation-connectors' ),
-			self::STATUS_SENDED    => __( 'Sended', 'translation-connectors' ),
+			self::STATUS_SENDED    => __( 'In Progress', 'translation-connectors' ),
 			self::STATUS_EXPORT    => __( 'In Progress', 'translation-connectors' ),
 			self::STATUS_COMPLETED => __( 'Completed', 'translation-connectors' ),
 			self::STATUS_CANCELLED => __( 'Cancelled', 'translation-connectors' ),

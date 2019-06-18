@@ -45,7 +45,7 @@ class StatisticRepository extends RepositoryAbstract {
 	 * @return Statistics[]
 	 */
 	public function get_sended( array $documents = [] ) {
-		return $this->get_by_status( 'sended', $documents );
+		return $this->get_by_status( Statistics::STATUS_SENDED, $documents );
 	}
 
 	/**
@@ -56,7 +56,7 @@ class StatisticRepository extends RepositoryAbstract {
 	 * @return Statistics[]
 	 */
 	public function get_export( array $documents = [] ) {
-		return $this->get_by_status( 'export', $documents );
+		return $this->get_by_status( Statistics::STATUS_EXPORT, $documents );
 	}
 
 	/**
@@ -67,7 +67,7 @@ class StatisticRepository extends RepositoryAbstract {
 	 * @return Statistics[]
 	 */
 	public function get_new( array $documents = [] ) {
-		return $this->get_by_status( 'new', $documents );
+		return $this->get_by_status( Statistics::STATUS_NEW, $documents );
 	}
 
 	/**
@@ -261,7 +261,7 @@ class StatisticRepository extends RepositoryAbstract {
 	protected function do_flush( array $persists ) {
 		/* @var Statistics[] $persists */
 		foreach ( $persists as $stat ) {
-			if ( get_class( $stat ) === 'SmartCAT\WP\DB\Entity\Statistics' ) {
+			if ( $stat instanceof Statistics ) {
 				if ( empty( $stat->get_id() ) ) {
 					if ( $res = $this->add( $stat ) ) {
 						$stat->set_id( $res );

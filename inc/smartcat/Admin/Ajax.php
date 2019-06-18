@@ -513,7 +513,7 @@ final class Ajax implements HookInterface {
 		}
 
 		if ( $task_id ) {
-			$ajax_response->send_success( 'ok', $data );
+			$ajax_response->send_success( __( 'Items was successfully sended', 'translation-connectors' ), $data );
 		} else {
 			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
 		}
