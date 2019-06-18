@@ -284,6 +284,7 @@ final class Ajax implements HookInterface {
 		try {
 			$result = $profiles_repo->save( $profile );
 		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t save profile', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$result = false;
 		}
 
