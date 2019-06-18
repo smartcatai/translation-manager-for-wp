@@ -249,6 +249,10 @@ final class Ajax implements HookInterface {
 			);
 		}
 
+		if ( empty( $data['profile_target_langs'] ) ) {
+			$ajax_response->send_error( __( 'Target languages are empty', 'translation-connectors' ), [], 400 );
+		}
+
 		$profile
 			->set_name( $data['profile_name'] )
 			->set_vendor( $data['profile_vendor'] )
@@ -277,7 +281,13 @@ final class Ajax implements HookInterface {
 			Logger::warning( "Can't set vendor name", "Reason: {$e->getMessage()}" );
 		}
 
-		if ( $profiles_repo->save( $profile ) ) {
+		try {
+			$result = $profiles_repo->save( $profile );
+		} catch ( \Exception $e ) {
+			$result = false;
+		}
+
+		if ( $result ) {
 			$ajax_response->send_success( __( 'Item successfully created', 'translation-connectors' ), $data );
 		} else {
 			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
