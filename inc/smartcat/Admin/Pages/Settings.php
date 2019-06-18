@@ -86,7 +86,7 @@ class Settings extends PageAbstract {
 
 		add_settings_field(
 			$server,
-			__( 'API server', 'translation-connectors' ),
+			__( 'Server', 'translation-connectors' ),
 			[ FrontendCallbacks::class, 'select_callback' ],
 			'smartcat',
 			'smartcat_required',
@@ -103,7 +103,7 @@ class Settings extends PageAbstract {
 
 		add_settings_field(
 			$login,
-			__( 'API login', 'translation-connectors' ),
+			__( 'Account ID', 'translation-connectors' ),
 			[ FrontendCallbacks::class, 'input_text_callback' ],
 			'smartcat',
 			'smartcat_required',
@@ -115,7 +115,7 @@ class Settings extends PageAbstract {
 
 		add_settings_field(
 			$password,
-			__( 'API password', 'translation-connectors' ),
+			__( 'API key', 'translation-connectors' ),
 			[ FrontendCallbacks::class, 'input_text_callback' ],
 			'smartcat',
 			'smartcat_required',
@@ -124,7 +124,7 @@ class Settings extends PageAbstract {
 				'option_name' => $password,
 				'type'        => 'password',
 				'hint'        => '<a href="https://help.smartcat.ai/hc/en-us/articles/115002475012" target="_blank">'
-								. __( 'Learn more', 'translation-connectors' ) . '</a> '
+								. __( 'Learn more on', 'translation-connectors' ) . '</a> '
 								. __( 'how to get Smartcat API credentials.', 'translation-connectors' ),
 			]
 		);

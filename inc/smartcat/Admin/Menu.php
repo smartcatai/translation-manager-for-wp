@@ -98,6 +98,15 @@ final class Menu implements InitInterface {
 			}
 		);
 
+		add_submenu_page(
+			'sc-dashboard',
+			__( 'Settings', 'translation-connectors' ),
+			__( 'Settings', 'translation-connectors' ),
+			'edit_pages',
+			'sc-settings',
+			[ Settings::class, 'render' ]
+		);
+
 		if ( $options->get( 'smartcat_debug_mode' ) ) {
 			$errors_hook = add_submenu_page(
 				'sc-dashboard',
@@ -122,15 +131,6 @@ final class Menu implements InitInterface {
 				}
 			);
 		}
-
-		add_submenu_page(
-			'sc-dashboard',
-			__( 'Settings', 'translation-connectors' ),
-			__( 'Settings', 'translation-connectors' ),
-			'edit_pages',
-			'sc-settings',
-			[ Settings::class, 'render' ]
-		);
 	}
 
 	/**

@@ -87,11 +87,11 @@ class ProfileEdit extends PageAbstract {
 			'profile_source_lang'     => __( 'Source Language', 'translation-connectors' ),
 			'profile_target_langs'    => __( 'Target Languages', 'translation-connectors' ),
 			'profile_workflow_stages' => __( 'Workflow Stages', 'translation-connectors' ),
-			'profile_project_id'      => __( 'Project id', 'translation-connectors' ),
+			'profile_project_id'      => __( 'Project ID', 'translation-connectors' ),
 			'profile_project_id_note' => __( 'Enter here a Smartcat project ID to send all ongiong tasks to one specific project.', 'translation-connectors' ),
 			'profile_name_note'       => __( 'Leave this field blank for automatic name generation', 'translation-connectors' ),
-			'profile_auto_update'     => __( 'Auto update edited post/page', 'translation-connectors' ),
-			'profile_auto_send'       => __( 'Auto send created post/page', 'translation-connectors' ),
+			'profile_auto_update'     => __( 'Automatically submit each content update for translation', 'translation-connectors' ),
+			'profile_auto_send'       => __( 'Automatically submit new content for translation', 'translation-connectors' ),
 		];
 	}
 

@@ -42,7 +42,7 @@ class Profiles extends PageAbstract {
 	 */
 	private static function get_texts() {
 		return [
-			'add_profile' => __( 'New profile', 'translation-connectors' ),
+			'add_profile' => __( 'Add New', 'translation-connectors' ),
 			'pages'       => __( 'Pages', 'translation-connectors' ),
 			'title'       => $GLOBALS['title'],
 		];

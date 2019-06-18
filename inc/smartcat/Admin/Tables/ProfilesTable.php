@@ -73,8 +73,8 @@ class ProfilesTable extends TableAbstract {
 			'target_languages' => __( 'Target languages', 'translation-connectors' ),
 			'vendor_name'      => __( 'Vendor', 'translation-connectors' ),
 			'workflow_stages'  => __( 'Workflow stages', 'translation-connectors' ),
-			'auto_send'        => __( 'Auto send', 'translation-connectors' ),
-			'auto_update'      => __( 'Auto update', 'translation-connectors' ),
+			'auto_send'        => __( 'Auto submit new', 'translation-connectors' ),
+			'auto_update'      => __( 'Auto submit updated', 'translation-connectors' ),
 		];
 
 		return $columns;

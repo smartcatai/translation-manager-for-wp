@@ -97,7 +97,9 @@ class Utils {
 		$post_body = $post->post_content;
 
 		// Gutenberg fix for WP 4.9.* and lower.
-		if ( ! function_exists( 'has_blocks' ) || ! has_blocks( $post_id ) ) {
+		if ( function_exists( 'has_blocks' ) && ! has_blocks( $post_id ) ) {
+			$post_body = wpautop( $post_body );
+		} elseif ( ! function_exists( 'has_blocks' ) ) {
 			$post_body = wpautop( $post_body );
 		}
 
