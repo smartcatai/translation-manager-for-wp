@@ -96,7 +96,7 @@ class SendToSmartCAT extends CronAbstract {
 				} else {
 					SmartCAT::debug( "Creating '{$task_name}'" );
 
-					$smartcat_project = $smartcat->create_project( $file, $profile );
+					$smartcat_project = $smartcat->create_project( $task, $file, $profile );
 					$statistic_repository->link_to_smartcat_document( $task, $smartcat_project->getDocuments() );
 					$task->set_project_id( $smartcat_project->getId() );
 					$task_repository->save( $task );
