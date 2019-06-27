@@ -401,9 +401,9 @@ final class Ajax implements HookInterface {
 				$statistic->set_status( Statistics::STATUS_CANCELLED );
 				if ( $statistics_repo->save( $statistic ) ) {
 					$data['statistic'] = [
-						'status' => __( 'Cancelled', 'translation-connectors' ),
+						'status' => __( 'Canceled', 'translation-connectors' ),
 					];
-					$ajax_response->send_success( __( 'Item was successfully cancelled', 'translation-connectors' ), $data );
+					$ajax_response->send_success( __( 'Item was successfully canceled', 'translation-connectors' ), $data );
 				}
 			}
 		}
