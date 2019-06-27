@@ -43,10 +43,12 @@ class TaskRepository extends RepositoryAbstract {
 		$wpdb       = $this->get_wp_db();
 
 		$data = [
-			'sourceLanguage'  => $task->get_source_language(),
-			'targetLanguages' => serialize( $task->get_target_languages() ),
-			'projectID'       => $task->get_project_id(),
-			'profileID'       => intval( $task->get_profile_id() ),
+            'sourceLanguage'  => $task->get_source_language(),
+            'targetLanguages' => serialize( $task->get_target_languages() ),
+            'projectID'       => $task->get_project_id(),
+            'vendorID'        => $task->get_vendor_id(),
+            'workflowStages'  => wp_json_encode( $task->get_workflow_stages() ) ,
+            'profileID'       => intval( $task->get_profile_id() ),
 		];
 
 		if ( ! empty( $task->get_id() ) ) {
@@ -75,6 +77,8 @@ class TaskRepository extends RepositoryAbstract {
 				'sourceLanguage'  => $task->get_source_language(),
 				'targetLanguages' => serialize( $task->get_target_languages() ),
 				'projectID'       => $task->get_project_id(),
+                'vendorID'        => $task->get_vendor_id(),
+                'workflowStages'  => wp_json_encode( $task->get_workflow_stages() ) ,
 				'profileID'       => intval( $task->get_profile_id() ),
 			];
 
@@ -133,6 +137,14 @@ class TaskRepository extends RepositoryAbstract {
 		if ( isset( $row->profileID ) ) {
 			$result->set_profile_id( $row->profileID );
 		}
+
+        if ( isset( $row->vendorID ) ) {
+            $result->set_vendor_id( $row->vendorID );
+        }
+
+        if ( isset( $row->workflowStages ) ) {
+            $result->set_workflow_stages( json_decode( $row->workflowStages ) );
+        }
 
 		return $result;
 	}
