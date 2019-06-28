@@ -89,11 +89,10 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
     /**
      * @param Task $task
      * @param $file
-     * @param Profile $profile
      * @return ProjectModel
      * @throws \Exception
      */
-	public function create_project( $task, $file, $profile ) {
+	public function create_project( $task, $file ) {
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
 
@@ -109,11 +108,11 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		$project_model->setName( $this->get_task_name( $task ) );
 		$project_model->setSourceLanguage( $source_language );
 		$project_model->setTargetLanguages( $target_languages );
-		$project_model->setWorkflowStages( $profile->get_workflow_stages() );
+		$project_model->setWorkflowStages( $task->get_workflow_stages() );
 
-		if ( $profile->get_vendor() ) {
+		if ( $task->get_vendor_id() ) {
 			$project_model->setAssignToVendor( true );
-			$project_model->setVendorAccountIds( [ $profile->get_vendor() ] );
+			$project_model->setVendorAccountIds( [ $task->get_vendor_id() ] );
 		} else {
 			$project_model->setAssignToVendor( false );
 		}
@@ -235,7 +234,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		$filename  = basename( $meta_data['uri'] );
 
 		if ( ! $with_extension ) {
-			$filename = preg_replace( '/^( .* )\.( .*? )$/', '\1', $filename );
+			$filename = preg_replace( '/^(.*?)\.(.*?)$/', '\1', $filename );
 		}
 
 		return $filename;
