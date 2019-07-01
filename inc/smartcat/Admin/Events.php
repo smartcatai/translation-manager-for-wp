@@ -30,15 +30,15 @@ class Events implements HookInterface {
 
 	/**
 	 * @param int      $post_id Post id.
-	 * @param \WP_Post $post_before Post before changes.
 	 * @param \WP_Post $post_after Post after changes.
+	 * @param \WP_Post $post_before Post before changes.
 	 */
-	public static function post_update_hook( $post_id, $post_before, $post_after ) {
+	public static function post_update_hook( $post_id, $post_after, $post_before ) {
 		if ( ! in_array( $post_after->post_type, [ 'page', 'post' ], true ) ) {
 			return;
 		}
 
-		if ( 'publish' === $post_after->post_status && strpos( $post_before->post_status, 'draft' ) !== false ) {
+		if ( 'publish' === $post_after->post_status && ( strpos( $post_before->post_status, 'draft' ) !== false ) ) {
 			$is_created = true;
 		} elseif ( 'publish' === $post_after->post_status && 'publish' === $post_before->post_status ) {
 			if ( $post_after->post_title === $post_before->post_title && $post_after->post_content === $post_before->post_content ) {
