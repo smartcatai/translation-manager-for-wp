@@ -168,6 +168,7 @@ class StatisticsTable extends TableAbstract {
 		$actions = [
 			'bulk-cancel-' . $this->_args['plural'] => __( 'Cancel', 'translation-connectors' ),
 			'bulk-delete-' . $this->_args['plural'] => __( 'Delete', 'translation-connectors' ),
+            'bulk-sync-' . $this->_args['plural'] => __( 'Sync', 'translation-connectors' ),
 		];
 
 		return $actions;
@@ -204,11 +205,20 @@ class StatisticsTable extends TableAbstract {
 				foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
 					$statistic = $statistic_repo->get_one_by_id( $statistic_id );
 					if ( ! in_array( $statistic->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELLED ], true ) ) {
-						$statistic->set_status( 'cancelled' );
+						$statistic->set_status( 'canceled' );
 						$statistic_repo->save( $statistic );
 					}
 				}
 				break;
+            case 'bulk-sync-' . $this->_args['plural']:
+                foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
+                    $statistic = $statistic_repo->get_one_by_id( $statistic_id );
+                    if ( $statistic->get_target_post_id() ) {
+                        $statistic->set_status( Statistics::STATUS_SENDED );
+                        $statistic_repo->save( $statistic );
+                    }
+                }
+                break;
 		}
 	}
 
@@ -258,7 +268,7 @@ class StatisticsTable extends TableAbstract {
 					'check_update' => sprintf(
 						'<a href="javascript:void( 0 );" class="refresh_stat_button" data-bind="%d">%s</a>',
 						$item->get_id(),
-						__( 'Check updates', 'translation-connectors' )
+						__( 'Sync', 'translation-connectors' )
 					),
 				],
 				$actions
