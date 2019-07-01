@@ -251,10 +251,9 @@ jQuery(function ($) {
                 printSuccess(responseJSON.message);
                 var $td = element.closest("tr");
                 $td.hide('slow', function(){ $td.remove(); });
-
             },
             error: function (responseObject) {
-                var responseJSON = JSON.parse(responseText);
+                var responseJSON = JSON.parse(responseObject.responseText);
                 printError('An a error occurred: ' + responseJSON.message);
             }
         });
@@ -353,7 +352,6 @@ jQuery(function ($) {
                 }
             },
             error: function (responseObject) {
-                cl('ERROR');
                 var responseJSON = JSON.parse(responseObject.responseText);
                 printError(responseJSON.message);
             }
@@ -378,7 +376,7 @@ jQuery(function ($) {
 
             },
             error: function (responseObject) {
-                var responseJSON = JSON.parse(responseText);
+                var responseJSON = JSON.parse(responseObject.responseText);
                 printError('An a error occurred: ' + responseJSON.message);
             }
         });
@@ -406,7 +404,7 @@ jQuery(function ($) {
                 $td.hide('slow', function(){ $td.remove(); });
             },
             error: function (responseObject) {
-                var responseJSON = JSON.parse(responseText);
+                var responseJSON = JSON.parse(responseObject.responseText);
                 printError('An a error occurred: ' + responseJSON.message);
             }
         });
@@ -434,7 +432,7 @@ jQuery(function ($) {
                 element.closest("span").remove();
             },
             error: function (responseObject) {
-                var responseJSON = JSON.parse(responseText);
+                var responseJSON = JSON.parse(responseObject.responseText);
                 printError('An a error occurred: ' + responseJSON.message);
             }
         });
