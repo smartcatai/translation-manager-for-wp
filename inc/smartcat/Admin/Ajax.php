@@ -250,7 +250,7 @@ final class Ajax implements HookInterface {
 		}
 
 		if ( empty( $data['profile_target_langs'] ) ) {
-			$ajax_response->send_error( __( 'Target languages are empty', 'translation-connectors' ), [], 400 );
+			$ajax_response->send_error( __( 'Source language and target language are the same. Please select different languages.', 'translation-connectors' ), [], 400 );
 		}
 
 		$profile
