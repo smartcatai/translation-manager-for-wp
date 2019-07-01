@@ -18,7 +18,7 @@ use SmartCAT\WP\DB\Entity\Error;
  *
  * @method Error get_one_by_id( int $id )
  * @method Error[] get_all_by( array $criterias )
- * @method Error[] get_one_by( array $criterias )
+ * @method Error get_one_by( array $criterias )
  * @package SmartCAT\WP\DB\Repository
  */
 class ErrorRepository extends RepositoryAbstract {

@@ -16,25 +16,33 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\Helpers\SmartCAT;
 
-class CheckProjectsStatus extends CronAbstract
-{
-	public function get_interval()
-	{
+/**
+ * Class CheckProjectsStatus
+ *
+ * @package SmartCAT\WP\Cron
+ */
+class CheckProjectsStatus extends CronAbstract {
+	/**
+	 * @return mixed
+	 */
+	public function get_interval() {
 		$schedules['1m'] = [
 			'interval' => 60,
-			'display' => __( 'Every minute', 'translation-connectors' ),
+			'display'  => __( 'Every minute', 'translation-connectors' ),
 		];
 
 		return $schedules;
 	}
 
-	public function run()
-	{
-		if ( !SmartCAT::is_active() ) {
+	/**
+	 *
+	 */
+	public function run() {
+		if ( ! SmartCAT::is_active() ) {
 			return;
 		}
 
-		SmartCAT::debug( "Checking documents started" );
+		SmartCAT::debug( 'Checking documents started' );
 
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
@@ -46,14 +54,14 @@ class CheckProjectsStatus extends CronAbstract
 		$smartcat = $container->get( 'smartcat' );
 
 		$statistics = $statistic_repository->get_sended();
-		$count = count( $statistics );
+		$count      = count( $statistics );
 
 		SmartCAT::debug( "Finded $count documents to check" );
 
 		foreach ( $statistics as $statistic ) {
 			$document = $smartcat->getDocumentManager()->documentGet(
-				['documentId' => $statistic->get_document_id()]
-			 );
+				[ 'documentId' => $statistic->get_document_id() ]
+			);
 
 			$stages   = $document->getWorkflowStages();
 			$progress = 0;
@@ -63,12 +71,11 @@ class CheckProjectsStatus extends CronAbstract
 			}
 
 			$progress = round( $progress / count( $stages ), 2 );
-			$statistic->set_progress( $progress )
-				->set_words_count( $document->getWordsCount() );
+			$statistic->set_progress( $progress );
 
 			$statistic_repository->update( $statistic );
 		}
 
-		SmartCAT::debug( "Checking documents ended" );
+		SmartCAT::debug( 'Checking documents ended' );
 	}
 }

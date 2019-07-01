@@ -23,7 +23,7 @@ use SmartCAT\WP\Helpers\Language\LanguageConverter;
  *
  * @method Statistics get_one_by_id( int $id )
  * @method Statistics[] get_all_by( array $criterias )
- * @method Statistics[] get_one_by( array $criterias )
+ * @method Statistics get_one_by( array $criterias )
  * @method Statistics[] get_all( $from = 0, $limit = 0 )
  * @package SmartCAT\WP\DB\Repository
  */
@@ -112,7 +112,6 @@ class StatisticRepository extends RepositoryAbstract {
 			'sourceLanguage' => $statistic->get_source_language(),
 			'targetLanguage' => $statistic->get_target_language(),
 			'progress'       => $statistic->get_progress(),
-			'wordsCount'     => $statistic->get_words_count(),
 			'targetPostID'   => $statistic->get_target_post_id(),
 			'documentID'     => $statistic->get_document_id(),
 			'status'         => $statistic->get_status(),
@@ -146,7 +145,6 @@ class StatisticRepository extends RepositoryAbstract {
 			'sourceLanguage' => $statistic->get_source_language(),
 			'targetLanguage' => $statistic->get_target_language(),
 			'progress'       => $statistic->get_progress(),
-			'wordsCount'     => $statistic->get_words_count(),
 			'targetPostID'   => $statistic->get_target_post_id(),
 			'documentID'     => $statistic->get_document_id(),
 			'status'         => $statistic->get_status(),
@@ -230,10 +228,6 @@ class StatisticRepository extends RepositoryAbstract {
 			$result->set_progress( $row->progress );
 		}
 
-		if ( isset( $row->wordsCount ) ) {
-			$result->set_words_count( $row->wordsCount );
-		}
-
 		if ( isset( $row->targetPostID ) ) {
 			$result->set_target_post_id( $row->targetPostID );
 		}
@@ -254,12 +248,11 @@ class StatisticRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param array $persists
+	 * @param Statistics[] $persists
 	 *
 	 * @return mixed|void
 	 */
 	protected function do_flush( array $persists ) {
-		/* @var Statistics[] $persists */
 		foreach ( $persists as $stat ) {
 			if ( $stat instanceof Statistics ) {
 				if ( empty( $stat->get_id() ) ) {

@@ -18,7 +18,7 @@ use SmartCAT\WP\DB\Entity\Task;
  *
  * @method Task get_one_by_id( int $id )
  * @method Task[] get_all_by( array $criterias )
- * @method Task[] get_one_by( array $criterias )
+ * @method Task get_one_by( array $criterias )
  * @method Task[] get_all( $from = 0, $limit = 0 )
  * @package SmartCAT\WP\DB\Repository
  */

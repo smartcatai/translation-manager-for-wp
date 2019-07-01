@@ -72,7 +72,6 @@ class StatisticsTable extends TableAbstract {
 			'title'              => __( 'Title', 'translation-connectors' ),
 			'sourceLang'         => __( 'Source language', 'translation-connectors' ),
 			'targetLang'         => __( 'Target language', 'translation-connectors' ),
-			'wordsCount'         => __( 'Words count', 'translation-connectors' ),
 			'progress'           => __( 'Progress', 'translation-connectors' ),
 			'status'             => __( 'Status', 'translation-connectors' ),
 			'actions'            => __( 'Additional actions', 'translation-connectors' ),
@@ -114,8 +113,6 @@ class StatisticsTable extends TableAbstract {
 				return $language_converter->get_sc_code_by_wp( $item->get_source_language() )->get_wp_name();
 			case 'targetLang':
 				return $language_converter->get_sc_code_by_wp( $item->get_target_language() )->get_wp_name();
-			case 'wordsCount':
-				return ( ! empty( $item->get_words_count() ) ) ? $item->get_words_count() : '-';
 			case 'progress':
 				return $item->get_progress();
 			case 'status':

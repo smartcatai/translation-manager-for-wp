@@ -142,7 +142,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			$sc_documents
 		);
 
-		$index = array_search( $document_model->getFile()['fileName'], $sc_document_names );
+		$index = array_search( $document_model->getFile()['fileName'], $sc_document_names, true );
 
 		if ( false !== $index ) {
 			$document = $this->getDocumentManager()->documentUpdate(

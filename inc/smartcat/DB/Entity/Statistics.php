@@ -172,24 +172,6 @@ class Statistics {
 	/**
 	 * @return int
 	 */
-	public function get_words_count() {
-		return $this->words_count;
-	}
-
-	/**
-	 * @param int $words_count
-	 *
-	 * @return Statistics
-	 */
-	public function set_words_count( $words_count ) {
-		$this->words_count = $words_count;
-
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
 	public function get_target_post_id() {
 		return $this->target_post_ID;
 	}
