@@ -22,7 +22,7 @@ class Statistics {
 	const STATUS_SENDED    = 'sended';
 	const STATUS_EXPORT    = 'export';
 	const STATUS_COMPLETED = 'completed';
-	const STATUS_CANCELLED = 'cancelled';
+	const STATUS_CANCELLED = 'canceled';
 
 	/** @var  integer */
 	private $id;
@@ -58,7 +58,7 @@ class Statistics {
 			self::STATUS_SENDED    => __( 'In Progress', 'translation-connectors' ),
 			self::STATUS_EXPORT    => __( 'In Progress', 'translation-connectors' ),
 			self::STATUS_COMPLETED => __( 'Completed', 'translation-connectors' ),
-			self::STATUS_CANCELLED => __( 'Cancelled', 'translation-connectors' ),
+			self::STATUS_CANCELLED => __( 'Canceled', 'translation-connectors' ),
 		];
 	}
 	/**

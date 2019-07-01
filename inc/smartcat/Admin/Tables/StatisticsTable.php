@@ -204,7 +204,7 @@ class StatisticsTable extends TableAbstract {
 				foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
 					$statistic = $statistic_repo->get_one_by_id( $statistic_id );
 					if ( ! in_array( $statistic->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELLED ], true ) ) {
-						$statistic->set_status( 'cancelled' );
+						$statistic->set_status( 'canceled' );
 						$statistic_repo->save( $statistic );
 					}
 				}
