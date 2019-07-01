@@ -30,19 +30,22 @@ class Events implements HookInterface {
 
 	/**
 	 * @param int      $post_id Post id.
-	 * @param \WP_Post $post_before Post before changes.
 	 * @param \WP_Post $post_after Post after changes.
+	 * @param \WP_Post $post_before Post before changes.
 	 */
-	public static function post_update_hook( $post_id, $post_before, $post_after ) {
-		if ( wp_is_post_revision( $post_id ) || 'publish' !== $post_after->post_status ) {
-			return;
-		}
-
+	public static function post_update_hook( $post_id, $post_after, $post_before ) {
 		if ( ! in_array( $post_after->post_type, [ 'page', 'post' ], true ) ) {
 			return;
 		}
 
-		if ( $post_before->post_content === $post_after->post_content && $post_before->post_title === $post_after->post_title ) {
+		if ( 'publish' === $post_after->post_status && ( strpos( $post_before->post_status, 'draft' ) !== false ) ) {
+			$is_created = true;
+		} elseif ( 'publish' === $post_after->post_status && 'publish' === $post_before->post_status ) {
+			if ( $post_after->post_title === $post_before->post_title && $post_after->post_content === $post_before->post_content ) {
+				return;
+			}
+			$is_created = false;
+		} else {
 			return;
 		}
 
@@ -60,7 +63,11 @@ class Events implements HookInterface {
 			return;
 		}
 
-		$profiles = $profile_repository->get_all_by( [ 'auto_update' => true ] );
+		if ( $is_created ) {
+			$profiles = $profile_repository->get_all_by( [ 'auto_send' => true ] );
+		} else {
+			$profiles = $profile_repository->get_all_by( [ 'auto_update' => true ] );
+		}
 
 		foreach ( $profiles as $profile ) {
 			$source_language  = $profile->get_source_language();
@@ -77,6 +84,7 @@ class Events implements HookInterface {
 			$task
 				->set_source_language( $source_language )
 				->set_target_languages( $target_languages )
+				->set_profile_id( $profile->get_id() )
 				->set_project_id( null );
 			$task_id = $task_repository->add( $task );
 
@@ -117,70 +125,9 @@ class Events implements HookInterface {
 	}
 
 	/**
-	 * @param int      $post_id Post id.
-	 * @param \WP_Post $post Post.
-	 * @param bool     $is_update If true - update. If false - create.
-	 */
-	public static function post_create_hook( $post_id, $post, $is_update ) {
-		if ( $is_update ) {
-			return;
-		}
-
-		if ( wp_is_post_revision( $post_id ) || 'publish' !== get_post( $post_id )->post_status ) {
-			return;
-		}
-
-		$container = self::get_container();
-
-		try {
-			/** @var TaskRepository $task_repository */
-			$task_repository = $container->get( 'entity.repository.task' );
-			/** @var StatisticRepository $statistics_repository */
-			$statistics_repository = $container->get( 'entity.repository.statistic' );
-			/** @var ProfileRepository $profile_repository */
-			$profile_repository = $container->get( 'entity.repository.profile' );
-		} catch ( \Exception $e ) {
-			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
-			return;
-		}
-
-		$profiles = $profile_repository->get_all_by( [ 'auto_send' => true ] );
-
-		foreach ( $profiles as $profile ) {
-			$source_language  = $profile->get_source_language();
-			$target_languages = $profile->get_target_languages();
-
-			$task = new Task();
-			$task
-				->set_source_language( $source_language )
-				->set_target_languages( $target_languages )
-				->set_project_id( null );
-			$task_id = $task_repository->add( $task );
-
-			$stat = new Statistics();
-			$stat->set_task_id( $task_id )
-				->set_post_id( $post_id )
-				->set_source_language( $source_language )
-				->set_progress( 0 )
-				->set_words_count( null )
-				->set_target_post_id( null )
-				->set_document_id( null )
-				->set_status( Statistics::STATUS_NEW );
-
-			foreach ( $target_languages as $target_language ) {
-				$new_stat = clone $stat;
-				$new_stat->set_target_language( $target_language );
-				$statistics_repository->save( $new_stat );
-			}
-		}
-	}
-
-	/**
 	 * Register hooks function
 	 */
 	public function register_hooks() {
 		add_action( 'post_updated', [ self::class, 'post_update_hook' ], 10, 3 );
-		add_action( 'save_post_page', [ self::class, 'post_create_hook' ], 10, 3 );
-		add_action( 'save_post_post', [ self::class, 'post_create_hook' ], 10, 3 );
 	}
 }
