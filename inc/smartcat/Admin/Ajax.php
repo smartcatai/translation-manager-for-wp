@@ -250,7 +250,7 @@ final class Ajax implements HookInterface {
 		}
 
 		if ( empty( $data['profile_target_langs'] ) ) {
-			$ajax_response->send_error( __( 'Target languages are empty', 'translation-connectors' ), [], 400 );
+			$ajax_response->send_error( __( 'Source language and target language are the same. Please select different languages.', 'translation-connectors' ), [], 400 );
 		}
 
 		$profile
@@ -401,9 +401,9 @@ final class Ajax implements HookInterface {
 				$statistic->set_status( Statistics::STATUS_CANCELLED );
 				if ( $statistics_repo->save( $statistic ) ) {
 					$data['statistic'] = [
-						'status' => __( 'Cancelled', 'translation-connectors' ),
+						'status' => __( 'Canceled', 'translation-connectors' ),
 					];
-					$ajax_response->send_success( __( 'Item was successfully cancelled', 'translation-connectors' ), $data );
+					$ajax_response->send_success( __( 'Item was successfully canceled', 'translation-connectors' ), $data );
 				}
 			}
 		}
