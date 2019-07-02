@@ -53,6 +53,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			/** @var SmartCAT $smartcat */
 			$smartcat = $container->get( 'smartcat' );
 			$smartcat->getAccountManager()->accountGetAccountInfo();
+
 			return true;
 		} catch ( \Exception $e ) {
 			return false;
@@ -61,6 +62,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 
 	/**
 	 * @param $s
+	 *
 	 * @return mixed
 	 */
 	public static function filter_chars( $s ) {
@@ -86,12 +88,13 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		}
 	}
 
-    /**
-     * @param Task $task
-     * @param $file
-     * @return ProjectModel
-     * @throws \Exception
-     */
+	/**
+	 * @param Task $task
+	 * @param $file
+	 *
+	 * @return ProjectModel
+	 * @throws \Exception
+	 */
 	public function create_project( $task, $file ) {
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
@@ -144,7 +147,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			$sc_documents
 		);
 
-		$index = array_search( $document_model->getFile()['fileName'], $sc_document_names );
+		$index = array_search( $document_model->getFile()['fileName'], $sc_document_names, true );
 
 		if ( false !== $index ) {
 			$document = $this->getDocumentManager()->documentUpdate(
@@ -178,36 +181,41 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		return $document;
 	}
 
-    /**
-     * @param Task $task
-     * @throws \Exception
-     */
-    public function get_task_name( $task ) {
-        $titles = [];
-        /** @var StatisticRepository $statistic_repository */
-	    $statistic_repository = Connector::get_container()->get('entity.repository.statistic');
-	    $statistics = $statistic_repository->get_all_by( [ 'taskId' => $task->get_id() ] );
+	/**
+	 * @param Task $task
+	 *
+	 * @throws \Exception
+	 */
+	public function get_task_name( $task ) {
+		$titles = [];
+		/** @var StatisticRepository $statistic_repository */
+		$statistic_repository = Connector::get_container()->get( 'entity.repository.statistic' );
+		$statistics           = $statistic_repository->get_all_by( [ 'taskId' => $task->get_id() ] );
 
-        foreach ($statistics as $statistic) {
-            $post = get_post( $statistic->get_post_id() );
-            $titles[] = $post->post_title;
-	    }
+		foreach ( $statistics as $statistic ) {
+			$post     = get_post( $statistic->get_post_id() );
+			$titles[] = $post->post_title;
+		}
 
-        return substr( self::filter_chars( implode( ' ,', $titles ) ), 0, 94 );
-    }
+		$result = self::filter_chars( implode( ' ,', $titles ) );
+		$result = Utils::substr_unicode( $result, 0, 94 );
 
-    /**
-     * @param $file
-     * @param Statistics $statistic
-     * @return CreateDocumentPropertyWithFilesModel
-     * @throws Language\Exceptions\LanguageNotFoundException
-     */
+		return trim( $result );
+	}
+
+	/**
+	 * @param $file
+	 * @param Statistics $statistic
+	 *
+	 * @return CreateDocumentPropertyWithFilesModel
+	 * @throws Language\Exceptions\LanguageNotFoundException
+	 */
 	public function create_document( $file, $statistic ) {
 		$filename = self::get_task_name_from_stream( $file, true );
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
 
-		$target_language  = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
+		$target_language = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
 
 		$bilingual_file_import_settings = new BilingualFileImportSettingsModel();
 		$bilingual_file_import_settings
