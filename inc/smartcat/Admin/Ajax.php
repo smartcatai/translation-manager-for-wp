@@ -397,8 +397,8 @@ final class Ajax implements HookInterface {
 		if ( $data['stat_id'] ) {
 			$statistic = $statistics_repo->get_one_by_id( $data['stat_id'] );
 
-			if ( ! in_array( $statistic->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELLED ], true ) ) {
-				$statistic->set_status( Statistics::STATUS_CANCELLED );
+			if ( ! in_array( $statistic->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELED ], true ) ) {
+				$statistic->set_status( Statistics::STATUS_CANCELED );
 				if ( $statistics_repo->save( $statistic ) ) {
 					$data['statistic'] = [
 						'status' => __( 'Canceled', 'translation-connectors' ),
@@ -455,8 +455,8 @@ final class Ajax implements HookInterface {
 		$task->set_source_language( $profile->get_source_language() )
 			->set_target_languages( $profile->get_target_languages() )
 			->set_profile_id( $profile->get_id() )
-            ->set_vendor_id( $profile->get_vendor() ?? null)
-            ->set_workflow_stages( $profile->get_workflow_stages() )
+			->set_vendor_id( $profile->get_vendor() ?? null )
+			->set_workflow_stages( $profile->get_workflow_stages() )
 			->set_project_id( $profile->get_project_id() ?? null );
 
 		$task_id = $task_repository->add( $task );

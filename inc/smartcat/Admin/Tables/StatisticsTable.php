@@ -201,7 +201,7 @@ class StatisticsTable extends TableAbstract {
 			case 'bulk-cancel-' . $this->_args['plural']:
 				foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
 					$statistic = $statistic_repo->get_one_by_id( $statistic_id );
-					if ( ! in_array( $statistic->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELLED ], true ) ) {
+					if ( ! in_array( $statistic->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELED ], true ) ) {
 						$statistic->set_status( 'canceled' );
 						$statistic_repo->save( $statistic );
 					}
@@ -246,7 +246,7 @@ class StatisticsTable extends TableAbstract {
 			),
 		];
 
-		if ( ! in_array( $item->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELLED ], true ) ) {
+		if ( ! in_array( $item->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELED ], true ) ) {
 			$actions = array_merge(
 				[
 					'cancel' => sprintf(

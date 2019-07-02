@@ -73,14 +73,14 @@ class StatisticRepository extends RepositoryAbstract {
 	/**
 	 * @param $status string|array
 	 * @param array $documents
-	 * @return array
+	 * @return Statistics[]
 	 */
 	public function get_by_status( $status, array $documents = [] ) {
 		$table_name = $this->get_table_name();
 		$wpdb       = $this->get_wp_db();
 
 		if ( is_array( $status ) ) {
-			$status = implode( "', and status='", $status );
+			$status = implode( "', OR status='", $status );
 		}
 
 		$query = "SELECT * FROM $table_name WHERE status='$status'";
