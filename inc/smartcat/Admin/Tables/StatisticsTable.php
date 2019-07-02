@@ -95,6 +95,7 @@ class StatisticsTable extends TableAbstract {
 
 		/** @var LanguageConverter $language_converter */
 		$language_converter = $container->get( 'language.converter' );
+		$pll_languages      = $language_converter->get_polylang_names_to_locales();
 
 		switch ( $column_name ) {
 			case 'title':
@@ -110,9 +111,9 @@ class StatisticsTable extends TableAbstract {
 
 				return $title;
 			case 'sourceLang':
-				return $language_converter->get_sc_code_by_wp( $item->get_source_language() )->get_wp_name();
+				return $pll_languages[ $item->get_source_language() ] ?? $item->get_source_language();
 			case 'targetLang':
-				return $language_converter->get_sc_code_by_wp( $item->get_target_language() )->get_wp_name();
+				return $pll_languages[ $item->get_target_language() ] ?? $item->get_target_language();
 			case 'progress':
 				return $item->get_progress();
 			case 'status':
