@@ -184,7 +184,7 @@ final class Ajax implements HookInterface {
 					'status' => __( 'In progress', 'translation-connectors' ),
 				];
 
-				$ajax_response->send_success( __( 'Item successfully sended on update', 'translation-connectors' ), $data );
+				$ajax_response->send_success( __( 'Items have been successfully sent on update.', 'translation-connectors' ), $data );
 			}
 		}
 
@@ -498,7 +498,7 @@ final class Ajax implements HookInterface {
 		spawn_cron();
 
 		if ( $task_id ) {
-			$ajax_response->send_success( __( 'Items was successfully sended', 'translation-connectors' ), $data );
+			$ajax_response->send_success( __( 'Items have been successfully sent.', 'translation-connectors' ), $data );
 		} else {
 			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
 		}

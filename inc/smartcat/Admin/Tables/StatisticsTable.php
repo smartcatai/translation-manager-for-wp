@@ -68,13 +68,13 @@ class StatisticsTable extends TableAbstract {
 	 */
 	public function get_columns() {
 		$columns = [
-			'cb'                 => '<input type="checkbox" />',
-			'title'              => __( 'Title', 'translation-connectors' ),
-			'sourceLang'         => __( 'Source language', 'translation-connectors' ),
-			'targetLang'         => __( 'Target language', 'translation-connectors' ),
-			'progress'           => __( 'Progress', 'translation-connectors' ),
-			'status'             => __( 'Status', 'translation-connectors' ),
-			'actions'            => __( 'Additional actions', 'translation-connectors' ),
+			'cb'         => '<input type="checkbox" />',
+			'title'      => __( 'Title', 'translation-connectors' ),
+			'sourceLang' => __( 'Source language', 'translation-connectors' ),
+			'targetLang' => __( 'Target language', 'translation-connectors' ),
+			'progress'   => __( 'Progress', 'translation-connectors' ),
+			'status'     => __( 'Status', 'translation-connectors' ),
+			'actions'    => __( 'Additional actions', 'translation-connectors' ),
 		];
 
 		return $columns;
@@ -150,7 +150,7 @@ class StatisticsTable extends TableAbstract {
 			$message .= "<p><a href='{$url}' target='_blank'>" . __( 'Edit target post', 'translation-connectors' ) . '</a></p>';
 		}
 
-		if ( in_array( $status, [ 'sended', 'export', 'completed' ], true ) && ! empty( $item->get_document_id() ) ) {
+		if ( in_array( $status, [ Statistics::STATUS_SENDED, Statistics::STATUS_EXPORT, Statistics::STATUS_COMPLETED ], true ) && ! empty( $item->get_document_id() ) ) {
 			$url      = $utils->get_url_to_smartcat_by_document_id( $item->get_document_id() );
 			$message .= "<p><a href='{$url}' target='_blank'>" . __( 'Go to Smartcat', 'translation-connectors' ) . '</a></p>';
 		}
@@ -165,7 +165,7 @@ class StatisticsTable extends TableAbstract {
 		$actions = [
 			'bulk-cancel-' . $this->_args['plural'] => __( 'Cancel', 'translation-connectors' ),
 			'bulk-delete-' . $this->_args['plural'] => __( 'Delete', 'translation-connectors' ),
-            'bulk-sync-' . $this->_args['plural'] => __( 'Sync', 'translation-connectors' ),
+			'bulk-sync-' . $this->_args['plural']   => __( 'Sync', 'translation-connectors' ),
 		];
 
 		return $actions;
@@ -207,15 +207,15 @@ class StatisticsTable extends TableAbstract {
 					}
 				}
 				break;
-            case 'bulk-sync-' . $this->_args['plural']:
-                foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
-                    $statistic = $statistic_repo->get_one_by_id( $statistic_id );
-                    if ( $statistic->get_target_post_id() ) {
-                        $statistic->set_status( Statistics::STATUS_SENDED );
-                        $statistic_repo->save( $statistic );
-                    }
-                }
-                break;
+			case 'bulk-sync-' . $this->_args['plural']:
+				foreach ( $post[ $this->_args['plural'] ] as $statistic_id ) {
+					$statistic = $statistic_repo->get_one_by_id( $statistic_id );
+					if ( $statistic->get_target_post_id() ) {
+						$statistic->set_status( Statistics::STATUS_SENDED );
+						$statistic_repo->save( $statistic );
+					}
+				}
+				break;
 		}
 	}
 

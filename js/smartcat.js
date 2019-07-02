@@ -16,8 +16,12 @@ function notice( message, nclass = 'success') {
         var $p = $(document.createElement('p'));
         $p.html(message);
         $div.append($p);
-        $div.append('<button type="button" class="notice-dismiss" onclick="dismissById(\'' + id + '\')"><span class="screen-reader-text">Dismiss this notice.</span></button>');
+        $div.append(
+            '<button type="button" class="notice-dismiss" onclick="dismissById(\'' + id + '\')">'
+            + '<span class="screen-reader-text">' + SmartcatFrontend.dismissNotice + '</span></button>'
+        );
         $('hr.wp-header-end').first().after($div);
+        $("html, body").animate({ scrollTop: 0 }, "slow");
     });
 }
 
@@ -227,7 +231,7 @@ jQuery(function ($) {
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseObject.responseText);
-                printError('An a error occurred: ' + responseJSON.message);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
                 $('button.edit-profile-submit').prop('disabled', false);
                 $(".sc-spinner").hide();
             }
@@ -254,7 +258,7 @@ jQuery(function ($) {
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseObject.responseText);
-                printError('An a error occurred: ' + responseJSON.message);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
             }
         });
     }
@@ -292,7 +296,7 @@ jQuery(function ($) {
                 $this.parent().dialog('close');
                 $('button.sc-send-button').prop('disabled', false);
                 var responseJSON = JSON.parse(responseObject.responseText);
-                printError('An a error occurred: ' + responseJSON.message);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
                 $(".sc-spinner").hide();
             }
         });
@@ -377,7 +381,7 @@ jQuery(function ($) {
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseObject.responseText);
-                printError('An a error occurred: ' + responseJSON.message);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
             }
         });
     }
@@ -405,7 +409,7 @@ jQuery(function ($) {
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseObject.responseText);
-                printError('An a error occurred: ' + responseJSON.message);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
             }
         });
     }
@@ -433,7 +437,7 @@ jQuery(function ($) {
             },
             error: function (responseObject) {
                 var responseJSON = JSON.parse(responseObject.responseText);
-                printError('An a error occurred: ' + responseJSON.message);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
             }
         });
     }
