@@ -54,12 +54,15 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 		$container    = Connector::get_container();
 		$param_prefix = $container->getParameter( 'plugin.table.prefix' );
 
-		$tasks_table_name = $this->prefix . 'smartcat_connector_tasks';
+		$tasks_table_name     = $this->prefix . 'smartcat_connector_tasks';
+		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
+
 		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN profileID BIGINT( 20 ) UNSIGNED NOT NULL;" );
 		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN vendorID VARCHAR (255) DEFAULT NULL;" );
 		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN workflowStages VARCHAR (255) DEFAULT NULL;" );
 		$this->exec( "ALTER TABLE {$tasks_table_name} DROP COLUMN postID;" );
 		$this->exec( "ALTER TABLE {$tasks_table_name} DROP COLUMN status;" );
+		$this->exec( "ALTER TABLE {$statistic_table_name} DROP COLUMN wordsCount;" );
 
 		if ( get_option( $param_prefix . 'smartcat_workflow_stages', false ) ) {
 			/** @var ProfileRepository $profile_repo */

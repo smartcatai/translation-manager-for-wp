@@ -11,20 +11,27 @@
 
 namespace SmartCAT\WP\Cron;
 
-/** Отчистка удаленных проектов */
-class ClearDeletedProject extends CronAbstract
-{
-
+/**
+ * Class ClearDeletedProject
+ *
+ * @package SmartCAT\WP\Cron
+ */
+class ClearDeletedProject extends CronAbstract {
+	/**
+	 * @return mixed
+	 */
 	public function get_interval() {
 		$schedules['daily'] = [
 			'interval' => DAY_IN_SECONDS,
-			'display'  => __( 'Once Daily', 'translation-connectors' )
+			'display'  => __( 'Once Daily', 'translation-connectors' ),
 		];
 
 		return $schedules;
 	}
 
-	public function run()
-	{
+	/**
+	 *
+	 */
+	public function run() {
 	}
 }

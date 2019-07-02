@@ -468,7 +468,6 @@ final class Ajax implements HookInterface {
 					->set_post_id( $post_id )
 					->set_source_language( $profile->get_source_language() )
 					->set_progress( 0 )
-					->set_words_count( null )
 					->set_target_post_id( null )
 					->set_document_id( null )
 					->set_status( Statistics::STATUS_NEW );

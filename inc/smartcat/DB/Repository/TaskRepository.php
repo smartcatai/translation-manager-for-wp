@@ -18,7 +18,7 @@ use SmartCAT\WP\DB\Entity\Task;
  *
  * @method Task get_one_by_id( int $id )
  * @method Task[] get_all_by( array $criterias )
- * @method Task[] get_one_by( array $criterias )
+ * @method Task get_one_by( array $criterias )
  * @method Task[] get_all( $from = 0, $limit = 0 )
  * @package SmartCAT\WP\DB\Repository
  */
@@ -36,6 +36,7 @@ class TaskRepository extends RepositoryAbstract {
 
 	/**
 	 * @param Task $task
+	 *
 	 * @return bool|int
 	 */
 	public function add( $task ) {
@@ -43,12 +44,12 @@ class TaskRepository extends RepositoryAbstract {
 		$wpdb       = $this->get_wp_db();
 
 		$data = [
-            'sourceLanguage'  => $task->get_source_language(),
-            'targetLanguages' => serialize( $task->get_target_languages() ),
-            'projectID'       => $task->get_project_id(),
-            'vendorID'        => $task->get_vendor_id(),
-            'workflowStages'  => wp_json_encode( $task->get_workflow_stages() ) ,
-            'profileID'       => intval( $task->get_profile_id() ),
+			'sourceLanguage'  => $task->get_source_language(),
+			'targetLanguages' => serialize( $task->get_target_languages() ),
+			'projectID'       => $task->get_project_id(),
+			'vendorID'        => $task->get_vendor_id(),
+			'workflowStages'  => wp_json_encode( $task->get_workflow_stages() ),
+			'profileID'       => intval( $task->get_profile_id() ),
 		];
 
 		if ( ! empty( $task->get_id() ) ) {
@@ -57,6 +58,7 @@ class TaskRepository extends RepositoryAbstract {
 
 		if ( $wpdb->insert( $table_name, $data ) ) {
 			$task->set_id( $wpdb->insert_id );
+
 			return $wpdb->insert_id;
 		}
 
@@ -77,8 +79,8 @@ class TaskRepository extends RepositoryAbstract {
 				'sourceLanguage'  => $task->get_source_language(),
 				'targetLanguages' => serialize( $task->get_target_languages() ),
 				'projectID'       => $task->get_project_id(),
-                'vendorID'        => $task->get_vendor_id(),
-                'workflowStages'  => wp_json_encode( $task->get_workflow_stages() ) ,
+				'vendorID'        => $task->get_vendor_id(),
+				'workflowStages'  => wp_json_encode( $task->get_workflow_stages() ),
 				'profileID'       => intval( $task->get_profile_id() ),
 			];
 
@@ -138,13 +140,13 @@ class TaskRepository extends RepositoryAbstract {
 			$result->set_profile_id( $row->profileID );
 		}
 
-        if ( isset( $row->vendorID ) ) {
-            $result->set_vendor_id( $row->vendorID );
-        }
+		if ( isset( $row->vendorID ) ) {
+			$result->set_vendor_id( $row->vendorID );
+		}
 
-        if ( isset( $row->workflowStages ) ) {
-            $result->set_workflow_stages( json_decode( $row->workflowStages ) );
-        }
+		if ( isset( $row->workflowStages ) ) {
+			$result->set_workflow_stages( json_decode( $row->workflowStages ) );
+		}
 
 		return $result;
 	}
