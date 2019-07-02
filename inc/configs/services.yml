@@ -38,7 +38,7 @@ services:
     tags: [queue]
 
   core.admin.columns:
-    class: SmartCAT\WP\Admin\Columns
+    class: SmartCAT\WP\Admin\AdditionalActions
     tags: [hook]
 
   core.admin.settings:
