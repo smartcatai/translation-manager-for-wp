@@ -21,6 +21,7 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Entity\Task;
+use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
 
 /**
@@ -52,6 +53,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			/** @var SmartCAT $smartcat */
 			$smartcat = $container->get( 'smartcat' );
 			$smartcat->getAccountManager()->accountGetAccountInfo();
+
 			return true;
 		} catch ( \Exception $e ) {
 			return false;
@@ -60,6 +62,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 
 	/**
 	 * @param $s
+	 *
 	 * @return mixed
 	 */
 	public static function filter_chars( $s ) {
@@ -86,31 +89,33 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	}
 
 	/**
+	 * @param Task $task
 	 * @param $file
-	 * @param Profile $profile
+	 *
 	 * @return ProjectModel
+	 * @throws \Exception
 	 */
-	public function create_project( $file, $profile ) {
+	public function create_project( $task, $file ) {
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
 
-		$source_language  = $language_converter->get_sc_code_by_wp( $profile->get_source_language() )->get_sc_code();
+		$source_language  = $language_converter->get_sc_code_by_wp( $task->get_source_language() )->get_sc_code();
 		$target_languages = array_map(
 			function ( $language ) use ( $language_converter ) {
 				return $language_converter->get_sc_code_by_wp( $language )->get_sc_code();
 			},
-			$profile->get_target_languages()
+			$task->get_target_languages()
 		);
 
 		$project_model = new CreateProjectWithFilesModel();
-		$project_model->setName( self::filter_chars( self::get_task_name_from_stream( $file ) ) );
+		$project_model->setName( $this->get_task_name( $task ) );
 		$project_model->setSourceLanguage( $source_language );
 		$project_model->setTargetLanguages( $target_languages );
-		$project_model->setWorkflowStages( $profile->get_workflow_stages() );
+		$project_model->setWorkflowStages( $task->get_workflow_stages() );
 
-		if ( $profile->get_vendor() ) {
+		if ( $task->get_vendor_id() ) {
 			$project_model->setAssignToVendor( true );
-			$project_model->setVendorAccountIds( [ $profile->get_vendor() ] );
+			$project_model->setVendorAccountIds( [ $task->get_vendor_id() ] );
 		} else {
 			$project_model->setAssignToVendor( false );
 		}
@@ -177,16 +182,40 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	}
 
 	/**
+	 * @param Task $task
+	 *
+	 * @throws \Exception
+	 */
+	public function get_task_name( $task ) {
+		$titles = [];
+		/** @var StatisticRepository $statistic_repository */
+		$statistic_repository = Connector::get_container()->get( 'entity.repository.statistic' );
+		$statistics           = $statistic_repository->get_all_by( [ 'taskId' => $task->get_id() ] );
+
+		foreach ( $statistics as $statistic ) {
+			$post     = get_post( $statistic->get_post_id() );
+			$titles[] = $post->post_title;
+		}
+
+		$result = self::filter_chars( implode( ' ,', $titles ) );
+		$result = Utils::substr_unicode( $result, 0, 94 );
+
+		return trim( $result );
+	}
+
+	/**
 	 * @param $file
 	 * @param Statistics $statistic
+	 *
 	 * @return CreateDocumentPropertyWithFilesModel
+	 * @throws Language\Exceptions\LanguageNotFoundException
 	 */
 	public function create_document( $file, $statistic ) {
 		$filename = self::get_task_name_from_stream( $file, true );
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
 
-		$target_language  = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
+		$target_language = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
 
 		$bilingual_file_import_settings = new BilingualFileImportSettingsModel();
 		$bilingual_file_import_settings
@@ -213,7 +242,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		$filename  = basename( $meta_data['uri'] );
 
 		if ( ! $with_extension ) {
-			$filename = preg_replace( '/^( .* )\.( .*? )$/', '\1', $filename );
+			$filename = preg_replace( '/^(.*?)\.(.*?)$/', '\1', $filename );
 		}
 
 		return $filename;
