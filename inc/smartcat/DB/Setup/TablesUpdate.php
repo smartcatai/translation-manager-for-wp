@@ -54,10 +54,15 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 		$container    = Connector::get_container();
 		$param_prefix = $container->getParameter( 'plugin.table.prefix' );
 
-		$tasks_table_name = $this->prefix . 'smartcat_connector_tasks';
+		$tasks_table_name     = $this->prefix . 'smartcat_connector_tasks';
+		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
+
 		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN profileID BIGINT( 20 ) UNSIGNED NOT NULL;" );
+		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN vendorID VARCHAR (255) DEFAULT NULL;" );
+		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN workflowStages VARCHAR (255) DEFAULT NULL;" );
 		$this->exec( "ALTER TABLE {$tasks_table_name} DROP COLUMN postID;" );
 		$this->exec( "ALTER TABLE {$tasks_table_name} DROP COLUMN status;" );
+		$this->exec( "ALTER TABLE {$statistic_table_name} DROP COLUMN wordsCount;" );
 
 		if ( get_option( $param_prefix . 'smartcat_workflow_stages', false ) ) {
 			/** @var ProfileRepository $profile_repo */
@@ -89,10 +94,13 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 			if ( $project_id ) {
 				$profile->set_project_id( $project_id );
-			}
+                $this->exec( "UPDATE {$tasks_table_name} SET vendorID = '{$project_id}' WHERE vendorID IS NULL;" );
+            }
 
 			$profile_repo->add( $profile );
+            $workflow_stages = wp_json_encode( get_option( $param_prefix . 'smartcat_workflow_stages' ) );
 			$this->exec( "UPDATE {$tasks_table_name} SET profileID = 1 WHERE profileID IS NULL;" );
+			$this->exec( "UPDATE {$tasks_table_name} SET workflowStages = '{$workflow_stages}' WHERE workflowStages IS NULL;" );
 			delete_option( $param_prefix . 'smartcat_workflow_stages' );
 			delete_option( $param_prefix . 'smartcat_vendor_id' );
 			delete_option( $param_prefix . 'smartcat_account_name' );

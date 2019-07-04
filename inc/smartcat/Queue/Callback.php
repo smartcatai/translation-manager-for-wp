@@ -46,7 +46,6 @@ class Callback extends QueueAbstract {
 
 				$progress = round( $progress / count( $stages ), 2 );
 				$statistics->set_progress( $progress )
-						   ->set_words_count( $document->getWordsCount() )
 						   ->set_error_count( 0 );
 
 				SmartCAT::debug( "[Callback] Set statistics config for '{$statistics->get_id()}'" );

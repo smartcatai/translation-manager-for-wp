@@ -11,12 +11,10 @@
 
 namespace SmartCAT\WP\Cron;
 
-interface CronInterface
-{
+interface CronInterface {
 	/** Получение информации об интервале выполнения задачи */
 	public function get_interval();
 
 	/** Код задачи */
 	public function run();
-
 }

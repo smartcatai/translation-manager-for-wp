@@ -22,7 +22,7 @@ class Statistics {
 	const STATUS_SENDED    = 'sended';
 	const STATUS_EXPORT    = 'export';
 	const STATUS_COMPLETED = 'completed';
-	const STATUS_CANCELLED = 'canceled';
+	const STATUS_CANCELED  = 'canceled';
 
 	/** @var  integer */
 	private $id;
@@ -37,9 +37,7 @@ class Statistics {
 	/** @var  float */
 	private $progress;
 	/** @var  integer */
-	private $words_count;
-	/** @var  integer */
-	private $target_post_ID;
+	private $target_post_id;
 	/** @var  string */
 	private $document_id;
 	/** @var  string */
@@ -58,7 +56,7 @@ class Statistics {
 			self::STATUS_SENDED    => __( 'In Progress', 'translation-connectors' ),
 			self::STATUS_EXPORT    => __( 'In Progress', 'translation-connectors' ),
 			self::STATUS_COMPLETED => __( 'Completed', 'translation-connectors' ),
-			self::STATUS_CANCELLED => __( 'Canceled', 'translation-connectors' ),
+			self::STATUS_CANCELED  => __( 'Canceled', 'translation-connectors' ),
 		];
 	}
 	/**
@@ -172,35 +170,17 @@ class Statistics {
 	/**
 	 * @return int
 	 */
-	public function get_words_count() {
-		return $this->words_count;
-	}
-
-	/**
-	 * @param int $words_count
-	 *
-	 * @return Statistics
-	 */
-	public function set_words_count( $words_count ) {
-		$this->words_count = $words_count;
-
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
 	public function get_target_post_id() {
-		return $this->target_post_ID;
+		return $this->target_post_id;
 	}
 
 	/**
-	 * @param int $target_post_ID
+	 * @param int $target_post_id
 	 *
 	 * @return Statistics
 	 */
-	public function set_target_post_id( $target_post_ID ) {
-		$this->target_post_ID = $target_post_ID;
+	public function set_target_post_id( $target_post_id ) {
+		$this->target_post_id = $target_post_id;
 
 		return $this;
 	}
@@ -269,5 +249,4 @@ class Statistics {
 
 		return $this;
 	}
-
 }

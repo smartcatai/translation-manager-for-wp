@@ -32,6 +32,50 @@ class Task {
 	/** @var  string */
 	private $project_id = null;
 
+    /** @var  array */
+	private $workflow_stages;
+
+    /** @var  string */
+    private $vendor_id;
+
+    /**
+     * @return array
+     */
+    public function get_workflow_stages()
+    {
+        return $this->workflow_stages;
+    }
+
+    /**
+     * @param array $workflow_stages
+     * @return Task
+     */
+    public function set_workflow_stages($workflow_stages)
+    {
+        $this->workflow_stages = $workflow_stages;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_vendor_id()
+    {
+        return $this->vendor_id;
+    }
+
+    /**
+     * @param string $vendor_id
+     * @return Task
+     */
+    public function set_vendor_id($vendor_id)
+    {
+        $this->vendor_id = $vendor_id;
+
+        return $this;
+    }
+
 	/**
 	 * @return int
 	 */

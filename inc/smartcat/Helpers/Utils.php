@@ -128,4 +128,18 @@ class Utils {
 	public static function get_plugin_version() {
 		return get_option( 'smartcat_connector_smartcat_db_version', 0 );
 	}
+
+	/**
+	 * @param $str
+	 * @param $start
+	 * @param null $length
+	 *
+	 * @return string
+	 */
+	public static function substr_unicode( $str, $start, $length = null ) {
+		return join(
+			'',
+			array_slice( preg_split( '//u', $str, -1, PREG_SPLIT_NO_EMPTY ), $start, $length )
+		);
+	}
 }
