@@ -1,4 +1,13 @@
 <?php
+/**
+ * Smartcat Translation Manager for WordPress
+ *
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
+ */
 
 namespace SmartCAT\WP;
 
@@ -26,8 +35,9 @@ trait DITrait {
 
 		$loader->load( 'autoload.yml' );
 		$config_files = $container->getParameter( 'config.files' );
-		foreach ( $config_files as $configFile ) {
-			$loader->load( $configFile );
+
+		foreach ( $config_files as $config_file ) {
+			$loader->load( $config_file );
 		}
 
 		self::$container_instance = $container;
@@ -37,15 +47,16 @@ trait DITrait {
 	 * Extracts mixed from container
 	 *
 	 * @param string $id
-	 * @param bool $isParam
+	 * @param bool $is_param
 	 *
 	 * @return mixed
+	 * @throws \Exception
 	 */
-	protected function from_container( $id, $isParam = false ) {
+	protected function from_container( $id, $is_param = false ) {
 		$container = self::get_container();
 		$content   = null;
 
-		if ( $isParam ) {
+		if ( $is_param ) {
 			$content = $container->getParameter( $id );
 		} else {
 			$content = $container->get( $id );

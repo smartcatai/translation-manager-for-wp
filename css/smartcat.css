@@ -3,36 +3,36 @@
  */
 #smartcat-modal-window table,
 #smartcat-modal-window form {
-	width: 100%;
+    width: 100%;
 }
 
 #smartcat-modal-window table {
-	border-collapse: collapse;
+    border-collapse: collapse;
 }
 
 #smartcat-modal-window form > div:first-child {
-	max-height: 600px;
-	overflow-y: scroll;
+    max-height: 600px;
+    overflow-y: scroll;
 }
 
 #smartcat-modal-window select {
-	padding: 2px;
-	line-height: 28px;
-	height: 28px;
-	max-width: 200px;
+    padding: 2px;
+    line-height: 28px;
+    height: 28px;
+    max-width: 200px;
 }
 
 #smartcat-modal-window form input[type="submit"] {
-	display: block;
+    display: block;
 }
 
 #smartcat-modal-window table tr td:first-child {
-	width: 50%;
+    width: 50%;
 }
 
 #smartcat-modal-window table thead tr td {
-	font-weight: bold;
-	border-bottom: 1px solid #aaa;
+    font-weight: bold;
+    border-bottom: 1px solid #aaa;
 }
 
 /*
@@ -40,69 +40,69 @@
  */
 
 #smartcat-modal-window .sc-select-language-block {
-	margin: 15px 0;
+    margin: 15px 0;
 }
 
 #smartcat-modal-window .sc-select-language-block > div {
-	font-size: 13px;
+    font-size: 13px;
 }
 
 #smartcat-modal-window .add-language:hover,
 #smartcat-modal-window .remove-language:hover {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 #smartcat-modal-window .remove-language,
 #smartcat-modal-window .add-language {
-	font-weight: bold;
-	text-align: center;
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	-webkit-border-radius: 20px;
-	-moz-border-radius: 20px;
-	border-radius: 20px;
-	vertical-align: middle;
-	margin-left: 15px;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    vertical-align: middle;
+    margin-left: 15px;
 }
 
 #smartcat-modal-window .remove-language {
-	background-color: red;
-	color: white;
+    background-color: red;
+    color: white;
 }
 
 #smartcat-modal-window .remove-language:after,
 #smartcat-modal-window .add-language:after {
-	vertical-align: 50%;
-	font-size: 20px;
-	line-height: 20px;
+    vertical-align: 50%;
+    font-size: 20px;
+    line-height: 20px;
 }
 
 #smartcat-modal-window .remove-language:after {
-	content: '-';
+    content: '-';
 }
 
 #smartcat-modal-window .add-language:after {
-	content: '+';
+    content: '+';
 }
 
 #smartcat-modal-window .add-language {
-	background-color: green;
-	color: white;
+    background-color: green;
+    color: white;
 }
 
 #smartcat-modal-window .smartcat-source-language-error,
 #smartcat-modal-window .smartcat-target-language-error {
-	background: #fff;
-	-webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-	margin: 5px 15px 2px;
-	padding: 1px 12px;
-	border-left: 4px solid #fffc28;
+    background: #fff;
+    -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+    margin: 5px 15px 2px;
+    padding: 1px 12px;
+    border-left: 4px solid #fffc28;
 }
 
 #smartcat-modal-window .smartcat-source-language-error {
-	display: none;
+    display: none;
 }
 
 /*
@@ -110,70 +110,58 @@
  */
 
 .shake-shake-baby {
-	animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
-	transform: translate3d(0, 0, 0);
-	backface-visibility: hidden;
-	perspective: 1000px;
+    animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
 }
 
 @keyframes shake {
-	10%, 90% {
-		transform: translate3d(-1px, 0, 0);
-	}
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
 
-	20%, 80% {
-		transform: translate3d(2px, 0, 0);
-	}
+    20%, 80% {
+        transform: translate3d(2px, 0, 0);
+    }
 
-	30%, 50%, 70% {
-		transform: translate3d(-4px, 0, 0);
-	}
+    30%, 50%, 70% {
+        transform: translate3d(-4px, 0, 0);
+    }
 
-	40%, 60% {
-		transform: translate3d(4px, 0, 0);
-	}
+    40%, 60% {
+        transform: translate3d(4px, 0, 0);
+    }
 }
 
-/*
- * Страница статистики
- */
-
-.smartcat-connector table {
-	width: 100%;
+table.wp-list-table.errors #id {
+    width: 5%;
 }
 
-.smartcat-connector table thead tr td {
-	font-weight: bold;
-	border-bottom: 1px solid #aaa;
-	background-color: white;
+table.wp-list-table.errors #date {
+    width: 10%;
 }
 
-.smartcat-connector table tr:nth-child(even) {
-	background-color: white;
+table.wp-list-table.errors #type {
+    width: 5%;
 }
 
-.smartcat-connector table tr:nth-child(odd) {
-	background-color: #fafafa;
+table.wp-list-table.errors #shortMessage {
+    width: 30%;
 }
 
-.smartcat-connector .pagination {
-	margin: 20px 0;
+table.wp-list-table.errors #message {
+    width: auto;
 }
 
-.smartcat-connector .pagination span:first-child {
-	font-weight: bold;
-	display: inline-block;
-	padding-right: 5px;
-}
-
-.wrap .page-title-action:disabled:hover {
-	border-color: #ccc;
-	background: #f7f7f7;
-	color: #ccc;
-}
-
-.wrap .page-title-action:disabled {
-	border-color: #ccc;
-	background: #f7f7f7;
-	color: #ccc;
+.sc-spinner {
+    background: url('/wp-admin/images/wpspin_light.gif') no-repeat;
+    background-size: 16px 16px;
+    display: none;
+    float: left;
+    opacity: .7;
+    filter: alpha(opacity=70);
+    width: 16px;
+    height: 16px;
+    margin: 5px 5px 0;
 }

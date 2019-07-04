@@ -1,16 +1,18 @@
 <?php
-///**
-// * Created by PhpStorm.
-// * User: Diversant_
-// * Date: 01.09.2017
-// * Time: 22:14
-// */
-//
+/**
+ * Smartcat Translation Manager for WordPress
+ *
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
+ */
 
 $resDir = __DIR__ . '/../../translation-connectors-svn';
 
-if (!is_dir("$resDir/trunk") || !is_dir("$resDir/tags")) {
-    die("SVN dir not found");
+if ( !is_dir( "$resDir/trunk" ) || !is_dir( "$resDir/tags" ) ) {
+	die( "SVN dir not found" );
 }
 
 function rrmdir( $path, $t = "1" ) {
@@ -64,7 +66,7 @@ function rcopy( $src, $dst ) {
 
 function copyFiles( $sourceDir, $destDir ) {
 	$dir_iterator = new RecursiveDirectoryIterator( $sourceDir );
-	$iterator     = new RecursiveIteratorIterator( $dir_iterator, RecursiveIteratorIterator::SELF_FIRST );
+	$iterator	 = new RecursiveIteratorIterator( $dir_iterator, RecursiveIteratorIterator::SELF_FIRST );
 
 	foreach ( $iterator as $file ) {
 		$pathInfo = pathinfo( $file );
@@ -78,18 +80,17 @@ function fileReplace( $search, $replace, $file ) {
 	$content = file_get_contents( $file );
 	$content = str_replace( $search, $replace, $content );
 	file_put_contents( $file, $content );
-
 }
 
 //Получаем версию из readme.txt
 $readme = file_get_contents( __DIR__ . '/../readme.txt' );
-$re     = '/Stable tag:\s*(\d+\.\d+\.\d+)\s*\n/';
+$re	 = '/Stable tag:\s*( \d+\.\d+\.\d+ )\s*\n/';
 preg_match( $re, $readme, $matches );
 $readmeVersion = $matches[1] ?? 'readme';
 
 //Получаем версию из translation-connectors.php
 $plugin = file_get_contents( __DIR__ . '/../translation-connectors.php' );
-$re     = '/Version:\s*(\d+\.\d+\.\d+)\s*\n/';
+$re	 = '/Version:\s*( \d+\.\d+\.\d+ )\s*\n/';
 preg_match( $re, $plugin, $matches );
 $pluginVersion = $matches[1] ?? 'plugin';
 
@@ -100,12 +101,12 @@ if ( $readmeVersion !== $pluginVersion ) {
 $version = $readmeVersion;
 
 //Проверяем присутсвие Changelog для текущей версии
-$re = '/= (.+) =/';
+$re = '/= ( .+ ) =/';
 preg_match_all( $re, $readme, $matches, PREG_SET_ORDER, 0 );
 
 $find = false;
 foreach ( $matches as $match ) {
-	if ((strpos($match[1], "$version ") !==false) && (strlen($version) <= strlen($match[1]))) {
+	if ( ( strpos( $match[1], "$version " ) !==false ) && ( strlen( $version ) <= strlen( $match[1] ) ) ) {
 		$find = true;
 		break;
 	}
@@ -151,7 +152,7 @@ $rmDirs = [
 ];
 
 chdir( __DIR__ . "/.." );
-//exec('composer update --no-dev');
+//exec( 'composer update --no-dev' );
 
 if ( ! file_exists( "$resDir/trunk" ) ) {
 	mkdir( "$resDir/trunk", 0777, true );
@@ -159,14 +160,14 @@ if ( ! file_exists( "$resDir/trunk" ) ) {
 
 chdir( "$resDir" );
 
-echo('=== 15% Updating svn to latest version ===' . PHP_EOL);
-exec('svn up');
+echo( '=== 15% Updating svn to latest version ===' . PHP_EOL );
+exec( 'svn up' );
 
-if (is_dir("$resDir/tags/$version")) {
-	die('ERROR: This version already exists!');
+if ( is_dir( "$resDir/tags/$version" ) ) {
+	die( 'ERROR: This version already exists!' );
 }
 
-echo('=== 30% Copy files ===' . PHP_EOL);
+echo( '=== 30% Copy files ===' . PHP_EOL );
 foreach ( $copyFiles as $file ) {
 	copy( __DIR__ . "/../$file", "$resDir/trunk/$file" );
 }
@@ -176,20 +177,20 @@ foreach ( $copyDirs as $dir ) {
 }
 
 foreach ( $rmDirs as $dir ) {
-	exec( "svn --force rm " . "$resDir/trunk/$dir");
+	exec( "svn --force rm " . "$resDir/trunk/$dir" );
 	rrmdir( "$resDir/trunk/$dir" );
 }
 
-echo('=== 45% Delete files from svn ===' . PHP_EOL);
-exec("svn status | grep '^!' | awk '{print $2}' | xargs svn delete");
+echo( '=== 45% Delete files from svn ===' . PHP_EOL );
+exec( "svn status | grep '^!' | awk '{print $2}' | xargs svn delete" );
 
-echo('=== 60% Adding files to snv ===' . PHP_EOL);
+echo( '=== 60% Adding files to snv ===' . PHP_EOL );
 exec( "svn --force --depth infinity add ." );
 
-echo('=== 75% Commiting changes ===' . PHP_EOL);
+echo( '=== 75% Commiting changes ===' . PHP_EOL );
 exec( "svn commit -m \"$message\"" );
 
-echo('=== 90% Create new version ===' . PHP_EOL);
+echo( '=== 90% Create new version ===' . PHP_EOL );
 if ( ! file_exists( "$resDir/tags/$version" ) ) {
 	mkdir( "$resDir/tags/$version", 0777, true );
 }
@@ -197,4 +198,4 @@ if ( ! file_exists( "$resDir/tags/$version" ) ) {
 exec( "svn --force --depth infinity add ." );
 exec( "svn cp trunk/* tags/$version" );
 exec( "svn commit  -m \"$message\"" );
-echo('=== 100% Done ===' . PHP_EOL);
+echo( '=== 100% Done ===' . PHP_EOL );

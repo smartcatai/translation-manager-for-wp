@@ -1,9 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 09.08.2017
- * Time: 15:57
+ * Smartcat Translation Manager for WordPress
+ *
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
  */
 
 namespace SmartCAT\WP\Helpers;
@@ -12,32 +15,87 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Error;
 use SmartCAT\WP\DB\Repository\ErrorRepository;
 
+/**
+ * Class Logger
+ *
+ * @package SmartCAT\WP\Helpers
+ */
 class Logger {
-	private static function add_record(string $type, string $shortMessage, string $message = '') {
-		$container = Connector::get_container();
+	const TYPE_INFO    = 'info';
+	const TYPE_WARNING = 'warning';
+	const TYPE_ERROR   = 'error';
 
-		/** @var ErrorRepository $repository */
-		$repository = $container->get('entity.repository.error');
-		
-		SmartCAT::debug("[{$type}] {$message}");
+	/**
+	 * Add message handler
+	 *
+	 * @param string $type Set message type.
+	 * @param string $short_message Set short message.
+	 * @param string $message Set message.
+	 */
+	private static function add_record( $type, $short_message, $message = '' ) {
+		$error      = new Error();
+		$repository = self::get_error_repository();
 
-		$error = new Error();
-		$error->set_date(new \DateTime())
-			->set_type($type)
-			->set_short_message($shortMessage)
-			->set_message($message);
-		$repository->add($error);
+		SmartCAT::debug( "[{$type}] {$message}" );
+
+		if ( ! $repository ) {
+			return;
+		}
+
+		try {
+			$error->set_date( new \DateTime() );
+		} catch ( \Exception $e ) {
+			return;
+		}
+
+		$error->set_type( $type )
+			->set_short_message( $short_message )
+			->set_message( str_replace( '\r\n', PHP_EOL, $message ) );
+
+		$repository->add( $error );
 	}
 
-	public static function info(string $shortMessage, string $message = '') {
-		self::add_record('info', $shortMessage, $message);
+	/**
+	 * Add an info message
+	 *
+	 * @param string $short_message Set short message.
+	 * @param string $message Set message.
+	 */
+	public static function info( $short_message, $message = '' ) {
+		self::add_record( self::TYPE_INFO, $short_message, $message );
 	}
 
-	public static function warning(string $shortMessage, string $message = '') {
-		self::add_record('warning', $shortMessage, $message);
+	/**
+	 * Add a warning message
+	 *
+	 * @param string $short_message Set short message.
+	 * @param string $message Set message.
+	 */
+	public static function warning( $short_message, $message = '' ) {
+		self::add_record( self::TYPE_WARNING, $short_message, $message );
 	}
 
-	public static function error(string $shortMessage, string $message = '') {
-		self::add_record('error', $shortMessage, $message);
+	/**
+	 * Add an error message
+	 *
+	 * @param string $short_message Set short message.
+	 * @param string $message Set message.
+	 */
+	public static function error( $short_message, $message = '' ) {
+		self::add_record( self::TYPE_ERROR, $short_message, $message );
+	}
+
+	/**
+	 * Get error repository
+	 *
+	 * @return ErrorRepository|null
+	 */
+	private static function get_error_repository() {
+		try {
+			return Connector::get_container()->get( 'entity.repository.error' );
+		} catch ( \Throwable $e ) {
+			SmartCAT::debug( '[error] Logger container does not exists' );
+			return null;
+		}
 	}
 }

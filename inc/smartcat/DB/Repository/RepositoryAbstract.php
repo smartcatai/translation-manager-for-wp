@@ -1,62 +1,90 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 16.06.2017
- * Time: 19:20
+ * Smartcat Translation Manager for WordPress
+ *
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
  */
 
 namespace SmartCAT\WP\DB\Repository;
 
+use SmartCAT\WP\DB\DbAbstract;
 
-abstract class RepositoryAbstract implements RepositoryInterface {
-
+/**
+ * Class RepositoryAbstract
+ *
+ * @package SmartCAT\WP\DB\Repository
+ */
+abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterface {
+	/** @var string */
 	protected $prefix = '';
-	private $wpdb;
+	/** @var array */
+	private $persists = [];
 
+	/**
+	 * RepositoryAbstract constructor.
+	 *
+	 * @param $prefix
+	 */
 	public function __construct( $prefix ) {
-		global $wpdb;
-		$this->prefix = $wpdb->get_blog_prefix() . $prefix;
-		$this->wpdb   = $wpdb;
+		parent::__construct();
+		$this->prefix = $this->wpdb->get_blog_prefix() . $prefix;
 	}
 
-	public function get_wp_db() {
-		return $this->wpdb;
-	}
-
-	protected function create_table( $sql ) {
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		$charset_collate = "DEFAULT CHARACTER SET {$this->get_wp_db()->charset} COLLATE {$this->get_wp_db()->collate}";
-		$sql             = "$sql{$charset_collate};";
-		dbDelta( $sql );
-	}
-
-	protected function drop_table( $tableName ) {
-		$this->get_wp_db()->query( "DROP TABLE IF EXISTS $tableName" );
-	}
-
+	/**
+	 * @return string|null
+	 */
 	public function get_count() {
 		$table_name = $this->get_table_name();
-		$count      = $this->get_wp_db()->get_var( "SELECT COUNT(*) FROM $table_name" );
+		$count      = $this->get_wp_db()->get_var( "SELECT COUNT( * ) FROM $table_name" );
 
 		return $count;
 	}
 
-	private $persists = [];
-
+	/**
+	 * @param $o
+	 */
 	public function persist( $o ) {
 		$this->persists[] = $o;
 	}
 
-	protected abstract function do_flush(array $persists);
+	/**
+	 * @param array $persists
+	 *
+	 * @return mixed
+	 */
+	abstract protected function do_flush( array $persists );
 
+	/**
+	 *
+	 */
 	public function flush() {
-		$this->do_flush($this->persists);
+		$this->do_flush( $this->persists );
 		$this->persists = [];
 	}
 
+	/**
+	 * @param $row
+	 *
+	 * @return mixed
+	 */
 	protected abstract function to_entity( $row );
 
+	/**
+	 * @param $entity
+	 *
+	 * @return mixed
+	 */
+	protected abstract function save( $entity );
+
+	/**
+	 * @param $rows
+	 *
+	 * @return array
+	 */
 	protected function prepare_result( $rows ) {
 		$result = [];
 		foreach ( $rows as $row ) {
@@ -66,4 +94,109 @@ abstract class RepositoryAbstract implements RepositoryInterface {
 		return $result;
 	}
 
+	/**
+	 * @param array $criterias
+	 *
+	 * @return DbAbstract|null
+	 */
+	public function get_one_by_id( $id ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table_name WHERE id=%d", $id ) );
+
+		return $row ? $this->to_entity( $row ) : null;
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return bool
+	 */
+	public function delete_by_id( $id ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+
+		if ( ! empty( $id ) ) {
+			if ( $wpdb->delete( $table_name, [ 'id' => $id ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param array $criterias
+	 *
+	 * @return DbAbstract[]|null
+	 */
+	public function get_all_by( array $criterias ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+		$query      = "SELECT * FROM $table_name WHERE ";
+
+		$where = $values = [];
+
+		foreach ( $criterias as $key => $value ) {
+			$where[]  = "$key=%s";
+			$values[] = $value;
+		}
+
+		$results =
+			$wpdb->get_results(
+				$wpdb->prepare( $query . implode( " AND ", $where ),
+					$values )
+			);
+
+		return $this->prepare_result( $results );
+	}
+
+	/**
+	 * @param array $criterias
+	 *
+	 * @return DbAbstract|null
+	 */
+	public function get_one_by( array $criterias ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+		$query      = "SELECT * FROM $table_name WHERE ";
+
+		$where = $values = [];
+
+		foreach ( $criterias as $key => $value ) {
+			$where[]  = "$key=%s";
+			$values[] = $value;
+		}
+
+		$row = $wpdb->get_row( $wpdb->prepare( $query . implode( " AND ", $where ), $values ) );
+
+		return $row ? $this->to_entity( $row ) : null;
+	}
+
+	/**
+	 * @param int $from
+	 * @param int $limit
+	 *
+	 * @return DbAbstract[]
+	 */
+	public function get_all( $from = 0, $limit = 0 ) {
+		$wpdb  = $this->get_wp_db();
+		$from  = intval( $from );
+		$limit = intval( $limit );
+
+		$table_name = $this->get_table_name();
+		$query      = "SELECT * FROM $table_name";
+
+		if ( $limit > 0 ) {
+			$query = $wpdb->prepare(
+				"SELECT * FROM $table_name LIMIT %d, %d",
+				[ $from, $limit ]
+			);
+		}
+
+		$results = $wpdb->get_results( $query );
+
+		return $this->prepare_result( $results );
+	}
 }

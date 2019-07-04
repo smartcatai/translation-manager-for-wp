@@ -1,9 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 20.06.2017
- * Time: 13:54
+ * Smartcat Translation Manager for WordPress
+ *
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
  */
 
 namespace SmartCAT\WP\Handler;
@@ -16,7 +19,6 @@ use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\Options;
 use SmartCAT\WP\WP\PluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 
 /**
  * Обработка запросов от callback smartCAT
@@ -38,7 +40,7 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 		/** @noinspection PhpUnusedParameterInspection */
 		\WP_REST_Server $server
 	) {
-		register_rest_route( self::ROUTE_PREFIX, '/(?<type>.+)/(?<method>.+)', [
+		register_rest_route( self::ROUTE_PREFIX, '/( ?<type>.+ )/( ?<method>.+ )', [
 			'methods'  => \WP_REST_Server::CREATABLE,
 			'callback' => [ $this, 'handle' ],
 		] );
@@ -58,7 +60,7 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 			$options = $this->container->get( 'core.options' );
 
 			if ( $request->get_header( 'authorization' ) == $options->get_and_decrypt( 'callback_authorisation_token' ) ) {
-				$body      = $request->get_body();
+				$body	  = $request->get_body();
 				$documents = json_decode( $body );
 				if ( is_array( $documents ) && count( $documents ) > 0 ) {
 					/** @var StatisticRepository $statistic_repository */
@@ -105,7 +107,7 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 			$options = $this->container->get( 'core.options' );
 
 			/** @var SmartCAT $sc */
-			$sc             = $this->container->get( 'smartcat' );
+			$sc			 = $this->container->get( 'smartcat' );
 			$callback_model = new CallbackPropertyModel();
 			$callback_model->setUrl( get_site_url() . '/wp-json/' . self::ROUTE_PREFIX );
 			$callback_model->setAdditionalHeaders( [

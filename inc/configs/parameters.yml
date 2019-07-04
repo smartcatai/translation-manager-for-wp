@@ -5,13 +5,8 @@ parameters:
     - "smartcat_api_login"
     - "smartcat_api_password"
     - "smartcat_api_server"
-    #Имя аккаунта (для формирования урла)
-    - "smartcat_account_name"
     #Additional params (отображаются)
-    - "smartcat_workflow_stages"
-    - "smartcat_vendor_id"
-    - "smartcat_api_project_id"
-    - "smartcat_auto_send_on_update"
+    - "smartcat_debug_mode"
     #Признак активации ручного обновления статистики
     - "statistic_queue_active"
     #Авторизационный код для callback

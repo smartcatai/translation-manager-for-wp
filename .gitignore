@@ -2,3 +2,4 @@ inc/vendor
 .vscode/
 .idea/
 .DS_Store
+debug.log

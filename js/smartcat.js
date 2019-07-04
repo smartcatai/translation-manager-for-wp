@@ -1,463 +1,495 @@
-jQuery( function ( $ ) {
-	function cl( message ) {
-		console.log( message );
-	}
+function printError(message) {
+    notice(message, 'error');
+}
 
-	function add_action_to_serialized_data( data, action ) {
-		if ( data.length > 0 ) {
-			return data + '&action=' + action;
-		} else {
-			return 'action= ' + action;
-		}
-	}
+function printSuccess(message) {
+    notice(message, 'success');
+}
 
-	function printError( message ) {
-		$( '.notice.notice-error.is-dismissible.shake-shake-baby' ).remove();
-		var $div = $( document.createElement( 'div' ) );
-		$div.attr( 'class', 'notice notice-error is-dismissible shake-shake-baby' );
-		var $p = $( document.createElement( 'p' ) );
-		$p.html( message );
-		$div.append( $p );
-		$( 'div.wrap h1' ).first().after( $div );
-	}
+function notice( message, nclass = 'success') {
+    jQuery(function ($) {
+        var id = revisedRandId();
+        $('.notice.notice-' + nclass + '.is-dismissible.shake-shake-baby').remove();
+        var $div = $(document.createElement('div'));
+        $div.attr('class', 'notice notice-' + nclass + ' is-dismissible shake-shake-baby');
+        $div.attr('id', id);
+        var $p = $(document.createElement('p'));
+        $p.html(message);
+        $div.append($p);
+        $div.append(
+            '<button type="button" class="notice-dismiss" onclick="dismissById(\'' + id + '\')">'
+            + '<span class="screen-reader-text">' + SmartcatFrontend.dismissNotice + '</span></button>'
+        );
+        $('hr.wp-header-end').first().after($div);
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+    });
+}
 
-	/*
-	 * Модальное окно и работа с ним
-	 */
+function revisedRandId() {
+    return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(2, 15);
+}
 
-	var sourceLangError = [];
-	var addedToModal = 0;
+function dismissById( $id ) {
+    jQuery(function ($) {
+        $('#' + $id).hide('slow', function(){ $('#' + $id).remove(); });
+    });
+}
 
-	function prepareInfo( postNumber ) {
-		var $inlineElement = $( '#inline_' + postNumber );
-		var title = $inlineElement.find( ".post_title" ).first().html();
+jQuery(function ($) {
+    function cl(message) {
+        console.log(message);
+    }
+
+    function add_action_to_serialized_data(data, action) {
+         return add_key_to_serialized_data(data, 'action', action);
+    }
+
+    function add_key_to_serialized_data(data, key, value) {
+        if (data.length > 0) {
+            return data + '&' + key + '=' + value;
+        } else {
+            return key + '=' + value;
+        }
+    }
+
+    /*
+     * Модальное окно и работа с ним
+     */
+
+    var addedToModal = 0;
+
+    function prepareInfo(postNumber) {
+        var $inlineElement = $('#inline_' + postNumber);
+        var title = $inlineElement.find(".post_title").first().html();
 
         var $translation_connectors_column = $('#translation-connectors-' + postNumber);
 
-		var author = $translation_connectors_column.attr('data-author');
-		var status = $inlineElement.find( '._status' ).first().text();
-		var sourceLangName = $translation_connectors_column.attr( 'data-source-language-name' );
-		var sourceLangSlug = $translation_connectors_column.attr( 'data-source-language-slug' );
+        var author = $translation_connectors_column.attr('data-author');
+        var status = $inlineElement.find('._status').first().text();
 
-		var translation_slugs = $translation_connectors_column.attr( 'data-translation-slugs' );
-		var pll_slugs = $translation_connectors_column.attr( 'data-post-pll-slugs' );
-		var isPostHaveAllTranslates = (translation_slugs === pll_slugs);
+        var translation_slugs = $translation_connectors_column.attr('data-translation-slugs');
+        var pll_slugs = $translation_connectors_column.attr('data-post-pll-slugs');
+        var isPostHaveAllTranslates = (translation_slugs === pll_slugs);
 
         var $tr;
-		if (!isPostHaveAllTranslates) {
-            // noinspection JSUnresolvedVariable
-            var isFound = $.inArray( sourceLangSlug + "", SmartcatFrontend.pll_languages_supported_by_sc );
-
-            if ( isFound <= - 1 ) {
-                cl( sourceLangSlug );
-                cl( SmartcatFrontend.pll_languages_supported_by_sc );
-
-                sourceLangError.push( '<b>' + title + '</b>' );
-                //sourceLang не находится в списке допустимых, выделяем title красным
-                title = '<span style="color: red">' + title + '</span>';
-            }
-
-            $tr = $( document.createElement( 'tr' ) );
-            $tr.html( '<td>' + title + '</td><td>' + author + '</td><td>' + status + '</td><td>' + sourceLangName + '</td>' );
+        if (!isPostHaveAllTranslates) {
+            $tr = $(document.createElement('tr'));
+            $tr.html('<td>' + title + '</td><td>' + author + '</td><td>' + status + '</td>');
             addedToModal++;
-		} else {
-			$tr = '';
-		}
+        } else {
+            $tr = '';
+        }
 
         return $tr;
-	}
+    }
 
-	function add_post_to_hidden( postNumber ) {
-		var $mwPosts = $( '#smartcat-modal-window-posts' );
-		var val = $mwPosts.val().toString();
-		var posts = (
-			val === ''
-		) ? [] : val.split( ',' );
+    function add_post_to_hidden(postNumber) {
+        var $mwPosts = $('#smartcat-modal-window-posts');
+        var val = $mwPosts.val().toString();
+        var posts = (
+            val === ''
+       ) ? [] : val.split(',');
 
-		posts.push( postNumber );
-		$mwPosts.val( posts.join( ',' ) );
-	}
+        posts.push(postNumber);
+        $mwPosts.val(posts.join(','));
+    }
 
-	function checkSourceLanguageError() {
-		cl( sourceLangError );
-		if ( sourceLangError.length > 0 ) {
-			var $modal = $( "#smartcat-modal-window" );
-			var $errorDiv = $modal.find( '.smartcat-source-language-error' ).first();
+    function modalWindowHandler(event) {
+        addedToModal = 0;
+        var $info = $("#smartcat-modal-window");
+        var $mwPosts = $('#smartcat-modal-window-posts');
+        $mwPosts.val('');
 
-			$errorDiv.html( '' );
-			$errorDiv.html( sourceLangError.join( ', ' ) + ' ' + SmartcatFrontend.sourceLanguageNotSupported );
-			$errorDiv.css( 'display', 'block' );
-			sourceLangError = [];
-		}
-	}
+        $info.dialog({
+            title: SmartcatFrontend.dialogTitle,
+            dialogClass: 'wp-dialog',
+            height: "auto",
+            width: 700,
+            modal: true,
+            autoOpen: false,
+            closeOnEscape: true
+        });
 
-	function modalWindowHandler( event ) {
-		addedToModal = 0;
-		var $info = $( "#smartcat-modal-window" );
-		var $mwPosts = $( '#smartcat-modal-window-posts' );
-		$mwPosts.val( '' );
+        var $tbody = $info.find('table tbody').first();
+        $tbody.html('');
+        //var $theList = $('#the-list');
 
-		$info.dialog( {
-			dialogClass: 'wp-dialog',
-			height: "auto",
-			width: 700,
-			modal: true,
-			autoOpen: false,
-			closeOnEscape: true
-		} );
+        var isChecked = false;
 
-		var $tbody = $info.find( 'table tbody' ).first();
-		$tbody.html( '' );
-		//var $theList = $('#the-list');
+        if (event.target.tagName === 'A') {
+            var $a = $(event.target);
+            console.log($a.closest('tr'));
+            var id = $a.closest('tr').get(0).id;
+            var $regOutput = id.match(/post-(\d+)/i);
+            var postNumber = $regOutput[1];
 
-		var isChecked = false;
+            cl(postNumber);
 
-		if ( event.target.tagName === 'A' ) {
-			var $a = $( event.target );
-			console.log( $a.closest( 'tr' ) );
-			var id = $a.closest( 'tr' ).get( 0 ).id;
-			var $regOutput = id.match( /post-(\d+)/i );
-			var postNumber = $regOutput[1];
+            add_post_to_hidden(postNumber);
 
-			cl( postNumber );
+            var $tr = prepareInfo(postNumber);
+            $tbody.append($tr);
 
-			add_post_to_hidden( postNumber );
+            $info.dialog('open');
+        } else {
+            $('tbody th.check-column input[type="checkbox"]').each(function () {
+                var $this = $(this);
 
-			var $tr = prepareInfo( postNumber );
-			$tbody.append( $tr );
+                if ($this.prop("checked")) {
+                    isChecked = true;
+                    var postNumber = $(this).val();
+                    add_post_to_hidden(postNumber);
 
-			checkSourceLanguageError();
-			$info.dialog( 'open' );
-		} else {
-			$( 'tbody th.check-column input[type="checkbox"]' ).each( function () {
-				var $this = $( this );
+                    var $tr = prepareInfo(postNumber);
+                    $tbody.append($tr);
+                }
+            });
 
-				if ( $this.prop( "checked" ) ) {
-					isChecked = true;
-					var postNumber = $( this ).val();
-					add_post_to_hidden( postNumber );
-
-					var $tr = prepareInfo( postNumber );
-					$tbody.append( $tr );
-				}
-			} );
-
-			if ( isChecked ) {
-				if (addedToModal) {
-                    checkSourceLanguageError();
-                    $info.dialog( 'open' );
+            if (isChecked) {
+                if (addedToModal) {
+                    $info.dialog('open');
                 } else {
-                    printError( SmartcatFrontend.postsAreAlreadyTranslated );
-				}
+                    printError(SmartcatFrontend.postsAreAlreadyTranslated);
+                }
+            } else {
+                printError(SmartcatFrontend.postsAreNotChoosen);
+            }
+        }
 
+        return false;
+    }
 
-			} else {
-				printError( SmartcatFrontend.postsAreNotChoosen );
-			}
-		}
+    $('a.send-to-smartcat-anchor').click(function (event) {
+        modalWindowHandler(event);
+        return false;
+    });
 
-		return false;
-	}
+    //появление модала
+    $("#doaction, #doaction2").click(function (event) {
+        var $this = $(this);
+        var butId = $this.attr("id");
+        var selName = butId.substr(2);
 
-	$( 'a.send-to-smartcat-anchor' ).click( function ( event ) {
-		modalWindowHandler( event );
-		return false;
-	} );
+        if ("send_to_smartcat" === $('select[name="' + selName + '"]').val()) {
+            modalWindowHandler(event);
+            return false;
+        }
+    });
 
-	//появление модала
-	$( "#doaction, #doaction2" ).click( function ( event ) {
-		var $this = $( this );
-		var butId = $this.attr( "id" );
-		var selName = butId.substr( 2 );
+    var $modalWindow = $('#smartcat-modal-window');
 
-		if ( "send_to_smartcat" === $( 'select[name="' + selName + '"]' ).val() ) {
-			modalWindowHandler( event );
-			return false;
-		}
-	} );
+    /*
+     * Часть по валидации страницы настроек на фронте
+     */
+    $('.smartcat-connector form[action="options.php"]').submit(function (event) {
+        var $this = $(this);
+        var formData = $this.serialize();
+        formData = add_action_to_serialized_data(
+            formData, SmartcatFrontend.smartcat_table_prefix + 'validate_settings');
 
-	/*
-	 * Обработчик "Возможность выбора нескольких языков"
-	 */
+        $('.submit button.button-primary').prop("disabled", true);
+        $(".sc-spinner").show();
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: formData,
+            success: function (responseText) {
+                $this.unbind('submit');
+                $this.submit();
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(responseJSON.message);
+                $(".sc-spinner").hide();
+                $('.submit button.button-primary').prop("disabled", false);
+            }
+        });
 
-	var addLanguagesCount = 1;
+        event.preventDefault();
+        return false;
+    });
 
-	// noinspection JSUnusedLocalSymbols
-	function add_language_handler( event ) {
-		var $this = $( this );
-		var $div = $this.parent();
+    /*
+     * Save profile action.
+     * P.S. WordPress must die! Getting instances by #ID DID NOT WORK!
+     */
+    $('.smartcat-connector form.edit-profile-form').submit(function (event) {
+        var $this = $(this);
+        var formData = $this.serialize();
+        formData = add_action_to_serialized_data(
+            formData, SmartcatFrontend.smartcat_table_prefix + 'create_profile');
 
-		var $clone = $div.clone();
+        $('button.edit-profile-submit').prop('disabled', true);
+        $(".sc-spinner").show();
 
-		$this.removeClass( 'add-language' );
-		$this.addClass( 'remove-language' );
-		$this.unbind( 'click' );
-		$this.click( remove_language_handler );
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: formData,
+            success: function (responseText) {
+                window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-profiles';
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
+                $('button.edit-profile-submit').prop('disabled', false);
+                $(".sc-spinner").hide();
+            }
+        });
 
-		if ( SmartcatFrontend.totalLanguages - 1 > addLanguagesCount ) {
-			$clone.find( '.add-language' ).first().click( add_language_handler );
-			addLanguagesCount ++;
-		} else {
-			$clone.find( '.add-language' ).first().remove();
-		}
+        event.preventDefault();
+        return false;
+    });
 
-		$div.after( $clone );
-	}
+    function deleteProfile(element) {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                profile_id: element.data('bind'),
+                action: SmartcatFrontend.smartcat_table_prefix + 'delete_profile'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                printSuccess(responseJSON.message);
+                var $td = element.closest("tr");
+                $td.hide('slow', function(){ $td.remove(); });
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
+            }
+        });
+    }
 
-	// noinspection JSUnusedLocalSymbols
-	function remove_language_handler( event ) {
-		var $this = $( this );
-		var $div = $this.parent();
-		var $selectLanguagesBlock = $this.parent().parent();
+    $('table.profiles .sc-profile-delete').each(function () {
+        $(this).on('click', function () {
+            deleteProfile($(this));
+        });
+    });
 
-		addLanguagesCount --;
-		var $lastDiv = $selectLanguagesBlock.last();
+    /*
+     * Обработчик самого модала
+     */
 
-		var isAddLanguage = $lastDiv.find( '.add-language' ).length;
+    $modalWindow.find('form').first().submit(function (event) {
+        var $this = $(this);
+        var formData = $this.serialize();
+        formData = add_action_to_serialized_data(
+            formData, SmartcatFrontend.smartcat_table_prefix + 'send_to_smartcat');
 
-		if ( ! isAddLanguage ) {
-			//alert(111);
-			var $addLanguageElement = $( document.createElement( 'div' ) );
-			$addLanguageElement.addClass( 'add-language' );
-			$addLanguageElement.click( add_language_handler );
-			$lastDiv.find( 'select' ).last().after( $addLanguageElement );
-			addLanguagesCount ++;
-		}
+        $('button.sc-send-button').prop('disabled', true);
+        $(".sc-spinner").show();
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: formData,
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                $this.parent().dialog('close');
+                printSuccess(responseJSON.message);
+                $('button.sc-send-button').prop('disabled', false);
+                $(".sc-spinner").hide();
+            },
+            error: function (responseObject) {
+                $this.parent().dialog('close');
+                $('button.sc-send-button').prop('disabled', false);
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
+                $(".sc-spinner").hide();
+            }
+        });
 
-		$div.remove();
-	}
+        event.preventDefault();
+        return false;
+    });
 
-	$( '.add-language' ).click( add_language_handler );
-	$( '.remove-language' ).click( remove_language_handler );
+    /*
+     * Фронт страницы статистики
+     */
 
-	var $modalWindow = $( '#smartcat-modal-window' );
+    var refreshStatButton = $('#smartcat-connector-refresh-statistics');
+    var intervalTimer;
+    var isStatWasStarted = false;
 
-	/*
-	 * Часть по валидации страницы настроек на фронте
-	 */
-	$( '.smartcat-connector form[action="options.php"]' ).submit( function ( event ) {
-		var $this = $( this );
-		var formData = $this.serialize();
-		formData = add_action_to_serialized_data(
-			formData, SmartcatFrontend.smartcat_table_prefix + 'validate_settings' );
+    function checkStatistics() {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                action: SmartcatFrontend.smartcat_table_prefix + 'check_statistic'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                var isActive = responseJSON.data.statistic_queue_active;
 
-		var workflowStages = ['Translation', 'Editing', 'Proofreading', 'Postediting'];
-		var selector = workflowStages.map( function ( name ) {
-			return 'input[value=' + name + ']';
-		} ).join( ', ' );
-		var checkboxList = document.querySelectorAll( selector );
+                if (! isActive) {
+                    clearInterval(intervalTimer);
+                    isStatWasStarted = false;
+                }
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(responseJSON.message);
 
-		var isWorkflowsChecked = false;
-		for ( var i = 0; i < checkboxList.length; i ++ ) {
-			if ( checkboxList[i].checked ) {
-				isWorkflowsChecked = true;
-				break;
-			}
-		}
+                if (intervalTimer) {
+                    clearInterval(intervalTimer);
+                }
 
-		if ( ! isWorkflowsChecked ) {
-			printError( SmartcatFrontend.workflowStagesAreNotSelected );
-			event.preventDefault();
-			return false;
-		}
+                refreshStatButton.prop('disabled', false);
+            }
+        });
+    }
 
-		// noinspection JSUnusedLocalSymbols
-		$.ajax( {
-			type: "POST",
-			url: ajaxurl,
-			data: formData,
-			success: function ( responseText ) {
-				//var responseJSON = JSON.parse(responseText);
-				cl( 'SUCCESS' );
+    function updateStatistics() {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                action: SmartcatFrontend.smartcat_table_prefix + 'start_statistic'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                if (responseJSON.message === 'ok') {
+                    checkStatistics();
+                }
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(responseJSON.message);
+            }
+        });
+    }
 
-				//в противном случае уходило в бесконечную рекурсию
-				$this.unbind( 'submit' );
-				$this.submit();
-			},
-			error: function ( responseObject ) {
-				var responseJSON = JSON.parse( responseObject.responseText );
-				printError( responseJSON.message );
-				cl( 'ERROR' );
-				cl( responseObject );
-			}
-		} );
+    function refreshStatistics(element) {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                stat_id: element.data('bind'),
+                action: SmartcatFrontend.smartcat_table_prefix + 'refresh_translation'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                printSuccess(responseJSON.message);
+                element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
+                element.parent().html("-");
+                updateStatistics();
 
-		event.preventDefault();
-		return false;
-	} );
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
+            }
+        });
+    }
 
-	/*
-	 * Обработчик самого модала
-	 */
+    $('table.statistics .refresh_stat_button').each(function () {
+        $(this).on('click', function () {
+            refreshStatistics($(this));
+        });
+    });
 
-	$modalWindow.find( 'form' ).first().submit( function ( event ) {
-		var $this = $( this ); //форма
-		var formData = $this.serialize();
-		formData = add_action_to_serialized_data(
-			formData, SmartcatFrontend.smartcat_table_prefix + 'send_to_smartcat' );
-		cl( formData );
+    function deleteStatistics(element) {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                stat_id: element.data('bind'),
+                action: SmartcatFrontend.smartcat_table_prefix + 'delete_statistics'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                printSuccess(responseJSON.message);
+                var $td = element.closest("tr");
+                $td.hide('slow', function(){ $td.remove(); });
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
+            }
+        });
+    }
 
-		$.ajax( {
-			type: "POST",
-			url: ajaxurl,
-			data: formData,
-			success: function ( responseText ) {
-				cl( 'success' );
-				cl( responseText );
-				$this.parent().dialog( 'close' );
-				//window.location.href = SmartcatFrontend.adminUrl + '/admin.php?page=sc-translation-progress';
-			},
-			error: function ( responseObject ) {
-				cl( 'error' );
-				var responseJSON = JSON.parse( responseObject.responseText );
-				printError( responseJSON.message );
-				alert( responseJSON.message );
-			}
-		} );
+    $('table.statistics .delete_stat_button').each(function () {
+        $(this).on('click', function () {
+            deleteStatistics($(this));
+        });
+    });
 
-		event.preventDefault();
-		return false;
-	} );
+    function cancelStatistics(element) {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                stat_id: element.data('bind'),
+                action: SmartcatFrontend.smartcat_table_prefix + 'cancel_statistics'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                printSuccess(responseJSON.message);
+                element.closest("tr").children(".column-status").html(responseJSON.data.statistic.status);
+                element.closest("span").remove();
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
+            }
+        });
+    }
 
-	/*
-	 * Фронт страницы статистики
-	 */
+    $('table.statistics .cancel_stat_button').each(function () {
+        $(this).on('click', function () {
+            cancelStatistics($(this));
+        });
+    });
 
-	var refreshStatButton = $( '#smartcat-connector-refresh-statistics' );
-	var intervalTimer;
-	var isStatWasStarted = false;
+    //проверяем на существование, что мы точно на странице статистики
+    if (refreshStatButton.length) {
+        isStatWasStarted = refreshStatButton.is(':disabled');
 
-	function checkStatistics() {
-		$.ajax( {
-			type: "POST",
-			url: ajaxurl,
-			data: {
-				action: SmartcatFrontend.smartcat_table_prefix + 'check_statistic'
-			},
-			success: function ( responseText ) {
-				cl( 'SUCCESS' );
-				var responseJSON = JSON.parse( responseText );
-				var isActive = responseJSON.data.statistic_queue_active;
+        refreshStatButton.click(function (event) {
+            //если уже получаем статистику - ничего не делать
+            if (isStatWasStarted) {
+                event.preventDefault();
+                return false;
+            }
 
-				if ( ! isActive ) {
-					clearInterval( intervalTimer );
-					isStatWasStarted = false;
-					//refreshStatButton.prop('disabled', false);
-					//window.location.reload();
-				}
-			},
-			error: function ( responseObject ) {
-				cl( 'ERROR' );
-				var responseJSON = JSON.parse( responseObject.responseText );
-				printError( responseJSON.message );
+            isStatWasStarted = true;
+            var $this = $(this);
+            $this.prop('disabled', true);
 
-				if ( intervalTimer ) {
-					clearInterval( intervalTimer );
-				}
+            updateStatistics();
 
-				refreshStatButton.prop( 'disabled', false );
-			}
-		} );
-	}
+            location.reload();
+            event.preventDefault();
+            return false;
+        });
 
-	function updateStatistics() {
-		$.ajax( {
-			type: "POST",
-			url: ajaxurl,
-			data: {
-				action: SmartcatFrontend.smartcat_table_prefix + 'start_statistic'
-			},
-			success: function ( responseText ) {
-				cl( 'SUCCESS' );
-				var responseJSON = JSON.parse( responseText );
-				cl( responseJSON );
+        //если статистика была запущена уже в первый запуск
+        if (isStatWasStarted) {
+            intervalTimer = setInterval(checkStatistics, 1000*60);
+        }
 
-				if ( responseJSON.message === 'ok' ) {
-					checkStatistics();
-				}
-			},
-			error: function ( responseObject ) {
-				cl( 'ERROR' );
-				var responseJSON = JSON.parse( responseObject.responseText );
-				printError( responseJSON.message );
-			}
-		} );
-	}
+        if (!isStatWasStarted) {
+            pageIntervalReload = setInterval(function () {
+                if (isStatWasStarted) {
+                    return false;
+                }
 
-	function refreshTranslation( element ) {
-		$.ajax( {
-			type: "POST",
-			url: ajaxurl,
-			data: {
-				stat_id: element.data('bind'),
-				action: SmartcatFrontend.smartcat_table_prefix + 'refresh_translation'
-			},
-			success: function ( responseText ) {
-				var responseJSON = JSON.parse( responseText );
-				cl( responseJSON );
-				if (responseJSON.message == "ok") {
-					element.closest("tr").children(".column-status").html( responseJSON.data.statistic.status );
-					element.parent().html( "-" );
-					updateStatistics();
-				}
-			},
-			error: function ( responseObject ) {
-				cl( 'ERROR' );
-			}
-		} );
-	}
-	
-	$('.refresh_stat_button').each(function () {
-		$(this).on('click', function () {
-			refreshTranslation($(this));
-			//location.reload();
-		});
-	});
+                isStatWasStarted = true;
+                var $this = $(this);
+                $this.prop('disabled', true);
 
-	//проверяем на существование, что мы точно на странице статистики
-	if ( refreshStatButton.length ) {
-		isStatWasStarted = refreshStatButton.is( ':disabled' );
+                updateStatistics();
 
-		refreshStatButton.click( function ( event ) {
-			//если уже получаем статистику - ничего не делать
-			if ( isStatWasStarted ) {
-				event.preventDefault();
-				return false;
-			}
+                location.reload();
+            }, 1000 * 60);
+        }
+    }
 
-			isStatWasStarted = true;
-			var $this = $( this );
-			$this.prop( 'disabled', true );
-
-			updateStatistics();
-
-			location.reload();
-			event.preventDefault();
-			return false;
-		} );
-
-		//если статистика была запущена уже в первый запуск
-		if ( isStatWasStarted ) {
-			intervalTimer = setInterval( checkStatistics, 1000*60 );
-		}
-
-		if ( !isStatWasStarted ) {
-			pageIntervalReload = setInterval( function () {
-				if ( isStatWasStarted ) {
-					event.preventDefault();
-					return false;
-				}
-
-				isStatWasStarted = true;
-				var $this = $( this );
-				$this.prop( 'disabled', true );
-
-				updateStatistics();
-
-				location.reload();
-				event.preventDefault();
-			}, 1000 * 60 );
-		}
-	}
-
-} );
+});

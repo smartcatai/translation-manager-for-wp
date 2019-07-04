@@ -1,0 +1,101 @@
+<div class="smartcat-connector wrap">
+    <h1 class="wp-heading-inline">{{ texts.title }}</h1>
+
+    <hr class="wp-header-end" />
+
+    <div class="form-wrap">
+        <form class="edit-profile-form" method="post" action="">
+            <input type="hidden" name="action" value="{{ action }}"/>
+            <input type="hidden" id="sc_profile_wpnonce" name="sc_profile_wpnonce" value="{{ sc_nonce }}"/>
+            <input type="hidden" name="_wp_http_referer" value="/wp-admin/admin.php?page=sc-profiles"/>
+            <input type="hidden" name="profile_id" value="{{ profile.id }}"/>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="profile_name">{{ texts.profile_name }}</label>
+                    </th>
+                    <td>
+                        <input type="text" id="profile_name" name="profile_name" value="{{ profile.name }}" size="40"/>
+                        <p>{{ texts.profile_name_note }}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="profile_vendor">{{ texts.profile_vendor }}</label>
+                    </th>
+                    <td>
+                        <select id="profile_vendor" name="profile_vendor" style="min-width: 200px;">
+                            {{# vendors }}
+                                <option value="{{ value }}" {{# selected }} selected="selected" {{/ selected }}>{{ name }}</option>
+                            {{/ vendors }}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="profile_source_lang">{{ texts.profile_source_lang }}*</label>
+                    </th>
+                    <td>
+                        <select id="profile_source_lang" name="profile_source_lang" required="required" style="min-width: 200px;">
+                            {{# source_lang }}
+                            <option value="{{ value }}" {{# selected }} selected="selected" {{/ selected }}>{{ name }}</option>
+                            {{/ source_lang }}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="profile_target_langs">{{ texts.profile_target_langs }}*</label>
+                    </th>
+                    <td>
+                        <select id="profile_target_langs" name="profile_target_langs[]" multiple="multiple" size="5" required="required" style="min-width: 200px;">
+                            {{# target_langs }}
+                            <option value="{{ value }}" {{# selected }} selected="selected" {{/ selected }}>{{ name }}</option>
+                            {{/ target_langs }}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="profile_workflow_stages">{{ texts.profile_workflow_stages }}*</label>
+                    </th>
+                    <td>
+                        <select id="profile_workflow_stages" name="profile_workflow_stages[]" multiple="multiple" size="5" required="required" style="min-width: 200px;">
+                            {{# workflow_stages }}
+                            <option value="{{ value }}" {{# selected }} selected="selected" {{/ selected }}>{{ name }}</option>
+                            {{/ workflow_stages }}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="profile_project_id">{{ texts.profile_project_id }}</label>
+                    </th>
+                    <td>
+                        <input type="text" id="profile_project_id" name="profile_project_id" value="{{ profile.project_id }}" size="40"/>
+                        <p>{{ texts.profile_project_id_note }}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="profile_auto_send">{{ texts.profile_auto_send }}</label>
+                    </th>
+                    <td>
+                        <input type="checkbox" id="profile_auto_send" name="profile_auto_send" value="1" {{# profile.auto_send }} checked="checked" {{/ profile.auto_send }} />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="profile_auto_update">{{ texts.profile_auto_update }}</label>
+                    </th>
+                    <td>
+                        <input type="checkbox" id="profile_auto_update" name="profile_auto_update" value="1" {{# profile.auto_update }} checked="checked" {{/ profile.auto_update }} />
+                    </td>
+                </tr>
+            </table>
+            <p class="submit">
+                <button type="submit" class="button-primary edit-profile-submit"><div class="sc-spinner"></div>{{ texts.save_button }}</button>
+            </p>
+        </form>
+    </div>
+</div>

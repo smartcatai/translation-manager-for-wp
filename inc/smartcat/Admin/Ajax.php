@@ -1,33 +1,51 @@
 <?php
+/**
+ * Smartcat Translation Manager for WordPress
+ *
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
+ */
 
 namespace SmartCAT\WP\Admin;
 
 use Http\Client\Common\Exception\ClientErrorException;
 use SmartCAT\WP\Connector;
+use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Entity\Task;
+use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\DITrait;
-use SmartCAT\WP\Helpers\Language\LanguageConverter;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\Options;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
+/**
+ * Class Ajax
+ *
+ * @package SmartCAT\WP\Admin
+ */
 final class Ajax implements HookInterface {
 	use DITrait;
 
-	static public function validate_settings() {
-		// валидация на js страницы с настройками
-		// в общем виде - проверка на стороне смартката правильности логина и пароля
-
+	/**
+	 * Validating settings before save on Smartcat side
+	 */
+	public static function validate_settings() {
 		$ajax_response = new AjaxResponse();
-		if ( ! current_user_can( 'publish_posts' ) ) {
+		$verify_nonce  = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['sc_validate_settings_nonce'] ?? null ) ),
+			'sc_validate_settings'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
 		$container = self::get_container();
@@ -36,11 +54,23 @@ final class Ajax implements HookInterface {
 		$data = [ 'isActive' => SmartCAT::is_active() ];
 
 		$required_parameters = [ $prefix . 'smartcat_api_login', $prefix . 'smartcat_api_password' ];
-		$parameters          = $_POST;
+		$parameters          = sanitize_post( $_POST );
 
-		$login = $password = '';
-		/** @var Utils $utils */
-		$utils = $container->get( 'utils' );
+		$login    = '';
+		$password = '';
+		$utils    = null;
+		$options  = null;
+
+		try {
+			/** @var Utils $utils */
+			$utils = $container->get( 'utils' );
+			/** @var Options $options */
+			$options = $container->get( 'core.options' );
+		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+			$ajax_response->send_error( $e->getMessage(), [], 400 );
+		}
+
 		if ( ! $utils->is_array_in_array( $required_parameters, array_keys( $parameters ) ) ) {
 			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
 		} elseif ( empty( $login = $parameters[ $prefix . 'smartcat_api_login' ] ) || empty( $password = $parameters[ $prefix . 'smartcat_api_password' ] ) ) {
@@ -49,34 +79,24 @@ final class Ajax implements HookInterface {
 
 		$server = $parameters[ $prefix . 'smartcat_api_server' ];
 
-		/** @var Options $options */
-		$options           = $container->get( 'core.options' );
 		$previous_login    = $options->get_and_decrypt( 'smartcat_api_login' );
 		$previous_password = $options->get_and_decrypt( 'smartcat_api_password' );
-		$previous_server  = $options->get( 'smartcat_api_server' );
+		$previous_server   = $options->get( 'smartcat_api_server' );
 
-		if ( $password === '******' ) {
-			$password = $previous_password; //упрощаю логику, иначе выходил уже набор костылей
+		if ( '******' === $password ) {
+			$password = $previous_password;
 		}
 
-		//проверка, что с кредами все ок
+		// Testing login to Smartcat.
 		$account_info = null;
 		try {
 			$api          = new \SmartCat\Client\SmartCAT( $login, $password, $server );
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
-			$is_ok        = (bool) $account_info->getId();
-			if ( ! $is_ok ) {
-				throw new Exception( 'Invalid username or password' );
-			}
 		} catch ( \Exception $e ) {
-			if ( $e->getMessage() === 'Invalid username or password' ) {
-				$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
-			} else {
-				$ajax_response->send_error( 'nok', $data );
-			}
+			$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
 		}
 
-		//согласно требованиям - если коллбэк уже висел, нужно сперва его дропнуть
+		// If callback already exists - drop needed.
 		if ( ! empty( $previous_login ) && ! empty( $previous_password ) && ! empty( $previous_server ) ) {
 			try {
 				$sc = new SmartCAT( $previous_login, $previous_password, $previous_server );
@@ -117,174 +137,410 @@ final class Ajax implements HookInterface {
 			$ajax_response->send_error( __( 'Problem with setting of new callback', 'translation-connectors' ), $data );
 		}
 
-		//сохраняем account_name
 		if ( $account_info && $account_info->getName() ) {
-			/** @var Options $options */
-			$options = $container->get( 'core.options' );
 			$options->set( 'smartcat_account_name', $account_info->getName() );
 		}
 
-		$ajax_response->send_success( 'ok', $data );
-		wp_die();
+		wp_cache_set( 'sc_smartcat_access', true, 'translation-connectors' );
+
+		$ajax_response->send_success( __( 'Settings successfully saved', 'translation-connectors' ), $data );
 	}
 
 	/**
 	 * @param Statistics $statistic
-	 *
-	 * @throws \Exception
 	 */
 	public function refresh_translation() {
-		$ajax_response = new AjaxResponse();
-		if ( ! current_user_can( 'publish_posts' ) ) {
+		$ajax_response        = new AjaxResponse();
+		$statistic_repository = null;
+
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ?? null ) ),
+			'bulk-statistics'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
-		$data = [ 'isActive' => SmartCAT::is_active() ];
+		$data      = [ 'isActive' => SmartCAT::is_active() ];
 		$container = self::get_container();
+		$post      = sanitize_post( $_POST );
 
-		/** @var StatisticRepository $statistic_repository */
-		$statistic_repository = $container->get('entity.repository.statistic');
+		try {
+			/** @var StatisticRepository $statistic_repository */
+			$statistic_repository = $container->get( 'entity.repository.statistic' );
+		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+			$ajax_response->send_error( $e->getMessage(), [], 400 );
+		}
 
-		if (!empty($_POST['stat_id']) && intval($_POST['stat_id'])) {
-			$statistic = $statistic_repository->get_one_by(['id' => intval($_POST['stat_id'])]);
-			if ($statistic->get_target_post_id()) {
-				$statistic->set_status('sended');
-				$statistic_repository->update($statistic);
+		if ( ! empty( $post['stat_id'] ) && intval( $post['stat_id'] ) ) {
+			$statistic = $statistic_repository->get_one_by_id( intval( $post['stat_id'] ) );
+			if ( $statistic->get_target_post_id() ) {
+				$statistic->set_status( Statistics::STATUS_SENDED );
+				$statistic_repository->update( $statistic );
 
-				$data["statistic"] = [
-					'status' => __( 'In progress', 'translation-connectors' )
+				$data['statistic'] = [
+					'status' => __( 'In progress', 'translation-connectors' ),
 				];
 
-				$ajax_response->send_success( 'ok', $data );
+				$ajax_response->send_success( __( 'Items have been successfully sent on update.', 'translation-connectors' ), $data );
 			}
-
-			wp_die();
 		}
 
-		$ajax_response->send_error( 'nok', $data );
-
-		wp_die();
+		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), $data );
 	}
 
-	static public function send_to_smartcat() {
+	/**
+	 *
+	 */
+	public static function create_profile() {
 		$ajax_response = new AjaxResponse();
-		if ( ! current_user_can( 'publish_posts' ) ) {
+		$verify_nonce  = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['sc_profile_wpnonce'] ?? null ) ),
+			'sc_profile_edit'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
 			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
-			wp_die();
 		}
 
-		$target_languages   = array_unique( $_POST['sc-target-lang'] );
-		$empty_language_key = array_search( '', $target_languages );
-		if ( $empty_language_key !== false ) {
-			unset( $target_languages[ $empty_language_key ] );
+		$data          = sanitize_post( $_POST, 'db' );
+		$profiles_repo = null;
+		$smartcat      = null;
+		$container     = self::get_container();
+		Connector::set_core_parameters();
+
+		try {
+			/** @var ProfileRepository $profiles_repo */
+			$profiles_repo = $container->get( 'entity.repository.profile' );
+			$smartcat      = self::get_smartcat();
+		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+			$ajax_response->send_error( $e->getMessage(), [], 400 );
 		}
 
-		! empty( $target_languages ) || $ajax_response->send_error( __( 'Target languages are empty',
-			'translation-connectors' ) );
+		if ( ! empty( $data['profile_id'] ) ) {
+			$profile = $profiles_repo->get_one_by_id( $data['profile_id'] );
+		} else {
+			$profile = new Profile();
+		}
 
-		$container = self::get_container();
-		/** @var TaskRepository $task_repository */
-		$task_repository = $container->get( 'entity.repository.task' );
-		/** @var StatisticRepository $statistics_repository */
-		$statistics_repository = $container->get( 'entity.repository.statistic' );
-		/** @var LanguageConverter $languages_converter */
-		$languages_converter = $container->get( 'language.converter' );
+		if ( empty( $data['profile_name'] ) ) {
+			$targets              = implode( ', ', $data['profile_target_langs'] );
+			$data['profile_name'] = sprintf(  __( 'Translation: %s', 'translation-connectors' ), "{$data['profile_source_lang']} -> {$targets}" );
+		}
 
-		$posts = explode( ',', $_POST['posts'] );
+		$key = array_search( $data['profile_source_lang'], $data['profile_target_langs'], true );
+		if ( false !== $key ) {
+			unset( $data['profile_target_langs'][ $key ] );
+		}
 
-		$data = [
-			'posts'     => $posts,
-			'languages' => $target_languages
-		];
+		try {
+			if ( ! empty( $data['profile_project_id'] ) ) {
+				$sc_project = $smartcat->getProjectManager()->projectGet( $data['profile_project_id'] );
+				$sc_project->getId();
+			}
+		} catch ( \Exception $e ) {
+			$ajax_response->send_error(
+				sprintf( __( 'Project "%s" does not exists', 'translation-connectors' ), $data['profile_project_id'] ),
+				[],
+				404
+			);
+		}
 
-		$is_new_task_created = false;
+		if ( empty( $data['profile_target_langs'] ) ) {
+			$ajax_response->send_error( __( 'Source language and target language are the same. Please select different languages.', 'translation-connectors' ), [], 400 );
+		}
 
-		foreach ( $posts as $post_id ) {
-			//$post = get_post( $postId );
-			/** @noinspection PhpUndefinedFunctionInspection */
-			$post_language = pll_get_post_language( $post_id, 'locale' );
+		$profile
+			->set_name( $data['profile_name'] )
+			->set_vendor( $data['profile_vendor'] )
+			->set_vendor_name( __( 'Translate internally', 'translation-connectors' ) )
+			->set_source_language( $data['profile_source_lang'] )
+			->set_target_languages( $data['profile_target_langs'] )
+			->set_project_id( $data['profile_project_id'] )
+			->set_workflow_stages( $data['profile_workflow_stages'] )
+			->set_auto_update( $data['profile_auto_update'] ?? false )
+			->set_auto_send( $data['profile_auto_send'] ?? false );
 
-			$available_languages = array_keys( $languages_converter->get_polylang_languages_supported_by_sc() );
-			if ( ! in_array( $post_language, $available_languages ) ) {
-				continue; //source язык запрещён, дальнейшую обработку пропускаем
+		try {
+			$vendor_list = wp_cache_get( 'vendor_list', 'translation-connectors' );
+
+			if ( ! $vendor_list ) {
+				$vendor_list = $smartcat->getDirectoriesManager()->directoriesGet( [ 'type' => 'vendor' ] )->getItems();
+				wp_cache_set( 'vendor_list', $vendor_list, 'translation-connectors', 3600 );
 			}
 
-			$post_target_languages = $target_languages;
-			if ( in_array( $post_language, $post_target_languages ) ) {
-				$sourceKey = array_search( $post_language, $post_target_languages );
-				unset( $post_target_languages[ $sourceKey ] );
-				$post_target_languages             = array_values( $post_target_languages ); //сбрасываем ключи
-				$data['same-language'][ $post_id ] = $post_language;
+			foreach ( $vendor_list as $vendor ) {
+				if ( $data['profile_vendor'] === $vendor->getId() ) {
+					$profile->set_vendor_name( $vendor->getName() );
+				}
 			}
+		} catch ( \Exception $e ) {
+			Logger::warning( "Can't set vendor name", "Reason: {$e->getMessage()}" );
+		}
 
-			if ( ! empty( $post_target_languages ) ) {
-				$task = new Task();
-				$task->set_post_id( $post_id )
-				     ->set_source_language( $post_language )
-				     ->set_target_languages( $post_target_languages )
-				     ->set_status( 'new' )
-				     ->set_project_id( null );
+		try {
+			$result = $profiles_repo->save( $profile );
+		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t save profile', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+			$result = false;
+		}
 
-				$task_id = $task_repository->add( $task );
+		if ( $result ) {
+			$ajax_response->send_success( __( 'Item successfully created', 'translation-connectors' ), $data );
+		} else {
+			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
+		}
+	}
 
-				if ( $task_id ) {
-					$is_new_task_created = true;
+	/**
+	 *
+	 */
+	public static function delete_profile() {
+		$ajax_response = new AjaxResponse();
 
-					$stat = new Statistics();
-					$stat->set_task_id( $task_id )
-					     ->set_post_id( $post_id )
-					     ->set_source_language( $post_language )
-					     ->set_progress( 0 )
-					     ->set_words_count( null )
-					     ->set_target_post_id( null )
-					     ->set_document_id( null )
-					     ->set_status( 'new' );
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ?? null ) ),
+			'bulk-profiles'
+		);
 
-					$data['stats'] = [];
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
+		}
 
-					foreach ( $post_target_languages as $target_language ) {
-						$newStat = clone $stat;
-						$newStat->set_target_language($target_language);
-						$stat_id = $statistics_repository->add($newStat);
-						if ( $stat_id ) {
-							array_push( $data['stats'], $stat_id );
-						} else {
-							array_push( $data['failed-stats'], $stat_id );
-						}
-					}
+		$profiles_repo = null;
+		$container     = self::get_container();
+		$data          = sanitize_post( $_POST, 'db' );
 
-					if ( count( $data['stats'] ) != count( $post_target_languages ) ) {
-						$ajax_response->send_error( __( 'Not all stats was created', 'translation-connectors' ) );
-					}
-				} else {
-					$data['task'] = $task;
-					$ajax_response->send_error( __( 'Task was not created', 'translation-connectors' ), $data );
+		try {
+			/** @var ProfileRepository $profiles_repo */
+			$profiles_repo = $container->get( 'entity.repository.profile' );
+		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+			$ajax_response->send_error( $e->getMessage(), [], 400 );
+		}
+
+		if ( $data['profile_id'] ) {
+			if ( $profiles_repo->delete_by_id( $data['profile_id'] ) ) {
+				$ajax_response->send_success( __( 'Item successfully deleted', 'translation-connectors' ), $data );
+			}
+		}
+
+		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
+	}
+
+	/**
+	 *
+	 */
+	public static function delete_statistics() {
+		$ajax_response = new AjaxResponse();
+
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ?? null ) ),
+			'bulk-statistics'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
+		}
+
+		$statistics_repo = null;
+		$container       = self::get_container();
+		$data            = sanitize_post( $_POST, 'db' );
+
+		try {
+			/** @var StatisticRepository $statistics_repo */
+			$statistics_repo = $container->get( 'entity.repository.statistic' );
+		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+			$ajax_response->send_error( $e->getMessage(), [], 400 );
+		}
+
+		if ( $data['stat_id'] ) {
+			if ( $statistics_repo->delete_by_id( $data['stat_id'] ) ) {
+				$ajax_response->send_success( __( 'Item successfully deleted', 'translation-connectors' ), $data );
+			}
+		}
+
+		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
+	}
+
+	/**
+	 *
+	 */
+	public static function cancel_statistics() {
+		$ajax_response = new AjaxResponse();
+
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ?? null ) ),
+			'bulk-statistics'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
+		}
+
+		$statistics_repo = null;
+		$container       = self::get_container();
+		$data            = sanitize_post( $_POST, 'db' );
+
+		try {
+			/** @var StatisticRepository $statistics_repo */
+			$statistics_repo = $container->get( 'entity.repository.statistic' );
+		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+			$ajax_response->send_error( $e->getMessage(), [], 400 );
+		}
+
+		if ( $data['stat_id'] ) {
+			$statistic = $statistics_repo->get_one_by_id( $data['stat_id'] );
+
+			if ( ! in_array( $statistic->get_status(), [ Statistics::STATUS_COMPLETED, Statistics::STATUS_FAILED, Statistics::STATUS_CANCELED ], true ) ) {
+				$statistic->set_status( Statistics::STATUS_CANCELED );
+				if ( $statistics_repo->save( $statistic ) ) {
+					$data['statistic'] = [
+						'status' => __( 'Canceled', 'translation-connectors' ),
+					];
+					$ajax_response->send_success( __( 'Item was successfully canceled', 'translation-connectors' ), $data );
 				}
 			}
 		}
 
-		//проверяем, что задание вообще было создано
-		if ( $is_new_task_created ) {
-			$ajax_response->send_success( 'ok', $data );
-		} else {
-			$ajax_response->send_error( 'Task was not created', $data );
+		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 400 );
+	}
+
+	/**
+	 * Create tasks for smartcat
+	 */
+	public static function send_to_smartcat() {
+		$ajax_response         = new AjaxResponse();
+		$task_repository       = null;
+		$statistics_repository = null;
+		$profiles_repository   = null;
+
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['sc_send_nonce'] ?? null ) ),
+			'sc_send_nonce'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
+		}
+
+		$post = sanitize_post( $_POST );
+
+		$container = self::get_container();
+		try {
+			/** @var TaskRepository $task_repository */
+			$task_repository = $container->get( 'entity.repository.task' );
+			/** @var StatisticRepository $statistics_repository */
+			$statistics_repository = $container->get( 'entity.repository.statistic' );
+			/** @var ProfileRepository $profiles_repository */
+			$profiles_repository = $container->get( 'entity.repository.profile' );
+		} catch ( \Exception $e ) {
+			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+			$ajax_response->send_error( $e->getMessage(), [], 400 );
+		}
+
+		$posts   = explode( ',', $post['posts'] );
+		$profile = $profiles_repository->get_one_by_id( $post['sc-profile'] );
+
+		if ( empty( $posts ) || empty( $profile ) ) {
+			$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), [], 403 );
+		}
+
+		$task = new Task();
+		$task->set_source_language( $profile->get_source_language() )
+			->set_target_languages( $profile->get_target_languages() )
+			->set_profile_id( $profile->get_id() )
+			->set_vendor_id( $profile->get_vendor() ?? null )
+			->set_workflow_stages( $profile->get_workflow_stages() )
+			->set_project_id( $profile->get_project_id() ?? null );
+
+		$task_id = $task_repository->add( $task );
+
+		foreach ( $posts as $post_id ) {
+			if ( $task_id ) {
+				$stat = new Statistics();
+				$stat->set_task_id( $task_id )
+					->set_post_id( $post_id )
+					->set_source_language( $profile->get_source_language() )
+					->set_progress( 0 )
+					->set_target_post_id( null )
+					->set_document_id( null )
+					->set_status( Statistics::STATUS_NEW );
+
+				$data['stats'] = [];
+
+				foreach ( $profile->get_target_languages() as $target_language ) {
+					$new_stat = clone $stat;
+					$new_stat->set_target_language( $target_language );
+					$stat_id = $statistics_repository->add( $new_stat );
+
+					if ( $stat_id ) {
+						array_push( $data['stats'], $stat_id );
+					} else {
+						array_push( $data['failed-stats'], $stat_id );
+					}
+				}
+
+				if ( count( $data['stats'] ) !== count( $profile->get_target_languages() ) ) {
+					$ajax_response->send_error( __( 'Not all items was created', 'translation-connectors' ) );
+				}
+			} else {
+				$data['task'] = $task;
+				$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
+			}
 		}
 
 		spawn_cron();
 
-		wp_die();
+		if ( $task_id ) {
+			$ajax_response->send_success( __( 'Items have been successfully sent.', 'translation-connectors' ), $data );
+		} else {
+			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
+		}
 	}
 
+	/**
+	 * Register hooks function
+	 */
 	public function register_hooks() {
 		if ( wp_doing_ajax() ) {
 			$container = self::get_container();
 			$prefix    = $container->getParameter( 'plugin.table.prefix' );
 
 			add_action( "wp_ajax_{$prefix}validate_settings", [ self::class, 'validate_settings' ] );
+			add_action( "wp_ajax_{$prefix}delete_profile", [ self::class, 'delete_profile' ] );
+			add_action( "wp_ajax_{$prefix}create_profile", [ self::class, 'create_profile' ] );
+			add_action( "wp_ajax_{$prefix}cancel_statistics", [ self::class, 'cancel_statistics' ] );
+			add_action( "wp_ajax_{$prefix}delete_statistics", [ self::class, 'delete_statistics' ] );
 			add_action( "wp_ajax_{$prefix}send_to_smartcat", [ self::class, 'send_to_smartcat' ] );
 			add_action( "wp_ajax_{$prefix}refresh_translation", [ self::class, 'refresh_translation' ] );
 		}
 	}
 
+	/**
+	 * Get Smartcat client service
+	 * WTF?! Why I can't use Connector::set_core_parameters WordPress?! TELL ME!!!
+	 *
+	 * @return SmartCAT|null
+	 * @throws \Exception
+	 */
+	private static function get_smartcat() {
+		$container = self::get_container();
+
+		try {
+			$options = $container->get( 'core.options' );
+			$container->setParameter( 'smartcat.api.login', $options->get_and_decrypt( 'smartcat_api_login' ) );
+			$container->setParameter( 'smartcat.api.password', $options->get_and_decrypt( 'smartcat_api_password' ) );
+			$container->setParameter( 'smartcat.api.server', $options->get( 'smartcat_api_server' ) );
+		} catch ( \Exception $e ) {
+			Logger::warning( "Can't set core parameters", "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
+		}
+
+		return $container->get( 'smartcat' );
+	}
 }

@@ -1,9 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 19.06.2017
- * Time: 21:45
+ * Smartcat Translation Manager for WordPress
+ *
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
  */
 
 namespace SmartCAT\WP\Queue;
@@ -43,8 +46,8 @@ class Statistic extends QueueAbstract {
 
 			} catch ( ClientErrorException $e ) {
 				Logger::error( "Document $item, update statistic", "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
-			} catch (\Throwable $e) {
-			    Logger::error( "Document $item, update statistic","Message: {$e->getMessage()}" );
+			} catch ( \Throwable $e ) {
+				Logger::error( "Document $item, update statistic","Message: {$e->getMessage()}" );
 			}
 		}
 

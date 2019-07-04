@@ -1,18 +1,28 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Diversant_
- * Date: 09.08.2017
- * Time: 15:28
+ * Smartcat Translation Manager for WordPress
+ *
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
  */
 
 namespace SmartCAT\WP\DB\Entity;
 
+use DateTime;
+
+/**
+ * Class Error
+ *
+ * @package SmartCAT\WP\DB\Entity
+ */
 class Error {
 	/** @var  integer */
 	private $id;
 
-	/** @var  \DateTime */
+	/** @var  DateTime */
 	private $date;
 
 	/** @var  string */
@@ -36,25 +46,25 @@ class Error {
 	 *
 	 * @return Error
 	 */
-	public function set_id( int $id ): Error {
+	public function set_id( $id ) {
 		$this->id = $id;
 
 		return $this;
 	}
 
 	/**
-	 * @return \DateTime
+	 * @return DateTime
 	 */
 	public function get_date() {
 		return $this->date;
 	}
 
 	/**
-	 * @param \DateTime $date
+	 * @param DateTime $date
 	 *
 	 * @return Error
 	 */
-	public function set_date( \DateTime $date ): Error {
+	public function set_date( DateTime $date ) {
 		$this->date = $date;
 
 		return $this;
@@ -72,7 +82,7 @@ class Error {
 	 *
 	 * @return Error
 	 */
-	public function set_type( string $type ): Error {
+	public function set_type( $type ) {
 		$this->type = $type;
 
 		return $this;
@@ -90,7 +100,7 @@ class Error {
 	 *
 	 * @return Error
 	 */
-	public function set_short_message( string $short_message ): Error {
+	public function set_short_message( $short_message ) {
 		$this->short_message = $short_message;
 
 		return $this;
@@ -108,10 +118,9 @@ class Error {
 	 *
 	 * @return Error
 	 */
-	public function set_message( string $message ): Error {
+	public function set_message( $message ) {
 		$this->message = $message;
 
 		return $this;
 	}
-
 }

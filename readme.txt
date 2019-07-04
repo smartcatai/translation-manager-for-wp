@@ -2,10 +2,10 @@
 Contributors: arybnikov, dkhapenkov, medic84
 Tags: localization, translation, translators, language, multilingual, bilingual, i18n, l10n
 Requires at least: 4.8
-Tested up to: 5.0.3
+Tested up to: 5.2
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl
-Stable tag: 1.2.1
+Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -73,6 +73,16 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 
 == Changelog ==
 
+= 2.0.0 (2019-06-10) =
+* New Profile feature
+* Half options migrated to profiles
+* New Dashboard view
+* Mass actions and row actions
+* Add Debug mode option with new Errors page
+* Update Ajax actions security
+* Add option of db version (for future updates)
+* Minor bugfixes
+
 = 1.2.1 (2019-05-13) =
 * Register support form
 
@@ -89,7 +99,8 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 * General bug fixes.
 
 = 1.0.13 (2019-01-23) =
-* Fix tested version
+* Auto send on post update
+* Fix linebreaks bugs
 
 = 1.0.12 (2019-01-25) =
 * Add external tag

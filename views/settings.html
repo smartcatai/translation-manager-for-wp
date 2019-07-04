@@ -1,49 +1,20 @@
-{{^ isCookie }}
-<a id="url" href="#TB_inline?&width=600&height=550&inlineId=my-content-id" class="thickbox" title="Please fill the form" style="display:none;">Open</a>
-<div id="my-content-id" style="display:none;">
-    <!--[if lte IE 8]>
-    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2-legacy.js"></script>
-    <![endif]-->
-    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
-    <script type="text/javascript">
-        hbspt.forms.create({
-            portalId: "4950983",
-            formId: "5da21dc3-49d9-49bb-aec1-2272338dbdcb",
-            onFormReady: function($form){
-                $form.find('input[name="utm_source"]').val('connectors');
-                $form.find('input[name="utm_medium"]').val('referral');
-                $form.find('input[name="utm_campaign"]').val('wordpress');
-            }
-        });
-        jQuery( function ( $ ) {
-            $( document ).ready(function () {
-                $("#url").click();
-                var expires = new Date();
-                expires.setTime(expires.getTime() + (1000*60*60*24*365*100));
-                document.cookie = "regform=true; expires= " + expires.toUTCString();
-            });
-        });
-    </script>
-</div>
-{{/ isCookie }}
 <div class="smartcat-connector wrap">
-    <h1 class="wp-heading-inline">{{ title }}</h1>
+    <h1 class="wp-heading-inline">{{ texts.title }}</h1>
     <hr class="wp-header-end" />
 
     {{# saved }}
     <div id=”message” class="updated settings-error notice is-dismissible">
-        <p><strong>{{ message }}</strong></p>
+        <p><strong>{{ texts.message }}</strong></p>
     </div>
     {{/ saved }}
 
     <div class="form-wrap">
         <form method="post" action="options.php">
-            <table class="form-table">
-                {{# fields }}{{/ fields }}
-                {{# sections }}{{/ sections }}
-            </table>
+            {{& fields }}
+            {{& sections }}
             <p class="submit">
-                <input type="submit" class="button-primary" value="{{ save_changes }}"/>
+                <button type="submit" class="button-primary"><div class="sc-spinner"></div>{{ texts.save_changes }}</button>
+                <input type="hidden" name="sc_validate_settings_nonce" value="{{ sc_validate_nonce }}" />
             </p>
         </form>
     </div>
