@@ -455,6 +455,8 @@ final class Ajax implements HookInterface {
 		$task->set_source_language( $profile->get_source_language() )
 			->set_target_languages( $profile->get_target_languages() )
 			->set_profile_id( $profile->get_id() )
+            ->set_vendor_id( $profile->get_vendor() ?? null)
+            ->set_workflow_stages( $profile->get_workflow_stages() )
 			->set_project_id( $profile->get_project_id() ?? null );
 
 		$task_id = $task_repository->add( $task );

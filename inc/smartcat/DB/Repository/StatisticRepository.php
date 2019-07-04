@@ -23,7 +23,7 @@ use SmartCAT\WP\Helpers\Language\LanguageConverter;
  *
  * @method Statistics get_one_by_id( int $id )
  * @method Statistics[] get_all_by( array $criterias )
- * @method Statistics[] get_one_by( array $criterias )
+ * @method Statistics get_one_by( array $criterias )
  * @method Statistics[] get_all( $from = 0, $limit = 0 )
  * @package SmartCAT\WP\DB\Repository
  */

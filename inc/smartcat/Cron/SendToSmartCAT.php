@@ -76,15 +76,10 @@ class SendToSmartCAT extends CronAbstract {
 
 		foreach ( $statistics as $statistic ) {
 			$task      = $task_repository->get_one_by_id( $statistic->get_task_id() );
-			$profile   = $profile_repository->get_one_by_id( $task->get_profile_id() );
 			$file      = $utils->get_post_to_file( $statistic->get_post_id() );
 			$task_name = $smartcat::get_task_name_from_stream( $file );
 
 			try {
-				if ( ! $profile ) {
-					throw new \Exception( 'Profile does not exists' );
-				}
-
 				if ( ! empty( $task->get_project_id() ) ) {
 					SmartCAT::debug( "Sending '{$task_name}'" );
 
@@ -96,7 +91,7 @@ class SendToSmartCAT extends CronAbstract {
 				} else {
 					SmartCAT::debug( "Creating '{$task_name}'" );
 
-					$smartcat_project = $smartcat->create_project( $file, $profile );
+					$smartcat_project = $smartcat->create_project( $task, $file );
 					$statistic_repository->link_to_smartcat_document( $task, $smartcat_project->getDocuments() );
 					$task->set_project_id( $smartcat_project->getId() );
 					$task_repository->save( $task );
@@ -109,7 +104,7 @@ class SendToSmartCAT extends CronAbstract {
 				} else {
 					$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
 				}
-				Logger::error( "Failed send to translate $task_name", $message );
+				Logger::error( "Failed send to translate '{$task_name}'", $message );
 				$statistic->set_status( Statistics::STATUS_FAILED );
 				$statistic_repository->save( $statistic );
 			}
