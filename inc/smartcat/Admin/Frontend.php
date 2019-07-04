@@ -29,7 +29,7 @@ final class Frontend implements HookInterface {
 	/**
 	 * @throws \Exception
 	 */
-	static public function custom_admin_footer_js() {
+	public static function custom_admin_footer_js() {
 		wp_enqueue_style( 'sc-custom-css' );
 
 		$container = self::get_container();
@@ -66,7 +66,7 @@ final class Frontend implements HookInterface {
 	/**
 	 * @throws \Exception
 	 */
-	static public function queue_my_admin_scripts() {
+	public static function queue_my_admin_scripts() {
 		wp_enqueue_script( 'jquery-ui-dialog' );
 		wp_register_script( 'smartcat-frontend', plugin_dir_url( SMARTCAT_PLUGIN_FILE ) . 'js/smartcat.js', [], Utils::get_plugin_version_file(), true );
 		wp_register_style( 'sc-custom-css', plugin_dir_url( SMARTCAT_PLUGIN_FILE ) . 'css/smartcat.css', [], Utils::get_plugin_version_file() );
@@ -87,12 +87,10 @@ final class Frontend implements HookInterface {
 			'pll_languages_supported_by_sc' => $pll_locales_array,
 
 			'dialogTitle'                   => __( 'Send for translation', 'translation-connectors' ),
-			'sourceLanguageNotSupported'    => __( 'won\'t be translated. Source language is not supported',
-				'translation-connectors' ),
-			'postsAreNotChoosen'            => __( 'Please, choose posts or pages for translation',
-				'translation-connectors' ),
-			'workflowStagesAreNotSelected'  => __( 'Workflow stages are not selected', 'translation-connectors' ),
-			'postsAreAlreadyTranslated'     => __( 'Selected posts or pages have already been translated', 'translation-connectors' )
+			'anErrorOccurred'               => __( 'An error occurred:', 'translation-connectors' ),
+			'dismissNotice'                 => __( 'Dismiss this notice.', 'translation-connectors' ),
+			'postsAreNotChoosen'            => __( 'Please, choose posts or pages for translation', 'translation-connectors' ),
+			'postsAreAlreadyTranslated'     => __( 'Selected posts or pages have already been translated', 'translation-connectors' ),
 		];
 
 		wp_localize_script( 'smartcat-frontend', 'SmartcatFrontend', $translation_and_vars );

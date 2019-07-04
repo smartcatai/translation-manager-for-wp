@@ -88,16 +88,17 @@ class ProfilesTable extends TableAbstract {
 	 */
 	public function column_default( $item, $column_name ) {
 		$language_converter = self::get_language_converter();
+		$pll_languages      = $language_converter->get_polylang_names_to_locales();
 
 		switch ( $column_name ) {
 			case 'name':
 				return $item->get_name();
 			case 'source_language':
-				return $language_converter->get_sc_code_by_wp( $item->get_source_language() )->get_wp_name();
+				return $pll_languages[ $item->get_source_language() ] ?? $item->get_source_language();
 			case 'target_languages':
 				$languages = [];
 				foreach ( $item->get_target_languages() as $wp_locale ) {
-					$languages[] = $language_converter->get_sc_code_by_wp( $wp_locale )->get_wp_name();
+					$languages[] = $pll_languages[ $wp_locale ] ?? $wp_locale;
 				}
 				return implode( ', ', $languages );
 			case 'vendor_name':
