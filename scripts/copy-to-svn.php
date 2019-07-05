@@ -153,8 +153,10 @@ $rmDirs = [
 	'inc/vendor/ralouphie/getallheaders/tests',
 ];
 
-chdir( __DIR__ . "/.." );
-//exec( 'composer update --no-dev' );
+if ( is_dir( __DIR__ . "/../inc/vendor" ) ) {
+	chdir( __DIR__ . "/.." );
+    exec( 'composer install --no-dev' );
+}
 
 if ( ! file_exists( "$resDir/trunk" ) ) {
 	mkdir( "$resDir/trunk", 0777, true );
