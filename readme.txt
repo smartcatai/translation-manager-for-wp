@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 5.2.2
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl, json
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,6 +72,9 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 1. Translation Connectors Settings.
 
 == Changelog ==
+
+= 2.0.1 (2019-07-05) =
+* Fix upgrade function
 
 = 2.0.0 (2019-07-05) =
 * Introducing new Profiles feature. Now you can create an unlimited amount of profiles with different settings (languages, workflow stages, etc.) and select a required profile while submitting for translation.

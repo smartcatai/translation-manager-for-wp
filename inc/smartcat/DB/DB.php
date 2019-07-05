@@ -13,6 +13,7 @@ namespace SmartCAT\WP\DB;
 
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Setup\SetupInterface;
+use SmartCAT\WP\Helpers\Utils;
 use SmartCAT\WP\WP\PluginInterface;
 
 /**
@@ -35,7 +36,7 @@ class DB implements PluginInterface {
 				$object->install();
 			}
 		}
-		update_option( $param_prefix . 'smartcat_db_version', $this->get_file_version() );
+		update_option( $param_prefix . 'smartcat_db_version', Utils::get_plugin_version_file() );
 	}
 
 	/**
@@ -59,18 +60,5 @@ class DB implements PluginInterface {
 			}
 		}
 		delete_option( $param_prefix . 'smartcat_db_version' );
-	}
-
-	/**
-	 * Get plugin version from file
-	 *
-	 * @return int|string
-	 */
-	private function get_file_version() {
-		if ( defined( 'SMARTCAT_PLUGIN_FILE' ) ) {
-			$plugin_data = get_file_data( SMARTCAT_PLUGIN_FILE, [ 'Version' => 'Version' ] );
-			return trim( $plugin_data['Version'] );
-		}
-		return 0;
 	}
 }

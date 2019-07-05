@@ -94,13 +94,15 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 			if ( $project_id ) {
 				$profile->set_project_id( $project_id );
-                $this->exec( "UPDATE {$tasks_table_name} SET vendorID = '{$project_id}' WHERE vendorID IS NULL;" );
-            }
+				$this->exec( "UPDATE {$tasks_table_name} SET vendorID = '{$project_id}' WHERE vendorID IS NULL;" );
+			}
 
-			$profile_repo->add( $profile );
-            $workflow_stages = wp_json_encode( get_option( $param_prefix . 'smartcat_workflow_stages' ) );
-			$this->exec( "UPDATE {$tasks_table_name} SET profileID = 1 WHERE profileID IS NULL;" );
-			$this->exec( "UPDATE {$tasks_table_name} SET workflowStages = '{$workflow_stages}' WHERE workflowStages IS NULL;" );
+			if ( $profile_repo->add( $profile ) ) {
+				$workflow_stages = wp_json_encode( get_option( $param_prefix . 'smartcat_workflow_stages' ) );
+				$this->exec( "UPDATE {$tasks_table_name} SET profileID = 1 WHERE profileID IS NULL;" );
+				$this->exec( "UPDATE {$tasks_table_name} SET workflowStages = '{$workflow_stages}' WHERE workflowStages IS NULL;" );
+			}
+
 			delete_option( $param_prefix . 'smartcat_workflow_stages' );
 			delete_option( $param_prefix . 'smartcat_vendor_id' );
 			delete_option( $param_prefix . 'smartcat_account_name' );
