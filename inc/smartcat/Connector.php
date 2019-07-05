@@ -94,7 +94,7 @@ class Connector {
 		flush_rewrite_rules();
 	}
 
-	public function plugin_update( $upgrader_object, $options ) {
+	public function plugin_upgrade( $upgrader_object, $options ) {
 		$plugin_file = plugin_basename( SMARTCAT_PLUGIN_FILE );
 
 		if ( 'update' === $options['action'] && 'plugin' === $options['type'] && isset( $options['plugins'] ) ) {
