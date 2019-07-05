@@ -11,21 +11,16 @@
 
 namespace SmartCAT\WP;
 
-use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\Cron\CronInterface;
-use SmartCAT\WP\DB\Entity\Task;
-use SmartCAT\WP\DB\Repository\StatisticRepository;
-use SmartCAT\WP\DB\Repository\TaskRepository;
-use SmartCAT\WP\Helpers\Language\LanguageConverter;
+use SmartCAT\WP\DB\Setup\SetupInterface;
 use SmartCAT\WP\Helpers\SmartCAT;
+use SmartCAT\WP\Helpers\Utils;
 use SmartCAT\WP\Queue\QueueAbstract;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\InitInterface;
 use SmartCAT\WP\WP\Notice;
 use SmartCAT\WP\WP\Options;
 use SmartCAT\WP\WP\PluginInterface;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class Connector
@@ -84,7 +79,7 @@ class Connector {
 	public function plugin_activate() {
 		if ( ! self::check_dependency() ) {
 			/** @var Notice $notice */
-			throw new Exception( __( 'You need to activate the plugin Polylang', 'translation-connectors' ) );
+			throw new \Exception( __( 'You need to activate the plugin Polylang', 'translation-connectors' ) );
 		}
 		self::set_core_parameters();
 
@@ -97,6 +92,24 @@ class Connector {
 		}
 
 		flush_rewrite_rules();
+	}
+
+	public function plugin_upgrade( $upgrader_object, $options ) {
+		$plugin_file = plugin_basename( SMARTCAT_PLUGIN_FILE );
+
+		if ( 'update' === $options['action'] && 'plugin' === $options['type'] && isset( $options['plugins'] ) ) {
+			if ( in_array( $plugin_file, $options['plugins'], true ) ) {
+				$param_prefix = self::get_container()->getParameter( 'plugin.table.prefix' );
+				$hooks = self::get_container()->findTaggedServiceIds( 'update' );
+				foreach ( $hooks as $hook => $tags ) {
+					$object = $this->from_container( $hook );
+					if ( $object instanceof SetupInterface ) {
+						$object->install();
+					}
+				}
+				update_option( $param_prefix . 'smartcat_db_version', Utils::get_plugin_version_file() );
+			}
+		}
 	}
 
 	public function plugin_deactivate() {

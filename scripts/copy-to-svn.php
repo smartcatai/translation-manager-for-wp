@@ -9,10 +9,10 @@
  * @link http://smartcat.ai
  */
 
-$resDir = __DIR__ . '/../../translation-connectors-svn';
+$resDir = '../../translation-manager-for-wp-svn';
 
 if ( !is_dir( "$resDir/trunk" ) || !is_dir( "$resDir/tags" ) ) {
-	die( "SVN dir not found" );
+	die( "SVN dir not found" . PHP_EOL );
 }
 
 function rrmdir( $path, $t = "1" ) {
@@ -82,26 +82,28 @@ function fileReplace( $search, $replace, $file ) {
 	file_put_contents( $file, $content );
 }
 
+$matches = [];
+
 //Получаем версию из readme.txt
 $readme = file_get_contents( __DIR__ . '/../readme.txt' );
-$re	 = '/Stable tag:\s*( \d+\.\d+\.\d+ )\s*\n/';
+$re	 = '/Stable tag:\s*(\d+\.\d+\.\d+)\s*\n/';
 preg_match( $re, $readme, $matches );
 $readmeVersion = $matches[1] ?? 'readme';
 
 //Получаем версию из translation-connectors.php
 $plugin = file_get_contents( __DIR__ . '/../translation-connectors.php' );
-$re	 = '/Version:\s*( \d+\.\d+\.\d+ )\s*\n/';
+$re	 = '/Version:\s*(\d+\.\d+\.\d+)\s*\n/';
 preg_match( $re, $plugin, $matches );
 $pluginVersion = $matches[1] ?? 'plugin';
 
 if ( $readmeVersion !== $pluginVersion ) {
-	die ( "Версия плагина в readme.txt $readmeVersion и translation-connectors.php $pluginVersion не совпадают" );
+	die ( "Версия плагина в readme.txt $readmeVersion и translation-connectors.php $pluginVersion не совпадают" . PHP_EOL);
 }
 
 $version = $readmeVersion;
 
 //Проверяем присутсвие Changelog для текущей версии
-$re = '/= ( .+ ) =/';
+$re = '/= (.+) =/';
 preg_match_all( $re, $readme, $matches, PREG_SET_ORDER, 0 );
 
 $find = false;
@@ -113,7 +115,7 @@ foreach ( $matches as $match ) {
 }
 
 if ( !$find ) {
-	die ( "readme.txt не содержит Changelog для версии $version" );
+	die ( "readme.txt не содержит Changelog для версии $version" . PHP_EOL );
 }
 
 $message = readline( "Введите описание коммита: " );
@@ -164,7 +166,7 @@ echo( '=== 15% Updating svn to latest version ===' . PHP_EOL );
 exec( 'svn up' );
 
 if ( is_dir( "$resDir/tags/$version" ) ) {
-	die( 'ERROR: This version already exists!' );
+	die( 'ERROR: This version already exists!' . PHP_EOL );
 }
 
 echo( '=== 30% Copy files ===' . PHP_EOL );
@@ -177,7 +179,7 @@ foreach ( $copyDirs as $dir ) {
 }
 
 foreach ( $rmDirs as $dir ) {
-	exec( "svn --force rm " . "$resDir/trunk/$dir" );
+	exec( "svn --force rm '$resDir/trunk/$dir'" );
 	rrmdir( "$resDir/trunk/$dir" );
 }
 

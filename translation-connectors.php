@@ -8,7 +8,7 @@
  * Plugin Name:     Smartcat Translation Manager
  * Plugin URI:      https://www.smartcat.ai/api/
  * Description:     WordPress integration to translation connectors.
- * Version:         2.0.0
+ * Version:         2.0.1
  * Author:          Smartcat
  * Author URI:      https://www.smartcat.ai
  * License:         GPL-3.0
@@ -77,6 +77,7 @@ if ( ! $connector::check_dependency() ) {
 	);
 	add_action( 'admin_menu', [ Menu::class, 'add_admin_menu' ] );
 	add_action( 'admin_init', [ Settings::class, 'make_page' ] );
+	add_action( 'upgrader_process_complete', [ $connector, 'plugin_upgrade' ], 10, 2 );
 	register_activation_hook( __FILE__, [ $connector, 'plugin_activate' ] );
 	register_deactivation_hook( __FILE__, [ $connector, 'plugin_deactivate' ] );
 }
