@@ -2,9 +2,9 @@
 Contributors: arybnikov, dkhapenkov, medic84
 Tags: localization, translation, translators, language, multilingual, bilingual, i18n, l10n
 Requires at least: 4.8
-Tested up to: 5.2
+Tested up to: 5.2.2
 Requires PHP: 7.0
-Requires PHP extensions: dom, openssl
+Requires PHP extensions: dom, openssl, json
 Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -73,15 +73,12 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 
 == Changelog ==
 
-= 2.0.0 (2019-06-10) =
-* New Profile feature
-* Half options migrated to profiles
-* New Dashboard view
-* Mass actions and row actions
-* Add Debug mode option with new Errors page
-* Update Ajax actions security
-* Add option of db version (for future updates)
-* Minor bugfixes
+= 2.0.0 (2019-07-05) =
+* Introducing new Profiles feature. Now you can create an unlimited amount of profiles with different settings (languages, workflow stages, etc.) and select a required profile while submitting for translation.
+* Debug Mode is now available to investigate any issues that could occur. Turn it on in Localization->Settings and Errors table will appear in Localization section.
+* Automatic submission of content implemented. You can find two options in profiles: “Automatically submit new content for translation” and “Automatically submit each content update for translation”. Please note that it works for the Published content only.
+* A new Dashboard view with mass and per-row actions.
+* General fixes and enhancements.
 
 = 1.2.1 (2019-05-13) =
 * Register support form
