@@ -43,7 +43,6 @@ class TablesSetup extends DbAbstract implements SetupInterface {
 		$this->drop_table( $this->prefix . 'smartcat_connector_tasks' );
 		$this->drop_table( $this->prefix . 'smartcat_connector_statistic' );
 		$this->drop_table( $this->prefix . 'smartcat_connector_errors' );
-		$this->drop_table( $this->prefix . 'smartcat_connector_profiles' );
 	}
 
 	/**
@@ -93,23 +92,6 @@ class TablesSetup extends DbAbstract implements SetupInterface {
 				`message` TEXT NOT NULL,
 				PRIMARY KEY ( `id` ),
 				INDEX ( `date` )
-			 );";
-
-		$this->create_table( $sql );
-
-		$profiles_table_name = $this->prefix . 'smartcat_connector_profiles';
-		$sql                 = "CREATE TABLE IF NOT EXISTS {$profiles_table_name} ( 
-				id  BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
-				`name` VARCHAR( 255 ),
-				vendor VARCHAR( 255 ),
-				vendor_name TEXT,
-				source_language VARCHAR( 255 ) NOT NULL,
-				target_languages TEXT NOT NULL,
-				workflow_stages TEXT,
-				project_id VARCHAR( 255 ),
-				auto_send BOOLEAN,
-				auto_update BOOLEAN,
-				PRIMARY KEY  ( id )
 			 );";
 
 		$this->create_table( $sql );

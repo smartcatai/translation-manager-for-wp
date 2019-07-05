@@ -63,24 +63,6 @@ abstract class DbAbstract {
 	}
 
 	/**
-	 * @return int
-	 */
-	protected function get_plugin_version_file() {
-		if ( defined( 'SMARTCAT_PLUGIN_FILE' ) ) {
-			$plugin_data = get_file_data( SMARTCAT_PLUGIN_FILE, [ 'Version' => 'Version' ] );
-			return $plugin_data['Version'];
-		}
-		return 0;
-	}
-
-	/**
-	 * @return mixed|void
-	 */
-	protected function get_plugin_version() {
-		return get_option( 'smartcat_connector_smartcat_db_version', 0 );
-	}
-
-	/**
 	 * @param $sql
 	 */
 	protected function update_table( $sql ) {

@@ -16,6 +16,7 @@ use SmartCAT\WP\DB\DbAbstract;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
+use SmartCAT\WP\Helpers\Utils;
 
 /**
  * Class TablesUpdate
@@ -42,7 +43,7 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	 * Main update function
 	 */
 	public function install() {
-		if ( version_compare( $this->get_plugin_version(), '2.0.0', '<' ) ) {
+		if ( version_compare( Utils::get_plugin_version(), '2.0.0', '<' ) ) {
 			$this->v200();
 		}
 	}
@@ -56,6 +57,23 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 		$tasks_table_name     = $this->prefix . 'smartcat_connector_tasks';
 		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
+		$profiles_table_name  = $this->prefix . 'smartcat_connector_profiles';
+
+		$sql = "CREATE TABLE IF NOT EXISTS {$profiles_table_name} ( 
+				id  BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
+				`name` VARCHAR( 255 ),
+				vendor VARCHAR( 255 ),
+				vendor_name TEXT,
+				source_language VARCHAR( 255 ) NOT NULL,
+				target_languages TEXT NOT NULL,
+				workflow_stages TEXT,
+				project_id VARCHAR( 255 ),
+				auto_send BOOLEAN,
+				auto_update BOOLEAN,
+				PRIMARY KEY  ( id )
+			 );";
+
+		$this->create_table( $sql );
 
 		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN profileID BIGINT( 20 ) UNSIGNED NOT NULL;" );
 		$this->exec( "ALTER TABLE {$tasks_table_name} ADD COLUMN vendorID VARCHAR (255) DEFAULT NULL;" );
@@ -114,5 +132,6 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	 * Main rollback function
 	 */
 	public function uninstall() {
+		$this->drop_table( $this->prefix . 'smartcat_connector_profiles' );
 	}
 }
