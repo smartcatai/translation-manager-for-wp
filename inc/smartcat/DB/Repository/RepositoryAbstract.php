@@ -12,6 +12,7 @@
 namespace SmartCAT\WP\DB\Repository;
 
 use SmartCAT\WP\DB\DbAbstract;
+use SmartCAT\WP\DB\Entity\EntityInterface;
 
 /**
  * Class RepositoryAbstract
@@ -74,13 +75,6 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 	protected abstract function to_entity( $row );
 
 	/**
-	 * @param $entity
-	 *
-	 * @return mixed
-	 */
-	protected abstract function save( $entity );
-
-	/**
 	 * @param $rows
 	 *
 	 * @return array
@@ -92,6 +86,59 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param EntityInterface $entity
+	 * @return bool|int
+	 */
+	public function add( $entity ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+		$data       = $entity->get_raw_data();
+
+		if ( ! empty( $entity->get_id() ) ) {
+			$data['id'] = $entity->get_id();
+		}
+
+		if ( $wpdb->insert( $table_name, $data ) ) {
+			return $wpdb->insert_id;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param EntityInterface $entity
+	 *
+	 * @return bool
+	 */
+	public function update( $entity ) {
+		$table_name = $this->get_table_name();
+		$wpdb       = $this->get_wp_db();
+
+		if ( ! empty( $entity->get_id() ) ) {
+			$data = $entity->get_raw_data();
+
+			if ( $wpdb->update( $table_name, $data, [ 'id' => $entity->get_id() ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param EntityInterface $entity
+	 *
+	 * @return bool|int
+	 */
+	public function save( $entity ) {
+		if ( $entity->get_id() ) {
+			return $this->update( $entity );
+		} else {
+			return $this->add( $entity );
+		}
 	}
 
 	/**

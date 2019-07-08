@@ -20,6 +20,7 @@ use SmartCAT\WP\DB\Entity\Task;
  * @method Task[] get_all_by( array $criterias )
  * @method Task get_one_by( array $criterias )
  * @method Task[] get_all( $from = 0, $limit = 0 )
+ *
  * @package SmartCAT\WP\DB\Repository
  */
 class TaskRepository extends RepositoryAbstract {
@@ -32,64 +33,6 @@ class TaskRepository extends RepositoryAbstract {
 	 */
 	public function get_table_name() {
 		return $this->prefix . self::TABLE_NAME;
-	}
-
-	/**
-	 * @param Task $task
-	 *
-	 * @return bool|int
-	 */
-	public function add( $task ) {
-		$table_name = $this->get_table_name();
-		$wpdb       = $this->get_wp_db();
-
-		$data = [
-			'sourceLanguage'  => $task->get_source_language(),
-			'targetLanguages' => serialize( $task->get_target_languages() ),
-			'projectID'       => $task->get_project_id(),
-			'vendorID'        => $task->get_vendor_id(),
-			'workflowStages'  => wp_json_encode( $task->get_workflow_stages() ),
-			'profileID'       => intval( $task->get_profile_id() ),
-		];
-
-		if ( ! empty( $task->get_id() ) ) {
-			$data['id'] = $task->get_id();
-		}
-
-		if ( $wpdb->insert( $table_name, $data ) ) {
-			$task->set_id( $wpdb->insert_id );
-
-			return $wpdb->insert_id;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param Task $task
-	 *
-	 * @return bool
-	 */
-	public function update( $task ) {
-		$table_name = $this->get_table_name();
-		$wpdb       = $this->get_wp_db();
-
-		if ( ! empty( $task->get_id() ) ) {
-			$data = [
-				'sourceLanguage'  => $task->get_source_language(),
-				'targetLanguages' => serialize( $task->get_target_languages() ),
-				'projectID'       => $task->get_project_id(),
-				'vendorID'        => $task->get_vendor_id(),
-				'workflowStages'  => wp_json_encode( $task->get_workflow_stages() ),
-				'profileID'       => intval( $task->get_profile_id() ),
-			];
-
-			if ( $wpdb->update( $table_name, $data, [ 'id' => $task->get_id() ] ) ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -118,49 +61,6 @@ class TaskRepository extends RepositoryAbstract {
 	 * @return mixed|Task
 	 */
 	protected function to_entity( $row ) {
-		$result = new Task();
-
-		if ( isset( $row->id ) ) {
-			$result->set_id( intval( $row->id ) );
-		}
-
-		if ( isset( $row->sourceLanguage ) ) {
-			$result->set_source_language( $row->sourceLanguage );
-		}
-
-		if ( isset( $row->targetLanguages ) ) {
-			$result->set_target_languages( unserialize( $row->targetLanguages ) );
-		}
-
-		if ( isset( $row->projectID ) ) {
-			$result->set_project_id( $row->projectID );
-		}
-
-		if ( isset( $row->profileID ) ) {
-			$result->set_profile_id( $row->profileID );
-		}
-
-		if ( isset( $row->vendorID ) ) {
-			$result->set_vendor_id( $row->vendorID );
-		}
-
-		if ( isset( $row->workflowStages ) ) {
-			$result->set_workflow_stages( json_decode( $row->workflowStages ) );
-		}
-
-		return $result;
-	}
-
-	/**
-	 * @param Task $task
-	 *
-	 * @return mixed|void
-	 */
-	public function save( $task ) {
-		if ( $task->get_id() ) {
-			return $this->update( $task );
-		} else {
-			return $this->add( $task );
-		}
+		return new Task( $row );
 	}
 }

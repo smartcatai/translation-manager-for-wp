@@ -16,71 +16,42 @@ namespace SmartCAT\WP\DB\Entity;
  *
  * @package SmartCAT\WP\DB\Entity
  */
-class Task {
+class Task extends EntityAbstract {
 	/** @var  integer */
-	private $id;
-
+	protected $id;
 	/** @var  string */
-	private $source_language;
-
-	/** @var  string[] */
-	private $target_languages;
-
-	/** @var int */
-	private $profile_id;
-
+	protected $source_language;
 	/** @var  string */
-	private $project_id = null;
+	protected $target_languages;
+	/** @var  int */
+	protected $profile_id;
+	/** @var  string */
+	protected $project_id = null;
+	/** @var  string */
+	protected $workflow_stages;
+	/** @var  string */
+	protected $vendor_id;
 
-    /** @var  array */
-	private $workflow_stages;
-
-    /** @var  string */
-    private $vendor_id;
-
-    /**
-     * @return array
-     */
-    public function get_workflow_stages()
-    {
-        return $this->workflow_stages;
-    }
-
-    /**
-     * @param array $workflow_stages
-     * @return Task
-     */
-    public function set_workflow_stages($workflow_stages)
-    {
-        $this->workflow_stages = $workflow_stages;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function get_vendor_id()
-    {
-        return $this->vendor_id;
-    }
-
-    /**
-     * @param string $vendor_id
-     * @return Task
-     */
-    public function set_vendor_id($vendor_id)
-    {
-        $this->vendor_id = $vendor_id;
-
-        return $this;
-    }
+	/**
+	 * @return array
+	 */
+	public function attributes(): array {
+		return [
+			'id'              => 'id',
+			'sourceLanguage'  => 'source_language',
+			'targetLanguages' => 'target_languages',
+			'projectID'       => 'project_id',
+			'vendorID'        => 'vendor_id',
+			'workflowStages'  => 'workflow_stages',
+			'profileID'       => 'profile_id',
+		];
+	}
 
 	/**
 	 * @return int
 	 */
 	public function get_id() {
-		return $this->id;
+		return intval( $this->id );
 	}
 
 	/**
@@ -89,7 +60,7 @@ class Task {
 	 * @return Task
 	 */
 	public function set_id( $id ) {
-		$this->id = $id;
+		$this->id = intval( $id );
 
 		return $this;
 	}
@@ -113,10 +84,10 @@ class Task {
 	}
 
 	/**
-	 * @return string[]
+	 * @return string
 	 */
 	public function get_target_languages() {
-		return $this->target_languages;
+		return unserialize( $this->target_languages );
 	}
 
 	/**
@@ -125,7 +96,7 @@ class Task {
 	 * @return Task
 	 */
 	public function set_target_languages( $target_languages ) {
-		$this->target_languages = $target_languages;
+		$this->target_languages = serialize( $target_languages );
 
 		return $this;
 	}
@@ -149,10 +120,10 @@ class Task {
 	}
 
 	/**
-	 * @return string|null
+	 * @return int
 	 */
 	public function get_profile_id() {
-		return $this->profile_id;
+		return intval( $this->profile_id );
 	}
 
 	/**
@@ -161,7 +132,43 @@ class Task {
 	 * @return Task
 	 */
 	public function set_profile_id( $profile_id ) {
-		$this->profile_id = $profile_id;
+		$this->profile_id = intval( $profile_id );
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_workflow_stages() {
+		return json_decode( $this->workflow_stages, true );
+	}
+
+	/**
+	 * @param array $workflow_stages
+	 *
+	 * @return Task
+	 */
+	public function set_workflow_stages( $workflow_stages ) {
+		$this->workflow_stages = wp_json_encode( $workflow_stages );
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_vendor_id() {
+		return $this->vendor_id;
+	}
+
+	/**
+	 * @param string $vendor_id
+	 *
+	 * @return Task
+	 */
+	public function set_vendor_id( $vendor_id ) {
+		$this->vendor_id = $vendor_id;
 
 		return $this;
 	}

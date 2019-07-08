@@ -18,27 +18,36 @@ use DateTime;
  *
  * @package SmartCAT\WP\DB\Entity
  */
-class Error {
+class Error extends EntityAbstract {
 	/** @var  integer */
-	private $id;
-
-	/** @var  DateTime */
-	private $date;
-
+	protected $id;
 	/** @var  string */
-	private $type;
-
+	protected $date;
 	/** @var  string */
-	private $short_message;
-
+	protected $type;
 	/** @var  string */
-	private $message;
+	protected $short_message;
+	/** @var  string */
+	protected $message;
+
+	/**
+	 * @return array
+	 */
+	public function attributes(): array {
+		return [
+			'id'           => 'id',
+			'date'         => 'date',
+			'type'         => 'type',
+			'shortMessage' => 'short_message',
+			'message'      => 'message',
+		];
+	}
 
 	/**
 	 * @return int
 	 */
 	public function get_id() {
-		return $this->id;
+		return intval( $this->id );
 	}
 
 	/**
@@ -47,7 +56,7 @@ class Error {
 	 * @return Error
 	 */
 	public function set_id( $id ) {
-		$this->id = $id;
+		$this->id = intval( $id );
 
 		return $this;
 	}
@@ -56,7 +65,7 @@ class Error {
 	 * @return DateTime
 	 */
 	public function get_date() {
-		return $this->date;
+		return DateTime::createFromFormat( 'Y-m-d H:i:s', $this->date );
 	}
 
 	/**
@@ -65,7 +74,7 @@ class Error {
 	 * @return Error
 	 */
 	public function set_date( DateTime $date ) {
-		$this->date = $date;
+		$this->date = $date->format( 'Y-m-d H:i:s' );
 
 		return $this;
 	}
