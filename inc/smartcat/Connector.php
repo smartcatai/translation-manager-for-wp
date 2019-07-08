@@ -30,8 +30,14 @@ use SmartCAT\WP\WP\PluginInterface;
 class Connector {
 	use DITrait;
 
+	/**
+	 * @var null
+	 */
 	public static $plugin_version = null;
 
+	/**
+	 * Connector constructor.
+	 */
 	public function __construct() {
 		ignore_user_abort( true );
 		set_time_limit( 0 );
@@ -42,6 +48,9 @@ class Connector {
 		}
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	private function init_cron() {
 		$new_schedules = [];
 		$services	 = self::get_container()->findTaggedServiceIds( 'cron' );
@@ -59,6 +68,9 @@ class Connector {
 		} );
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	private function register_hooks() {
 		$hooks = self::get_container()->findTaggedServiceIds( 'hook' );
 		foreach ( $hooks as $hook => $tags ) {
@@ -69,6 +81,9 @@ class Connector {
 		}
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	private function init_queue() {
 		$services = self::get_container()->findTaggedServiceIds( 'queue' );
 		foreach ( $services as $service => $tags ) {
@@ -76,6 +91,9 @@ class Connector {
 		}
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function plugin_activate() {
 		if ( ! self::check_dependency() ) {
 			/** @var Notice $notice */
@@ -94,26 +112,25 @@ class Connector {
 		flush_rewrite_rules();
 	}
 
+	/**
+	 * @param $upgrader_object
+	 * @param $options
+	 */
 	public function plugin_upgrade( $upgrader_object, $options ) {
 		$plugin_file = plugin_basename( SMARTCAT_PLUGIN_FILE );
 
 		if ( 'update' === $options['action'] && 'plugin' === $options['type'] && isset( $options['plugins'] ) ) {
 			if ( in_array( $plugin_file, $options['plugins'], true ) ) {
-				$param_prefix = self::get_container()->getParameter( 'plugin.table.prefix' );
-				$hooks = self::get_container()->findTaggedServiceIds( 'update' );
-				foreach ( $hooks as $hook => $tags ) {
-					$object = $this->from_container( $hook );
-					if ( $object instanceof SetupInterface ) {
-						$object->install();
-					}
-				}
-				update_option( $param_prefix . 'smartcat_db_version', Utils::get_plugin_version_file() );
+				set_transient( 'smartcat_translation_connector_updated', 1 );
 			}
 		}
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function plugin_deactivate() {
-		//Деактивация компонентов плагина
+		// Deactivation plugin components.
 		$hooks = self::get_container()->findTaggedServiceIds( 'installable' );
 		foreach ( $hooks as $hook => $tags ) {
 			$object = $this->from_container( $hook );
@@ -121,7 +138,7 @@ class Connector {
 				$object->plugin_deactivate();
 			}
 		}
-		//Остановка очередей
+		// Stopping queues.
 		$hooks = self::get_container()->findTaggedServiceIds( 'queue' );
 		foreach ( $hooks as $hook => $tags ) {
 			$object = $this->from_container( $hook );
@@ -131,10 +148,32 @@ class Connector {
 		}
 	}
 
-	public function plugin_load( /** @noinspection PhpUnusedParameterInspection */ $query ) {
+	/**
+	 * @param $query
+	 *
+	 * @throws \Exception
+	 */
+	public function plugin_load( $query ) {
 		load_plugin_textdomain( SMARTCAT_PLUGIN_NAME, false, basename( SMARTCAT_PLUGIN_DIR ) . '/languages' );
+
+		if ( get_transient( 'smartcat_translation_connector_updated' ) && current_user_can( 'update_plugins' ) ) {
+			$param_prefix = self::get_container()->getParameter( 'plugin.table.prefix' );
+			$hooks        = self::get_container()->findTaggedServiceIds( 'update' );
+
+			foreach ( $hooks as $hook => $tags ) {
+				$object = $this->from_container( $hook );
+				if ( $object instanceof SetupInterface ) {
+					$object->install();
+				}
+			}
+			update_option( $param_prefix . 'smartcat_db_version', Utils::get_plugin_version_file() );
+			delete_transient( 'smartcat_translation_connector_updated' );
+		}
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	static public function plugin_uninstall() {
 		$hooks = self::get_container()->findTaggedServiceIds( 'installable' );
 		foreach ( $hooks as $hook => $tags ) {
@@ -145,7 +184,12 @@ class Connector {
 		}
 	}
 
-	public function plugin_init( /** @noinspection PhpUnusedParameterInspection */ $query ) {
+	/**
+	 * @param $query
+	 *
+	 * @throws \Exception
+	 */
+	public function plugin_init( $query ) {
 		$this->init_queue();
 		$hooks = self::get_container()->findTaggedServiceIds( 'initable' );
 		foreach ( $hooks as $hook => $tags ) {
@@ -157,7 +201,12 @@ class Connector {
 		self::set_core_parameters();
 	}
 
-	public function plugin_admin_notice( /** @noinspection PhpUnusedParameterInspection */ $query ) {
+	/**
+	 * @param $query
+	 *
+	 * @throws \Exception
+	 */
+	public function plugin_admin_notice( $query ) {
 		if ( ! wp_doing_ajax() ) {
 			/** @var Notice $notice */
 			$notice = $this->from_container( 'core.notice' );
@@ -175,6 +224,9 @@ class Connector {
 		}
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public static function set_core_parameters() {
 		/** @var  ContainerInterface */
 		$container = self::get_container();
@@ -185,6 +237,9 @@ class Connector {
 		$container->setParameter( 'smartcat.api.server', $options->get( 'smartcat_api_server' ) );
 	}
 
+	/**
+	 * @return bool
+	 */
 	public static function check_dependency() {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 

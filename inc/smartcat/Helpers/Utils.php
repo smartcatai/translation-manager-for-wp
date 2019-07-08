@@ -11,7 +11,7 @@
 
 namespace SmartCAT\WP\Helpers;
 
-//вспомогательные функции
+use SmartCAT\WP\Connector;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\WP\Options;
 
@@ -30,7 +30,7 @@ class Utils {
 
 		$intersect = array_intersect( $needle, $haystack );
 
-		return ( bool ) ( count( $intersect ) == count( $needle ) );
+		return (bool) ( count( $intersect ) === count( $needle ) );
 	}
 
 	/**
@@ -126,7 +126,8 @@ class Utils {
 	 * @return mixed|void
 	 */
 	public static function get_plugin_version() {
-		return get_option( 'smartcat_connector_smartcat_db_version', 0 );
+		$prefix = Connector::get_container()->getParameter( 'plugin.table.prefix' );
+		return get_option( $prefix . 'smartcat_db_version', 0 );
 	}
 
 	/**
