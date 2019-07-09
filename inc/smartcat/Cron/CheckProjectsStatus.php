@@ -16,6 +16,7 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
+use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 
 /**
@@ -44,7 +45,7 @@ class CheckProjectsStatus extends CronAbstract {
 			return;
 		}
 
-		SmartCAT::debug( 'Checking documents started' );
+		Logger::event( 'cron', 'Checking documents started' );
 
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
@@ -61,7 +62,7 @@ class CheckProjectsStatus extends CronAbstract {
 		$statistics = $statistic_repository->get_sended();
 		$count      = count( $statistics );
 
-		SmartCAT::debug( "Finded $count documents to check" );
+		Logger::event( 'cron', "Find $count documents to check" );
 
 		foreach ( $statistics as $statistic ) {
 			if ( $statistic->get_status() !== Statistics::STATUS_SENDED ) {
@@ -99,6 +100,6 @@ class CheckProjectsStatus extends CronAbstract {
 			$statistic_repository->save( $statistic );
 		}
 
-		SmartCAT::debug( 'Checking documents ended' );
+		Logger::event( 'cron', 'Checking documents ended' );
 	}
 }
