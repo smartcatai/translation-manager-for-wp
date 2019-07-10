@@ -18,6 +18,7 @@ use SmartCAT\WP\DB\Repository\ErrorRepository;
 use SmartCAT\WP\DB\Repository\EventRepository;
 use \DateTime;
 use \Exception;
+use SmartCAT\WP\WP\Options;
 
 /**
  * Class Logger
@@ -66,10 +67,14 @@ class Logger {
 	 * @param string $message Set message.
 	 */
 	public static function event( $type, $message ) {
+		SmartCAT::debug( "[{$type}] {$message}" );
+
+		if ( ! self::get_options()->get( 'smartcat_events_enabled' ) ) {
+			return;
+		}
+
 		$event      = new Event();
 		$repository = self::get_event_repository();
-
-		SmartCAT::debug( "[{$type}] {$message}" );
 
 		if ( ! $repository ) {
 			return;
@@ -142,6 +147,20 @@ class Logger {
 			return Connector::get_container()->get( 'entity.repository.event' );
 		} catch ( \Throwable $e ) {
 			SmartCAT::debug( '[error] Event repository container does not exists' );
+			return null;
+		}
+	}
+
+	/**
+	 * Get error repository
+	 *
+	 * @return Options|null
+	 */
+	private static function get_options() {
+		try {
+			return Connector::get_container()->get( 'core.options' );
+		} catch ( \Throwable $e ) {
+			SmartCAT::debug( '[error] Options container does not exists' );
 			return null;
 		}
 	}

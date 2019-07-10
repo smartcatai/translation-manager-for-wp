@@ -53,7 +53,7 @@ class EventRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param $row
+	 * @param \stdClass $row Class with raw data from database.
 	 *
 	 * @return Event
 	 */

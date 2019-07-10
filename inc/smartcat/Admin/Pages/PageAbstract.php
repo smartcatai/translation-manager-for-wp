@@ -54,10 +54,9 @@ abstract class PageAbstract {
 			}
 
 			return $ret;
-
-		} else {
-			return true;
 		}
+
+		return true;
 	}
 
 	/**

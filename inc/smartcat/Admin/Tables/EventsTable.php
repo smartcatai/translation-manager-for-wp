@@ -22,7 +22,7 @@ use SmartCAT\WP\DB\Repository\EventRepository;
  */
 class EventsTable extends TableAbstract {
 	/**
-	 * ErrorsTable constructor.
+	 * EventsTable constructor.
 	 */
 	public function __construct() {
 		parent::__construct(
@@ -68,11 +68,11 @@ class EventsTable extends TableAbstract {
 	 */
 	public function get_columns() {
 		$columns = [
-			'cb'           => '<input type="checkbox" />',
-			'id'           => __( 'ID', 'translation-connectors' ),
-			'date'         => __( 'Date', 'translation-connectors' ),
-			'type'         => __( 'Type', 'translation-connectors' ),
-			'message'      => __( 'Message', 'translation-connectors' ),
+			'cb'      => '<input type="checkbox" />',
+			'id'      => __( 'ID', 'translation-connectors' ),
+			'date'    => __( 'Date', 'translation-connectors' ),
+			'type'    => __( 'Type', 'translation-connectors' ),
+			'message' => __( 'Message', 'translation-connectors' ),
 		];
 
 		return $columns;

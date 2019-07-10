@@ -8,14 +8,14 @@
             <input type="hidden" name="action" value="{{ action }}"/>
             <input type="hidden" id="sc_profile_wpnonce" name="sc_profile_wpnonce" value="{{ sc_nonce }}"/>
             <input type="hidden" name="_wp_http_referer" value="/wp-admin/admin.php?page=sc-profiles"/>
-            <input type="hidden" name="profile_id" value="{{ profile.id }}"/>
+            <input type="hidden" name="profile_id" value="{{ profile.get_id }}"/>
             <table class="form-table">
                 <tr>
                     <th scope="row">
                         <label for="profile_name">{{ texts.profile_name }}</label>
                     </th>
                     <td>
-                        <input type="text" id="profile_name" name="profile_name" value="{{ profile.name }}" size="40"/>
+                        <input type="text" id="profile_name" name="profile_name" value="{{ profile.get_name }}" size="40"/>
                         <p>{{ texts.profile_name_note }}</p>
                     </td>
                 </tr>
@@ -72,7 +72,7 @@
                         <label for="profile_project_id">{{ texts.profile_project_id }}</label>
                     </th>
                     <td>
-                        <input type="text" id="profile_project_id" name="profile_project_id" value="{{ profile.project_id }}" size="40"/>
+                        <input type="text" id="profile_project_id" name="profile_project_id" value="{{ profile.get_project_id }}" size="40"/>
                         <p>{{ texts.profile_project_id_note }}</p>
                     </td>
                 </tr>
@@ -81,7 +81,7 @@
                         <label for="profile_auto_send">{{ texts.profile_auto_send }}</label>
                     </th>
                     <td>
-                        <input type="checkbox" id="profile_auto_send" name="profile_auto_send" value="1" {{# profile.auto_send }} checked="checked" {{/ profile.auto_send }} />
+                        <input type="checkbox" id="profile_auto_send" name="profile_auto_send" value="1" {{# profile.is_auto_send }} checked="checked" {{/ profile.is_auto_send }} />
                     </td>
                 </tr>
                 <tr>
@@ -89,7 +89,7 @@
                         <label for="profile_auto_update">{{ texts.profile_auto_update }}</label>
                     </th>
                     <td>
-                        <input type="checkbox" id="profile_auto_update" name="profile_auto_update" value="1" {{# profile.auto_update }} checked="checked" {{/ profile.auto_update }} />
+                        <input type="checkbox" id="profile_auto_update" name="profile_auto_update" value="1" {{# profile.is_auto_update }} checked="checked" {{/ profile.is_auto_update }} />
                     </td>
                 </tr>
             </table>

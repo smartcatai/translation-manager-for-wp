@@ -23,7 +23,7 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 	/** @var string */
 	protected $prefix = '';
 	/** @var array */
-	private $persists = [];
+	protected $persists = [];
 
 	/**
 	 * RepositoryAbstract constructor.
@@ -192,8 +192,7 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 
 		$results =
 			$wpdb->get_results(
-				$wpdb->prepare( $query . implode( " AND ", $where ),
-					$values )
+				$wpdb->prepare( $query . implode( " AND ", $where ), $values )
 			);
 
 		return $this->prepare_result( $results );
@@ -216,7 +215,9 @@ abstract class RepositoryAbstract extends DbAbstract implements RepositoryInterf
 			$values[] = $value;
 		}
 
-		$row = $wpdb->get_row( $wpdb->prepare( $query . implode( " AND ", $where ), $values ) );
+		$row = $wpdb->get_row(
+			$wpdb->prepare( $query . implode( ' AND ', $where ), $values )
+		);
 
 		return $row ? $this->to_entity( $row ) : null;
 	}
