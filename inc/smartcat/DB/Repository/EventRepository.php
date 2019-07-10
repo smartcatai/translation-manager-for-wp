@@ -23,7 +23,7 @@ use SmartCAT\WP\DB\Entity\Event;
  * @package SmartCAT\WP\DB\Repository
  */
 class EventRepository extends RepositoryAbstract {
-	const TABLE_NAME = 'errors';
+	const TABLE_NAME = 'events';
 
 	/**
 	 * @return string

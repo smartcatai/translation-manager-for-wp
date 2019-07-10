@@ -12,7 +12,6 @@
 namespace SmartCAT\WP\Admin\Pages;
 
 use SmartCAT\WP\Admin\Tables\StatisticsTable;
-use SmartCAT\WP\WP\Options;
 
 /**
  * Class Dashboard
@@ -29,12 +28,11 @@ class Dashboard extends PageAbstract {
 		$statistics_table           = new StatisticsTable();
 		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
 
-		add_thickbox();
-
 		echo self::get_renderer()->render(
 			'dashboard',
 			[
 				'button_status'    => $is_statistics_queue_active,
+				'show_regform'     => self::is_need_show_regform(),
 				'statistic_table'  => $statistics_table->display(),
 				'texts'            => self::get_texts(),
 			]
@@ -51,20 +49,5 @@ class Dashboard extends PageAbstract {
 			'refresh' => __( 'Refresh statistics', 'translation-connectors' ),
 			'title'   => $GLOBALS['title'],
 		];
-	}
-
-	/**
-	 * Get options service
-	 *
-	 * @return Options|null
-	 */
-	private static function get_options() {
-		$container = self::get_container();
-
-		try {
-			return $container->get( 'core.options' );
-		} catch ( \Exception $e ) {
-			return null;
-		}
 	}
 }

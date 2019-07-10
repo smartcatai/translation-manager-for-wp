@@ -7,6 +7,8 @@ parameters:
     - "smartcat_api_server"
     #Additional params (отображаются)
     - "smartcat_debug_mode"
+    - "smartcat_events_enabled"
+    - "smartcat_regform_showed"
     #Признак активации ручного обновления статистики
     - "statistic_queue_active"
     #Авторизационный код для callback

@@ -127,7 +127,7 @@ class Utils {
 	 */
 	public static function get_plugin_version() {
 		$prefix = Connector::get_container()->getParameter( 'plugin.table.prefix' );
-		return get_option( $prefix . 'smartcat_db_version', 0 );
+		return get_option( $prefix . 'smartcat_db_version', '1.0.0' );
 	}
 
 	/**

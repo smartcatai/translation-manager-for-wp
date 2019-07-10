@@ -13,6 +13,7 @@ namespace SmartCAT\WP\Admin;
 
 use SmartCAT\WP\Admin\Pages\Dashboard;
 use SmartCAT\WP\Admin\Pages\Errors;
+use SmartCAT\WP\Admin\Pages\Events;
 use SmartCAT\WP\Admin\Pages\ProfileEdit;
 use SmartCAT\WP\Admin\Pages\Profiles;
 use SmartCAT\WP\Admin\Pages\Settings;
@@ -126,6 +127,31 @@ final class Menu implements InitInterface {
 							'label'   => __( 'Show per page', 'translation-connectors' ),
 							'default' => 20,
 							'option'  => 'sc_errors_per_page',
+						]
+					);
+				}
+			);
+		}
+
+		if ( $options->get( 'smartcat_events_enabled' ) ) {
+			$events_hook = add_submenu_page(
+				'sc-dashboard',
+				__( 'Events', 'translation-connectors' ),
+				__( 'Events', 'translation-connectors' ),
+				'edit_pages',
+				'sc-events',
+				[ Events::class, 'render' ]
+			);
+
+			add_action(
+				"load-$events_hook",
+				function () {
+					add_screen_option(
+						'per_page',
+						[
+							'label'   => __( 'Show per page', 'translation-connectors' ),
+							'default' => 50,
+							'option'  => 'sc_events_per_page',
 						]
 					);
 				}

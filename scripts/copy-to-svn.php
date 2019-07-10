@@ -153,7 +153,7 @@ $rmDirs = [
 	'inc/vendor/ralouphie/getallheaders/tests',
 ];
 
-if ( is_dir( __DIR__ . "/../inc/vendor" ) ) {
+if ( ! is_dir( __DIR__ . "/../inc/vendor" ) ) {
 	chdir( __DIR__ . "/.." );
     exec( 'composer install --no-dev' );
 }
@@ -188,7 +188,7 @@ foreach ( $rmDirs as $dir ) {
 echo( '=== 45% Delete files from svn ===' . PHP_EOL );
 exec( "svn status | grep '^!' | awk '{print $2}' | xargs svn delete" );
 
-echo( '=== 60% Adding files to snv ===' . PHP_EOL );
+echo( '=== 60% Adding files to svn ===' . PHP_EOL );
 exec( "svn --force --depth infinity add ." );
 
 echo( '=== 75% Commiting changes ===' . PHP_EOL );
