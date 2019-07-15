@@ -122,6 +122,10 @@ class Utils {
 			);
 
 			$iteration++;
+
+			if ( $iteration >= 50 ) {
+				Logger::warning( 'Limit exceeded', "Shortcodes replacing iteration limit exceeded in post '{$post->post_title}'" );
+			}
 		} while ( $replace_count && ( $iteration < 50 ) );
 
 		$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post_body}</body></html>";

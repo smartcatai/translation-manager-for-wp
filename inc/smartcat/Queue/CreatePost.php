@@ -104,6 +104,10 @@ class CreatePost extends QueueAbstract {
 					);
 
 					$iteration++;
+
+					if ( $iteration >= 50 ) {
+						Logger::warning( 'Limit exceeded', "Shortcodes replacing iteration limit exceeded in returned post from SC '{$title}'" );
+					}
 				} while ( $replace_count && ( $iteration < 50 ) );
 
 				if ( $statistics->get_target_post_id() ) {
