@@ -18,7 +18,11 @@ use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\WP\Options;
 
-/** Обработка очереди "Обновление статистики" */
+/**
+ * Class Statistic
+ *
+ * @package SmartCAT\WP\Queue
+ */
 class Statistic extends QueueAbstract {
 	protected $action = 'smartcat_statistic_async';
 
@@ -42,12 +46,13 @@ class Statistic extends QueueAbstract {
 
 				/** @var \SmartCAT\WP\Queue\Callback $queue */
 				$queue = $container->get( 'core.queue.callback' );
+				Logger::event( "statistic", "Send to update statistic '{$item}'");
 				$queue->update_statistic( $item );
 
 			} catch ( ClientErrorException $e ) {
-				Logger::error( "Document $item, update statistic", "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
+				Logger::error( "Document '$item', update statistic", "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}" );
 			} catch ( \Throwable $e ) {
-				Logger::error( "Document $item, update statistic","Message: {$e->getMessage()}" );
+				Logger::error( "Document '$item', update statistic","Message: {$e->getMessage()}" );
 			}
 		}
 
