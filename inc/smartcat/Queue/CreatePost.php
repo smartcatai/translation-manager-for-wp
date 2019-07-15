@@ -81,6 +81,27 @@ class CreatePost extends QueueAbstract {
 					$body .= $child->ownerDocument->saveHTML( $child );
 				}
 
+				$replace_count = 0;
+				$iteration     = 0;
+
+				do {
+					$body = preg_replace_callback(
+						'%<\s*([\w]+)\s+type="sc-shortcode"\s*(\s+.+?)?>((.*?)<\/\1>)?%',
+						function( $matches ) {
+							if ( empty( $matches[4] ) ) {
+								return "[{$matches[1]}{$matches[2]}]";
+							} else {
+								return "[{$matches[1]}{$matches[2]}]{$matches[4]}[/{$matches[1]}]";
+							}
+						},
+						$body,
+						-1,
+						$replace_count
+					);
+
+					$iteration++;
+				} while ( $replace_count && ( $iteration < 50 ) );
+
 				if ( $statistics->get_target_post_id() ) {
 					SmartCAT::debug( "[CreatePost] Updating post {$statistics->get_target_post_id()} '{$item['documentID']}'" );
 					wp_update_post(

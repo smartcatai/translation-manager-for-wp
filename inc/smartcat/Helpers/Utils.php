@@ -103,6 +103,27 @@ class Utils {
 			$post_body = wpautop( $post_body );
 		}
 
+		$replace_count = 0;
+		$iteration     = 0;
+
+		do {
+			$post_body = preg_replace_callback(
+				'%\[\s*([\w]+)\s*(\s+.+?)?\]((.*?)\[\s*\/\1\s*\])?%',
+				function( $matches ) {
+					if ( empty( $matches[4] ) ) {
+						return "<{$matches[1]} type=\"sc-shortcode\"{$matches[2]}>";
+					} else {
+						return "<{$matches[1]}{$matches[2]}>{$matches[4]}</{$matches[1]}>";
+					}
+				},
+				$post_body,
+				-1,
+				$replace_count
+			);
+
+			$iteration++;
+		} while ( $replace_count && ( $iteration < 50 ) );
+
 		$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post_body}</body></html>";
 		$file      = fopen( "php://temp/{$post->post_title}.html", 'r+' );
 		fwrite( $file, $file_body );
