@@ -108,12 +108,12 @@ class Utils {
 
 		do {
 			$post_body = preg_replace_callback(
-				'%\[\s*([\w]+)\s*(\s+.+?)?\]((.*?)\[\s*\/\1\s*\])?%',
+				'%\[\s*([\w]+)\s*(\s+.+?)?\]((.*?)\[\s*\/\1\s*\])?%s',
 				function( $matches ) {
 					if ( empty( $matches[4] ) ) {
 						return "<{$matches[1]} type=\"sc-shortcode\"{$matches[2]}>";
 					} else {
-						return "<{$matches[1]}{$matches[2]}>{$matches[4]}</{$matches[1]}>";
+						return "<{$matches[1]} type=\"sc-shortcode\"{$matches[2]}>{$matches[4]}</{$matches[1]}>";
 					}
 				},
 				$post_body,

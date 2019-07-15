@@ -90,7 +90,7 @@ class CreatePost extends QueueAbstract {
 
 				do {
 					$body = preg_replace_callback(
-						'%<\s*([\w]+)\s+type="sc-shortcode"\s*(\s+.+?)?>((.*?)<\/\1>)?%',
+						'%<\s*([\w]+)\s+type="sc-shortcode"\s*(\s+.+?)?>((.*?)<\/\1>)?%s',
 						function( $matches ) {
 							if ( empty( $matches[4] ) ) {
 								return "[{$matches[1]}{$matches[2]}]";
