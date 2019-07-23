@@ -85,6 +85,7 @@ class CreatePost extends QueueAbstract {
 					$body .= $child->ownerDocument->saveHTML( $child );
 				}
 
+				/**
 				$replace_count = 0;
 				$iteration     = 0;
 
@@ -109,6 +110,8 @@ class CreatePost extends QueueAbstract {
 						Logger::warning( 'Limit exceeded', "Shortcodes replacing iteration limit exceeded in returned post from SC '{$title}'" );
 					}
 				} while ( $replace_count && ( $iteration < 50 ) );
+
+				 */
 
 				if ( $statistics->get_target_post_id() ) {
 					Logger::event( "createPost", "Updating post {$statistics->get_target_post_id()} '{$item['documentID']}'");
