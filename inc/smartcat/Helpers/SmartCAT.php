@@ -17,6 +17,7 @@ use SmartCat\Client\Model\CreateProjectWithFilesModel;
 use SmartCat\Client\Model\DocumentModel;
 use SmartCat\Client\Model\ProjectChangesModel;
 use SmartCat\Client\Model\ProjectModel;
+use SmartCat\Client\Model\ProjectVendorModel;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Entity\Statistics;
@@ -142,7 +143,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		$sc_documents      = $sc_project->getDocuments();
 		$sc_document_names = array_map(
 			function ( DocumentModel $value ) {
-				return $value->getName() . '.html';
+				return $value->getName() . "({$value->getTargetLanguage()}).html";
 			},
 			$sc_documents
 		);
@@ -172,6 +173,9 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		$update_model = ( new ProjectChangesModel() )
 			->setName( $sc_project->getName() )
 			->setDescription( $sc_project->getDescription() )
+            ->setVendorAccountIds( array_map(function ( ProjectVendorModel $vendorModel ) {
+                return $vendorModel->getVendorAccountId();
+            }, $sc_project->getVendors() ) )
 			->setExternalTag( 'source:WPPL' );
 
 		if ( $sc_project->getExternalTag() !== 'source:WPPL' ) {
@@ -211,7 +215,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 * @throws Language\Exceptions\LanguageNotFoundException
 	 */
 	public function create_document( $file, $statistic ) {
-		$filename = self::get_task_name_from_stream( $file, true );
+		$filename = self::get_task_name_from_stream( $file, false ) . "({$statistic->get_target_language()}).html";
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
 
