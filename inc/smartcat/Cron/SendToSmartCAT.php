@@ -11,12 +11,10 @@
 
 namespace SmartCAT\WP\Cron;
 
-use Http\Client\Common\Exception\ClientErrorException;
 use Http\Client\Exception\HttpException;
 use Psr\Container\ContainerInterface;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\Connector;
-use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\Helpers\Logger;
@@ -97,15 +95,11 @@ class SendToSmartCAT extends CronAbstract {
 					Logger::event( 'cron', "File '{$file_name}' was created" );
 				}
 			} catch ( \Throwable $e ) {
-				if ( $e instanceof ClientErrorException ) {
+				if ( $e instanceof HttpException ) {
 					$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
 				} else {
 					$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
 				}
-
-				if ($e instanceof HttpException) {
-				    $message = "Message: {$e->getMessage()}. Body: {$e->getResponse()->getBody()->getContents()}. Trace: {$e->getTraceAsString()}";
-                }
 
 				Logger::error( "Failed send to translate '{$file_name}'", $message );
 				$statistic->set_status( Statistics::STATUS_FAILED );
