@@ -85,6 +85,34 @@ class CreatePost extends QueueAbstract {
 					$body .= $child->ownerDocument->saveHTML( $child );
 				}
 
+				/**
+				$replace_count = 0;
+				$iteration     = 0;
+
+				do {
+					$body = preg_replace_callback(
+						'%<\s*([\w]+)\s+type="sc-shortcode"\s*(\s+.+?)?>((.*?)<\/\1>)?%s',
+						function( $matches ) {
+							if ( empty( $matches[4] ) ) {
+								return "[{$matches[1]}{$matches[2]}]";
+							} else {
+								return "[{$matches[1]}{$matches[2]}]{$matches[4]}[/{$matches[1]}]";
+							}
+						},
+						$body,
+						-1,
+						$replace_count
+					);
+
+					$iteration++;
+
+					if ( $iteration >= 50 ) {
+						Logger::warning( 'Limit exceeded', "Shortcodes replacing iteration limit exceeded in returned post from SC '{$title}'" );
+					}
+				} while ( $replace_count && ( $iteration < 50 ) );
+
+				 */
+
 				if ( $statistics->get_target_post_id() ) {
 					Logger::event( "createPost", "Updating post {$statistics->get_target_post_id()} '{$item['documentID']}'");
 					wp_update_post(
