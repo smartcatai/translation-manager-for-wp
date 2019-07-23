@@ -49,7 +49,7 @@ class SendToSmartCAT extends CronAbstract {
 			return;
 		}
 
-		Logger::event( 'cron', 'Sending to SmartCat started' );
+		Logger::event( 'cron', 'Sending to Smartсat started' );
 
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
@@ -112,5 +112,7 @@ class SendToSmartCAT extends CronAbstract {
 				$statistic_repository->save( $statistic );
 			}
 		}
+
+		Logger::event( 'cron', 'Sending to Smartсat ended' );
 	}
 }

@@ -33,6 +33,32 @@ class EventRepository extends RepositoryAbstract {
 	}
 
 	/**
+	 * @param int $from
+	 * @param int $limit
+	 *
+	 * @return Event[]
+	 */
+	public function get_all( $from = 0, $limit = 0 ) {
+		$wpdb  = $this->get_wp_db();
+		$from  = intval( $from );
+		$limit = intval( $limit );
+
+		$table_name = $this->get_table_name();
+		$query      = "SELECT * FROM $table_name";
+
+		if ( $limit > 0 ) {
+			$query = $wpdb->prepare(
+				"SELECT * FROM $table_name ORDER BY id DESC LIMIT %d, %d",
+				[ $from, $limit ]
+			);
+		}
+
+		$results = $wpdb->get_results( $query );
+
+		return $this->prepare_result( $results );
+	}
+
+	/**
 	 * @param Event[] $persists
 	 *
 	 * @return mixed|void
