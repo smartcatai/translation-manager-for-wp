@@ -11,26 +11,26 @@
 
 namespace SmartCAT\WP\Admin\Pages;
 
-use SmartCAT\WP\Admin\Tables\ProfilesTable;
+use SmartCAT\WP\Admin\Tables\EventsTable;
 
 /**
- * Class Profiles
+ * Class Events
  *
  * @package SmartCAT\WP\Admin\Pages
  */
-class Profiles extends PageAbstract {
+class Events extends PageAbstract {
 	/**
-	 * Render profiles page
+	 * Render events page
 	 */
 	public static function render() {
-		$profiles_table = new ProfilesTable();
+		$errors_table = new EventsTable();
 
 		echo self::get_renderer()->render(
-			'profiles',
+			'events',
 			[
-				'texts'           => self::get_texts(),
-				'show_regform'    => self::is_need_show_regform(),
-				'profiles_table'  => $profiles_table->display(),
+				'events_table' => $errors_table->display(),
+				'show_regform' => self::is_need_show_regform(),
+				'texts'        => self::get_texts(),
 			]
 		);
 	}
@@ -42,9 +42,7 @@ class Profiles extends PageAbstract {
 	 */
 	private static function get_texts() {
 		return [
-			'add_profile' => __( 'Add New', 'translation-connectors' ),
-			'pages'       => __( 'Pages', 'translation-connectors' ),
-			'title'       => $GLOBALS['title'],
+			'title'   => $GLOBALS['title'],
 		];
 	}
 }

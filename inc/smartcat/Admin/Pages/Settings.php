@@ -14,7 +14,6 @@ namespace SmartCAT\WP\Admin\Pages;
 use SmartCAT\WP\Admin\FrontendCallbacks;
 use SmartCAT\WP\Helpers\Cryptographer;
 use SmartCAT\WP\Helpers\SmartCAT;
-use SmartCAT\WP\WP\Options;
 
 /**
  * Class Settings
@@ -27,13 +26,13 @@ class Settings extends PageAbstract {
 	 */
 	public static function render() {
 		$renderer = self::get_renderer();
-		add_thickbox();
 
 		echo $renderer->render(
 			'settings',
 			[
 				'texts'             => self::get_texts(),
 				'saved'             => isset( $_GET['settings-updated'] ),
+				'show_regform'      => self::is_need_show_regform(),
 				'fields'            => $renderer->ob_to_string( 'settings_fields', 'smartcat' ),
 				'sections'          => $renderer->ob_to_string( 'do_settings_sections', 'smartcat' ),
 				'sc_validate_nonce' => wp_create_nonce( 'sc_validate_settings' ),
@@ -58,17 +57,19 @@ class Settings extends PageAbstract {
 	 * @throws \Exception
 	 */
 	public static function make_page() {
-		$container  = self::get_container();
-		$prefix     = $container->getParameter( 'plugin.table.prefix' );
-		$server     = $prefix . 'smartcat_api_server';
-		$login      = $prefix . 'smartcat_api_login';
-		$password   = $prefix . 'smartcat_api_password';
-		$debug_mode = $prefix . 'smartcat_debug_mode';
+		$container      = self::get_container();
+		$prefix         = $container->getParameter( 'plugin.table.prefix' );
+		$server         = $prefix . 'smartcat_api_server';
+		$login          = $prefix . 'smartcat_api_login';
+		$password       = $prefix . 'smartcat_api_password';
+		$debug_mode     = $prefix . 'smartcat_debug_mode';
+		$events_enabled = $prefix . 'smartcat_events_enabled';
 
 		register_setting( 'smartcat', $server, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $login, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $password, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $debug_mode, [ 'type' => 'bool' ] );
+		register_setting( 'smartcat', $events_enabled, [ 'type' => 'bool' ] );
 
 		add_settings_section(
 			'smartcat_required',
@@ -140,6 +141,18 @@ class Settings extends PageAbstract {
 				'option_name'     => $debug_mode,
 			]
 		);
+
+		add_settings_field(
+			$events_enabled,
+			__( 'Enable events log', 'translation-connectors' ),
+			[ FrontendCallbacks::class, 'input_checkbox_callback' ],
+			'smartcat',
+			'smartcat_additional',
+			[
+				'label_for'       => $events_enabled,
+				'option_name'     => $events_enabled,
+			]
+		);
 	}
 
 	/**
@@ -168,20 +181,5 @@ class Settings extends PageAbstract {
 		add_filter( "pre_update_option_{$prefix}smartcat_api_password", [ self::class, 'pre_update_password' ] );
 		add_filter( "option_{$prefix}smartcat_api_login", [ Cryptographer::class, 'decrypt' ] );
 		add_filter( "option_{$prefix}smartcat_api_password", [ Cryptographer::class, 'decrypt' ] );
-	}
-
-	/**
-	 * Get options service
-	 *
-	 * @return Options|null
-	 */
-	private static function get_options() {
-		$container = self::get_container();
-
-		try {
-			return $container->get( 'core.options' );
-		} catch ( \Exception $e ) {
-			return null;
-		}
 	}
 }

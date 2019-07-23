@@ -27,39 +27,23 @@ class ProfileEdit extends PageAbstract {
 	 * Render profiles page
 	 */
 	public static function render() {
-		$profile    = [];
-		$profile_db = null;
-
+		$profile      = null;
 		$sanitized_id = intval( sanitize_key( $_GET['profile'] ?? null ) );
 
 		if ( $sanitized_id ) {
-			$profile_db = self::get_repository()->get_one_by_id( $sanitized_id );
-
-			if ( $profile_db ) {
-				$profile = [
-					'id'              => $profile_db->get_id(),
-					'project_id'      => $profile_db->get_project_id(),
-					'name'            => $profile_db->get_name(),
-					'vendor'          => $profile_db->get_vendor(),
-					'source_lang'     => $profile_db->get_source_language(),
-					'target_langs'    => $profile_db->get_target_languages(),
-					'workflow_stages' => $profile_db->get_workflow_stages(),
-					'auto_send'       => $profile_db->is_auto_send(),
-					'auto_update'     => $profile_db->is_auto_update(),
-				];
-			}
+			$profile = self::get_repository()->get_one_by_id( $sanitized_id );
 		}
 
 		echo self::get_renderer()->render(
 			'profile_edit',
 			[
-				'texts'           => self::get_texts( $profile_db ),
+				'texts'           => self::get_texts( $profile ),
 				'profile'         => $profile,
 				'sc_nonce'        => wp_create_nonce( 'sc_profile_edit' ),
-				'workflow_stages' => self::get_workflow_stages( $profile_db ),
-				'source_lang'     => self::get_languages( $profile_db, 'source_language' ),
-				'target_langs'    => self::get_languages( $profile_db, 'target_languages' ),
-				'vendors'         => self::get_vendors( $profile_db ),
+				'workflow_stages' => self::get_workflow_stages( $profile ),
+				'source_lang'     => self::get_languages( $profile, 'source_language' ),
+				'target_langs'    => self::get_languages( $profile, 'target_languages' ),
+				'vendors'         => self::get_vendors( $profile ),
 			]
 		);
 	}
@@ -88,7 +72,7 @@ class ProfileEdit extends PageAbstract {
 			'profile_target_langs'    => __( 'Target Languages', 'translation-connectors' ),
 			'profile_workflow_stages' => __( 'Workflow Stages', 'translation-connectors' ),
 			'profile_project_id'      => __( 'Project ID', 'translation-connectors' ),
-			'profile_project_id_note' => __( 'Enter here a Smartcat project ID to send all ongiong tasks to one specific project.', 'translation-connectors' ),
+			'profile_project_id_note' => __( 'Enter here a Smartcat project ID to send all ongoing tasks to one specific project.', 'translation-connectors' ),
 			'profile_name_note'       => __( 'Leave this field blank for automatic name generation', 'translation-connectors' ),
 			'profile_auto_update'     => __( 'Automatically submit each content update for translation', 'translation-connectors' ),
 			'profile_auto_send'       => __( 'Automatically submit new content for translation', 'translation-connectors' ),

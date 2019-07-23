@@ -165,3 +165,19 @@ table.wp-list-table.errors #message {
     height: 16px;
     margin: 5px 5px 0;
 }
+
+table.wp-list-table.events #id {
+    width: 5%;
+}
+
+table.wp-list-table.events #date {
+    width: 15%;
+}
+
+table.wp-list-table.events #type {
+    width: 5%;
+}
+
+table.wp-list-table.events #message {
+    width: auto;
+}

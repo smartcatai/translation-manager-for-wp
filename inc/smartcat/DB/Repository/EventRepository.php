@@ -11,19 +11,19 @@
 
 namespace SmartCAT\WP\DB\Repository;
 
-use SmartCAT\WP\DB\Entity\Error;
+use SmartCAT\WP\DB\Entity\Event;
 
 /**
- * Class ErrorRepository
+ * Class EventRepository
  *
- * @method Error get_one_by_id( int $id )
- * @method Error[] get_all_by( array $criterias )
- * @method Error get_one_by( array $criterias )
+ * @method Event get_one_by_id( int $id )
+ * @method Event[] get_all_by( array $criterias )
+ * @method Event get_one_by( array $criterias )
  *
  * @package SmartCAT\WP\DB\Repository
  */
-class ErrorRepository extends RepositoryAbstract {
-	const TABLE_NAME = 'errors';
+class EventRepository extends RepositoryAbstract {
+	const TABLE_NAME = 'events';
 
 	/**
 	 * @return string
@@ -36,7 +36,7 @@ class ErrorRepository extends RepositoryAbstract {
 	 * @param int $from
 	 * @param int $limit
 	 *
-	 * @return Error[]
+	 * @return Event[]
 	 */
 	public function get_all( $from = 0, $limit = 0 ) {
 		$wpdb  = $this->get_wp_db();
@@ -48,7 +48,7 @@ class ErrorRepository extends RepositoryAbstract {
 
 		if ( $limit > 0 ) {
 			$query = $wpdb->prepare(
-				"SELECT * FROM $table_name ORDER BY date DESC LIMIT %d, %d",
+				"SELECT * FROM $table_name ORDER BY id DESC LIMIT %d, %d",
 				[ $from, $limit ]
 			);
 		}
@@ -59,13 +59,13 @@ class ErrorRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param Error[] $persists
+	 * @param Event[] $persists
 	 *
 	 * @return mixed|void
 	 */
 	protected function do_flush( array $persists ) {
 		foreach ( $persists as $error ) {
-			if ( get_class( $error ) === Error::class ) {
+			if ( get_class( $error ) === Event::class ) {
 				if ( empty( $error->get_id() ) ) {
 					$res = $this->add( $error );
 					if ( $res ) {
@@ -79,11 +79,11 @@ class ErrorRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param $row
+	 * @param \stdClass $row Class with raw data from database.
 	 *
-	 * @return mixed|Error
+	 * @return Event
 	 */
 	protected function to_entity( $row ) {
-		return new Error( $row );
+		return new Event( $row );
 	}
 }

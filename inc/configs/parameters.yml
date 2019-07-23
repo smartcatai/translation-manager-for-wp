@@ -1,13 +1,16 @@
 parameters:
   plugin.table.prefix: "smartcat_connector_"
   plugin.options:
-    #Данные к доступу к api (отображаются)
+    #API credentials
     - "smartcat_api_login"
     - "smartcat_api_password"
     - "smartcat_api_server"
-    #Additional params (отображаются)
+    #Additional params
     - "smartcat_debug_mode"
-    #Признак активации ручного обновления статистики
+    - "smartcat_events_enabled"
+    - "smartcat_regform_showed"
+    #Manual update statistics switch
     - "statistic_queue_active"
-    #Авторизационный код для callback
+    #Сallback Authorize code
     - "callback_authorisation_token"
+    - "smartcat_account_name"

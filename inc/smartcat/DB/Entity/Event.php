@@ -14,19 +14,17 @@ namespace SmartCAT\WP\DB\Entity;
 use DateTime;
 
 /**
- * Class Error
+ * Class Event
  *
  * @package SmartCAT\WP\DB\Entity
  */
-class Error extends EntityAbstract {
+class Event extends EntityAbstract {
 	/** @var  integer */
 	protected $id;
 	/** @var  string */
 	protected $date;
 	/** @var  string */
 	protected $type;
-	/** @var  string */
-	protected $short_message;
 	/** @var  string */
 	protected $message;
 
@@ -35,11 +33,10 @@ class Error extends EntityAbstract {
 	 */
 	public function attributes(): array {
 		return [
-			'id'           => 'id',
-			'date'         => 'date',
-			'type'         => 'type',
-			'shortMessage' => 'short_message',
-			'message'      => 'message',
+			'id'      => 'id',
+			'date'    => 'date',
+			'type'    => 'type',
+			'message' => 'message',
 		];
 	}
 
@@ -53,7 +50,7 @@ class Error extends EntityAbstract {
 	/**
 	 * @param int $id
 	 *
-	 * @return Error
+	 * @return Event
 	 */
 	public function set_id( $id ) {
 		$this->id = intval( $id );
@@ -71,9 +68,9 @@ class Error extends EntityAbstract {
 	/**
 	 * @param DateTime $date
 	 *
-	 * @return Error
+	 * @return Event
 	 */
-	public function set_date( DateTime $date ) {
+	public function set_date( $date ) {
 		$this->date = $date->format( 'Y-m-d H:i:s' );
 
 		return $this;
@@ -89,28 +86,10 @@ class Error extends EntityAbstract {
 	/**
 	 * @param string $type
 	 *
-	 * @return Error
+	 * @return Event
 	 */
 	public function set_type( $type ) {
 		$this->type = $type;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function get_short_message() {
-		return $this->short_message;
-	}
-
-	/**
-	 * @param string $short_message
-	 *
-	 * @return Error
-	 */
-	public function set_short_message( $short_message ) {
-		$this->short_message = $short_message;
 
 		return $this;
 	}
@@ -125,7 +104,7 @@ class Error extends EntityAbstract {
 	/**
 	 * @param string $message
 	 *
-	 * @return Error
+	 * @return Event
 	 */
 	public function set_message( $message ) {
 		$this->message = $message;

@@ -11,11 +11,10 @@
 
 namespace SmartCAT\WP\Cron;
 
-use Http\Client\Common\Exception\ClientErrorException;
+use Http\Client\Exception\HttpException;
 use Psr\Container\ContainerInterface;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\Connector;
-use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\Helpers\Logger;
@@ -48,7 +47,7 @@ class SendToSmartCAT extends CronAbstract {
 			return;
 		}
 
-		SmartCAT::debug( 'Sending to SmartCat started' );
+		Logger::event( 'cron', 'Sending to Smartсat started' );
 
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
@@ -58,9 +57,6 @@ class SendToSmartCAT extends CronAbstract {
 
 		/** @var StatisticRepository $statistic_repository */
 		$statistic_repository = $container->get( 'entity.repository.statistic' );
-
-		/** @var ProfileRepository $profile_repository */
-		$profile_repository = $container->get( 'entity.repository.profile' );
 
 		/** @var Utils $utils */
 		$utils = $container->get( 'utils' );
@@ -72,42 +68,45 @@ class SendToSmartCAT extends CronAbstract {
 		$statistics = $statistic_repository->get_by_status( Statistics::STATUS_NEW );
 
 		$count = count( $statistics );
-		SmartCAT::debug( "Finded $count tasks to send" );
+		Logger::event( 'cron', "Find $count tasks to send" );
 
 		foreach ( $statistics as $statistic ) {
 			$task      = $task_repository->get_one_by_id( $statistic->get_task_id() );
 			$file      = $utils->get_post_to_file( $statistic->get_post_id() );
-			$task_name = $smartcat::get_task_name_from_stream( $file );
+			$file_name = $smartcat::get_task_name_from_stream( $file );
 
 			try {
 				if ( ! empty( $task->get_project_id() ) ) {
-					SmartCAT::debug( "Sending '{$task_name}'" );
+					Logger::event( 'cron', "Sending '{$file_name}'" );
 
 					$document_model = $smartcat->create_document( $file, $statistic );
 					$document       = $smartcat->update_project( $document_model, $task );
 
 					$statistic_repository->link_to_smartcat_document( $task, $document );
-					SmartCAT::debug( "Sended '{$task_name}'" );
+					Logger::event( 'cron', "File '{$file_name}' was sent" );
 				} else {
-					SmartCAT::debug( "Creating '{$task_name}'" );
+					Logger::event( 'cron', "Creating '{$file_name}'" );
 
 					$smartcat_project = $smartcat->create_project( $task, $file );
 					$statistic_repository->link_to_smartcat_document( $task, $smartcat_project->getDocuments() );
 					$task->set_project_id( $smartcat_project->getId() );
 					$task_repository->save( $task );
 
-					SmartCAT::debug( "Created '{$task_name}'" );
+					Logger::event( 'cron', "File '{$file_name}' was created" );
 				}
 			} catch ( \Throwable $e ) {
-				if ( $e instanceof ClientErrorException ) {
+				if ( $e instanceof HttpException ) {
 					$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
 				} else {
 					$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
 				}
-				Logger::error( "Failed send to translate '{$task_name}'", $message );
+
+				Logger::error( "Failed send to translate '{$file_name}'", $message );
 				$statistic->set_status( Statistics::STATUS_FAILED );
 				$statistic_repository->save( $statistic );
 			}
 		}
+
+		Logger::event( 'cron', 'Sending to Smartсat ended' );
 	}
 }

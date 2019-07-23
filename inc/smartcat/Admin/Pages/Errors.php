@@ -12,7 +12,6 @@
 namespace SmartCAT\WP\Admin\Pages;
 
 use SmartCAT\WP\Admin\Tables\ErrorsTable;
-use SmartCAT\WP\DB\Repository\ErrorRepository;
 
 /**
  * Class Errors
@@ -30,6 +29,7 @@ class Errors extends PageAbstract {
 			'errors',
 			[
 				'errors_table' => $errors_table->display(),
+				'show_regform' => self::is_need_show_regform(),
 				'texts'        => self::get_texts(),
 			]
 		);
@@ -42,7 +42,6 @@ class Errors extends PageAbstract {
 	 */
 	private static function get_texts() {
 		return [
-			'refresh' => __( 'Refresh statistics', 'translation-connectors' ),
 			'title'   => $GLOBALS['title'],
 		];
 	}

@@ -16,76 +16,45 @@ namespace SmartCAT\WP\DB\Entity;
  *
  * @package SmartCAT\WP\DB\Entity
  */
-class Profile {
-	/**
-	 * Profile primary key
-	 *
-	 * @var int
-	 */
-	private $profile_id;
+class Profile extends EntityAbstract {
+	/** @var  int */
+	protected $profile_id;
+	/** @var  string */
+	protected $name;
+	/** @var  string */
+	protected $vendor;
+	/** @var  string */
+	protected $vendor_name;
+	/** @var  string */
+	protected $source_language;
+	/** @var  string */
+	protected $target_languages;
+	/** @var  string */
+	protected $workflow_stages;
+	/** @var  int */
+	protected $project_id;
+	/** @var  bool */
+	protected $auto_send;
+	/** @var  bool */
+	protected $auto_update;
 
 	/**
-	 * Profile name
-	 *
-	 * @var string
+	 * @return array
 	 */
-	private $name;
-
-	/**
-	 * Selected vendor GUID to send in
-	 *
-	 * @var string
-	 */
-	private $vendor;
-
-	/**
-	 * Vendor name for display when connection lost
-	 *
-	 * @var string
-	 */
-	private $vendor_name;
-
-	/**
-	 * Source language translate from
-	 *
-	 * @var string
-	 */
-	private $source_language;
-
-	/**
-	 * Array of target languages
-	 *
-	 * @var string[]
-	 */
-	private $target_languages;
-
-	/**
-	 * Array of workflow stages
-	 *
-	 * @var string[]
-	 */
-	private $workflow_stages;
-
-	/**
-	 * Project GUID to store translates
-	 *
-	 * @var int
-	 */
-	private $project_id;
-
-	/**
-	 * Automatic Send on content Create
-	 *
-	 * @var bool
-	 */
-	private $auto_send;
-
-	/**
-	 * Automatic Send on content Update
-	 *
-	 * @var bool
-	 */
-	private $auto_update;
+	public function attributes(): array {
+		return [
+			'id'               => 'profile_id',
+			'name'             => 'name',
+			'source_language'  => 'source_language',
+			'target_languages' => 'target_languages',
+			'project_id'       => 'project_id',
+			'workflow_stages'  => 'workflow_stages',
+			'vendor'           => 'vendor',
+			'vendor_name'      => 'vendor_name',
+			'auto_send'        => 'auto_send',
+			'auto_update'      => 'auto_update',
+		];
+	}
 
 	/**
 	 * Profile ID getter
@@ -93,7 +62,7 @@ class Profile {
 	 * @return int
 	 */
 	public function get_id() {
-		return $this->profile_id;
+		return intval( $this->profile_id );
 	}
 
 	/**
@@ -104,7 +73,7 @@ class Profile {
 	 * @return Profile
 	 */
 	public function set_id( $profile_id ) {
-		$this->profile_id = $profile_id;
+		$this->profile_id = intval( $profile_id );
 
 		return $this;
 	}
@@ -203,7 +172,7 @@ class Profile {
 	 * @return string[]
 	 */
 	public function get_target_languages() {
-		return $this->target_languages;
+		return json_decode( $this->target_languages, true );
 	}
 
 	/**
@@ -214,7 +183,7 @@ class Profile {
 	 * @return Profile
 	 */
 	public function set_target_languages( $target_languages ) {
-		$this->target_languages = $target_languages;
+		$this->target_languages = wp_json_encode( $target_languages );
 
 		return $this;
 	}
@@ -225,7 +194,7 @@ class Profile {
 	 * @return string[]
 	 */
 	public function get_workflow_stages() {
-		return $this->workflow_stages;
+		return json_decode( $this->workflow_stages, true );
 	}
 
 	/**
@@ -236,7 +205,7 @@ class Profile {
 	 * @return Profile
 	 */
 	public function set_workflow_stages( $workflow_stages ) {
-		$this->workflow_stages = $workflow_stages;
+		$this->workflow_stages = wp_json_encode( $workflow_stages );
 
 		return $this;
 	}
@@ -247,7 +216,7 @@ class Profile {
 	 * @return bool
 	 */
 	public function is_auto_send() {
-		return $this->auto_send;
+		return boolval( $this->auto_send );
 	}
 
 	/**
@@ -258,7 +227,7 @@ class Profile {
 	 * @return Profile
 	 */
 	public function set_auto_send( $auto_send ) {
-		$this->auto_send = $auto_send;
+		$this->auto_send = boolval( $auto_send );
 
 		return $this;
 	}
@@ -269,7 +238,7 @@ class Profile {
 	 * @return bool
 	 */
 	public function is_auto_update() {
-		return $this->auto_update;
+		return boolval( $this->auto_update );
 	}
 
 	/**
@@ -280,7 +249,7 @@ class Profile {
 	 * @return Profile
 	 */
 	public function set_auto_update( $auto_update ) {
-		$this->auto_update = $auto_update;
+		$this->auto_update = boolval( $auto_update );
 
 		return $this;
 	}

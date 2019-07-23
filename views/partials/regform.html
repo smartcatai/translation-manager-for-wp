@@ -17,9 +17,6 @@
         jQuery(function ($) {
             $(document).ready(function () {
                 $("#url").click();
-                var expires = new Date();
-                expires.setTime(expires.getTime() + (1000*60*60*24*365*100));
-                document.cookie = "regform=true; expires= " + expires.toUTCString();
             });
         });
     </script>

@@ -20,6 +20,7 @@ use SmartCAT\WP\DB\Entity\Profile;
  * @method Profile[] get_all_by( array $criterias )
  * @method Profile get_one_by( array $criterias )
  * @method Profile[] get_all( $from = 0, $limit = 0 )
+ *
  * @package SmartCAT\WP\DB\Repository
  */
 class ProfileRepository extends RepositoryAbstract {
@@ -39,42 +40,9 @@ class ProfileRepository extends RepositoryAbstract {
 	 *
 	 * @param \stdClass $row RAW data from DB in stdClass.
 	 * @return Profile
-	 *
-	 * @SuppressWarnings( PHPMD.CyclomaticComplexity )
-	 * @SuppressWarnings( PHPMD.NPathComplexity )
 	 */
 	protected function to_entity( $row ) {
-		$result = new Profile();
-
-		$text_columns = [
-			'id',
-			'name',
-			'vendor',
-			'vendor_name',
-			'source_language',
-			'project_id',
-			'auto_send',
-			'auto_update',
-		];
-
-		$array_columns = [
-			'target_languages',
-			'workflow_stages',
-		];
-
-		foreach ( $text_columns as $column ) {
-			if ( isset( $row->{$column} ) ) {
-				$result->{'set_' . $column}( $row->{$column} );
-			}
-		}
-
-		foreach ( $array_columns as $column ) {
-			if ( isset( $row->{$column} ) ) {
-				$result->{'set_' . $column}( json_decode( $row->{$column}, true ) );
-			}
-		}
-
-		return $result;
+		return new Profile( $row );
 	}
 
 	/**
@@ -96,81 +64,5 @@ class ProfileRepository extends RepositoryAbstract {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Add profile record to DB
-	 *
-	 * @param Profile $profile Profile object.
-	 * @return bool|int
-	 */
-	public function add( $profile ) {
-		$wpdb = $this->get_wp_db();
-
-		$data = [
-			'name'             => $profile->get_name(),
-			'source_language'  => $profile->get_source_language(),
-			'target_languages' => wp_json_encode( $profile->get_target_languages() ),
-			'project_id'       => $profile->get_project_id(),
-			'workflow_stages'  => wp_json_encode( $profile->get_workflow_stages() ),
-			'vendor'           => $profile->get_vendor(),
-			'vendor_name'      => $profile->get_vendor_name(),
-			'auto_send'        => boolval( $profile->is_auto_send() ),
-			'auto_update'      => boolval( $profile->is_auto_update() ),
-		];
-
-		if ( ! empty( $profile->get_id() ) ) {
-			$data['id'] = $profile->get_id();
-		}
-
-		if ( $wpdb->insert( $this->get_table_name(), $data ) ) {
-			$profile->set_id( $wpdb->insert_id );
-			return $wpdb->insert_id;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param Profile $profile
-	 *
-	 * @return mixed|void
-	 */
-	public function save( $profile ) {
-		if ( $profile->get_id() ) {
-			return $this->update( $profile );
-		} else {
-			return $this->add( $profile );
-		}
-	}
-
-	/**
-	 * Update Profile object in DB
-	 *
-	 * @param Profile $profile Profile object.
-	 * @return bool
-	 */
-	public function update( $profile ) {
-		$wpdb = $this->get_wp_db();
-
-		if ( ! empty( $profile->get_id() ) ) {
-			$data = [
-				'name'             => $profile->get_name(),
-				'source_language'  => $profile->get_source_language(),
-				'target_languages' => wp_json_encode( $profile->get_target_languages() ),
-				'project_id'       => $profile->get_project_id(),
-				'workflow_stages'  => wp_json_encode( $profile->get_workflow_stages() ),
-				'vendor'           => $profile->get_vendor(),
-				'vendor_name'      => $profile->get_vendor_name(),
-				'auto_send'        => boolval( $profile->is_auto_send() ),
-				'auto_update'      => boolval( $profile->is_auto_update() ),
-			];
-
-			if ( $wpdb->update( $this->get_table_name(), $data, [ 'id' => $profile->get_id() ] ) ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

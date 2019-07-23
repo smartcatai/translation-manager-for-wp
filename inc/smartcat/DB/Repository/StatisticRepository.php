@@ -25,6 +25,7 @@ use SmartCAT\WP\Helpers\Language\LanguageConverter;
  * @method Statistics[] get_all_by( array $criterias )
  * @method Statistics get_one_by( array $criterias )
  * @method Statistics[] get_all( $from = 0, $limit = 0 )
+ *
  * @package SmartCAT\WP\DB\Repository
  */
 class StatisticRepository extends RepositoryAbstract {
@@ -98,76 +99,13 @@ class StatisticRepository extends RepositoryAbstract {
 	}
 
 	/**
-	 * @param mixed $statistic
-	 *
-	 * @return bool|int|mixed
-	 */
-	public function add( $statistic ) {
-		$table_name = $this->get_table_name();
-		$wpdb       = $this->get_wp_db();
-
-		$data = [
-			'taskId'         => $statistic->get_task_id(),
-			'postID'         => $statistic->get_post_id(),
-			'sourceLanguage' => $statistic->get_source_language(),
-			'targetLanguage' => $statistic->get_target_language(),
-			'progress'       => $statistic->get_progress(),
-			'targetPostID'   => $statistic->get_target_post_id(),
-			'documentID'     => $statistic->get_document_id(),
-			'status'         => $statistic->get_status(),
-			'errorCount'     => $statistic->get_error_count(),
-		];
-
-		if ( ! empty( $statistic->get_id() ) ) {
-			$data['id'] = $statistic->get_id();
-		}
-
-		if ( $wpdb->insert( $table_name, $data ) ) {
-			$statistic->set_id( $wpdb->insert_id );
-			return $wpdb->insert_id;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param mixed $statistic
-	 *
-	 * @return bool|mixed
-	 */
-	public function update( $statistic ) {
-		$table_name = $this->get_table_name();
-		$wpdb       = $this->get_wp_db();
-
-		$data = [
-			'taskId'         => $statistic->get_task_id(),
-			'postID'         => $statistic->get_post_id(),
-			'sourceLanguage' => $statistic->get_source_language(),
-			'targetLanguage' => $statistic->get_target_language(),
-			'progress'       => $statistic->get_progress(),
-			'targetPostID'   => $statistic->get_target_post_id(),
-			'documentID'     => $statistic->get_document_id(),
-			'status'         => $statistic->get_status(),
-			'errorCount'     => $statistic->get_error_count(),
-		];
-
-		if ( ! empty( $statistic->get_id() ) ) {
-			if ( $wpdb->update( $table_name, $data, [ 'id' => $statistic->get_id() ] ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * @param $post_id
 	 *
 	 * @return bool
 	 */
 	public function delete_by_post_id( $post_id ) {
 		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
+		$wpdb       = $this->get_wp_db();
 
 		if ( ! is_null( $post_id ) && ! empty( $post_id ) && is_int( $post_id ) ) {
 			if ( $wpdb->delete( $table_name, [ 'postID' => $post_id ] ) ) {
@@ -184,16 +122,7 @@ class StatisticRepository extends RepositoryAbstract {
 	 * @return bool
 	 */
 	public function delete( Statistics $stat ) {
-		$table_name = $this->get_table_name();
-		$wpdb	   = $this->get_wp_db();
-
-		if ( ! empty( $stat->get_id() ) ) {
-			if ( $wpdb->delete( $table_name, [ 'id' => $stat->get_id() ] ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		return $this->delete_by_id( $stat->get_id() );
 	}
 
 	/**
@@ -202,49 +131,7 @@ class StatisticRepository extends RepositoryAbstract {
 	 * @return mixed|Statistics
 	 */
 	protected function to_entity( $row ) {
-		$result = new Statistics();
-
-		if ( isset( $row->id ) ) {
-			$result->set_id( $row->id );
-		}
-
-		if ( isset( $row->taskId ) ) {
-			$result->set_task_id( $row->taskId );
-		}
-
-		if ( isset( $row->postID ) ) {
-			$result->set_post_id( $row->postID );
-		}
-
-		if ( isset( $row->sourceLanguage ) ) {
-			$result->set_source_language( $row->sourceLanguage );
-		}
-
-		if ( isset( $row->targetLanguage ) ) {
-			$result->set_target_language( $row->targetLanguage );
-		}
-
-		if ( isset( $row->progress ) ) {
-			$result->set_progress( $row->progress );
-		}
-
-		if ( isset( $row->targetPostID ) ) {
-			$result->set_target_post_id( $row->targetPostID );
-		}
-
-		if ( isset( $row->documentID ) ) {
-			$result->set_document_id( $row->documentID );
-		}
-
-		if ( isset( $row->status ) ) {
-			$result->set_status( $row->status );
-		}
-
-		if ( isset( $row->errorCount ) ) {
-			$result->set_error_count( $row->errorCount );
-		}
-
-		return $result;
+		return new Statistics( $row );
 	}
 
 	/**
@@ -304,18 +191,5 @@ class StatisticRepository extends RepositoryAbstract {
 				'targetLanguage' => $converter->get_wp_code_by_sc( $document->getTargetLanguage() )->get_wp_code(),
 			]
 		);
-	}
-
-	/**
-	 * @param Statistics $statistic
-	 *
-	 * @return mixed|void
-	 */
-	public function save( $statistic ) {
-		if ( $statistic->get_id() ) {
-			return $this->update( $statistic );
-		} else {
-			return $this->add( $statistic );
-		}
 	}
 }

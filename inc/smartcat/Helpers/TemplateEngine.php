@@ -27,7 +27,7 @@ class TemplateEngine extends \Mustache_Engine {
 			$options,
 			[
 				'loader'          => new \Mustache_Loader_FilesystemLoader( SMARTCAT_PLUGIN_DIR . 'views', [ 'extension' => '.html' ] ),
-				'partials_loader' => new \Mustache_Loader_FilesystemLoader( SMARTCAT_PLUGIN_DIR . 'views/partials' ),
+				'partials_loader' => new \Mustache_Loader_FilesystemLoader( SMARTCAT_PLUGIN_DIR . 'views/partials', [ 'extension' => '.html' ] ),
 			]
 		);
 		parent::__construct( $options );

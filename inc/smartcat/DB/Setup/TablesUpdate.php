@@ -31,12 +31,15 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	 */
 	private $prefix = '';
 
+	private $container;
+
 	/**
 	 * TablesSetup constructor.
 	 */
 	public function __construct() {
 		parent::__construct();
 		$this->prefix = $this->get_wp_db()->get_blog_prefix();
+		$this->container = Connector::get_container();
 	}
 
 	/**
@@ -46,14 +49,17 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 		if ( version_compare( Utils::get_plugin_version(), '2.0.0', '<' ) ) {
 			$this->v200();
 		}
+
+		if ( version_compare( Utils::get_plugin_version(), '2.0.4', '<' ) ) {
+			$this->v204();
+		}
 	}
 
 	/**
 	 * Update to version 2.0.0
 	 */
 	private function v200() {
-		$container    = Connector::get_container();
-		$param_prefix = $container->getParameter( 'plugin.table.prefix' );
+		$param_prefix = $this->container->getParameter( 'plugin.table.prefix' );
 
 		$tasks_table_name     = $this->prefix . 'smartcat_connector_tasks';
 		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
@@ -84,9 +90,9 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 		if ( get_option( $param_prefix . 'smartcat_workflow_stages', false ) ) {
 			/** @var ProfileRepository $profile_repo */
-			$profile_repo = $container->get( 'entity.repository.profile' );
+			$profile_repo = $this->container->get( 'entity.repository.profile' );
 			/** @var LanguageConverter $language_converter */
-			$language_converter = $container->get( 'language.converter' );
+			$language_converter = $this->container->get( 'language.converter' );
 
 			$default_language = pll_default_language( 'locale' );
 
@@ -128,6 +134,22 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 		}
 	}
 
+	/**
+	 * Update to version 2.0.4
+	 */
+	private function v204() {
+		$events_table_name = $this->prefix . 'smartcat_connector_events';
+		$sql               = "CREATE TABLE IF NOT EXISTS {$events_table_name} ( 
+				`id` BIGINT NOT NULL AUTO_INCREMENT, 
+				`date` DATETIME NOT NULL, 
+				`type` VARCHAR( 255 ) NOT NULL,
+				`message` TEXT NOT NULL,
+				PRIMARY KEY ( `id` ),
+				INDEX ( `date` )
+			 );";
+
+		$this->create_table( $sql );
+	}
 	/**
 	 * Main rollback function
 	 */

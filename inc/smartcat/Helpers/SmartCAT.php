@@ -17,8 +17,8 @@ use SmartCat\Client\Model\CreateProjectWithFilesModel;
 use SmartCat\Client\Model\DocumentModel;
 use SmartCat\Client\Model\ProjectChangesModel;
 use SmartCat\Client\Model\ProjectModel;
+use SmartCat\Client\Model\ProjectVendorModel;
 use SmartCAT\WP\Connector;
-use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Entity\Statistics;
 use SmartCAT\WP\DB\Entity\Task;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
@@ -66,7 +66,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 * @return mixed
 	 */
 	public static function filter_chars( $s ) {
-		return str_replace( [ '*', '|', '\\', ':', '"', '<', '>', '?', '/' ], '_', $s );
+		return Utils::substr_unicode( str_replace( [ '*', '|', '\\', ':', '"', '<', '>', '?', '/' ], '_', $s ), 0, 90 );
 	}
 
 	/**
@@ -150,6 +150,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		$index = array_search( $document_model->getFile()['fileName'], $sc_document_names, true );
 
 		if ( false !== $index ) {
+			Logger::event( 'info', "Document update: '{$sc_documents[ $index ]->getName()}'" );
 			$document = $this->getDocumentManager()->documentUpdate(
 				[
 					'documentId'   => $sc_documents[ $index ]->getId(),
@@ -157,6 +158,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 				]
 			);
 		} else {
+			Logger::event( 'info', "Document add: '{$document_model->getFile()['fileName']}'" );
 			$document = $this->getProjectManager()->projectAddDocument(
 				[
 					'documentModel' => [ $document_model ],
@@ -169,12 +171,19 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			$document = array_shift( $document );
 		}
 
-		$update_model = ( new ProjectChangesModel() )
-			->setName( $sc_project->getName() )
-			->setDescription( $sc_project->getDescription() )
-			->setExternalTag( 'source:WPPL' );
-
 		if ( $sc_project->getExternalTag() !== 'source:WPPL' ) {
+			$update_model = ( new ProjectChangesModel() )
+				->setName( $sc_project->getName() )
+				->setDescription( $sc_project->getDescription() )
+				->setVendorAccountIds(
+					array_map(
+						function ( ProjectVendorModel $vendor_model ) {
+							return $vendor_model->getVendorAccountId();
+						},
+						$sc_project->getVendors()
+					)
+				)
+				->setExternalTag( 'source:WPPL' );
 			$this->getProjectManager()->projectUpdateProject( $task->get_project_id(), $update_model );
 		}
 
@@ -211,11 +220,10 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 * @throws Language\Exceptions\LanguageNotFoundException
 	 */
 	public function create_document( $file, $statistic ) {
-		$filename = self::get_task_name_from_stream( $file, true );
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
-
-		$target_language = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
+		$target_language    = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
+		$filename           = self::filter_chars( self::get_task_name_from_stream( $file, false ) ) . "({$target_language}).html";
 
 		$bilingual_file_import_settings = new BilingualFileImportSettingsModel();
 		$bilingual_file_import_settings
@@ -226,7 +234,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 		$document_model->setBilingualFileImportSettings( $bilingual_file_import_settings );
 		$document_model->setExternalId( $statistic->get_id() );
 		$document_model->setTargetLanguages( [ $target_language ] );
-		$document_model->attachFile( $file, self::filter_chars( $filename ) );
+		$document_model->attachFile( $file, $filename );
 
 		return $document_model;
 	}

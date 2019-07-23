@@ -16,35 +16,34 @@ namespace SmartCAT\WP\DB\Entity;
  *
  * @package SmartCAT\WP\DB\Entity
  */
-class Statistics {
+class Statistics extends EntityAbstract {
+	/** @var  integer */
+	protected $id;
+	/** @var  integer */
+	protected $task_id;
+	/** @var  integer */
+	protected $post_id;
+	/** @var  string */
+	protected $source_language;
+	/** @var  string */
+	protected $target_language;
+	/** @var  float */
+	protected $progress;
+	/** @var  integer */
+	protected $target_post_id;
+	/** @var  string */
+	protected $document_id;
+	/** @var  string */
+	protected $status;
+	/** @var  integer */
+	protected $error_count = 0;
+
 	const STATUS_NEW       = 'new';
 	const STATUS_FAILED    = 'failed';
 	const STATUS_SENDED    = 'sended';
 	const STATUS_EXPORT    = 'export';
 	const STATUS_COMPLETED = 'completed';
 	const STATUS_CANCELED  = 'canceled';
-
-	/** @var  integer */
-	private $id;
-	/** @var  integer */
-	private $task_id;
-	/** @var  integer */
-	private $post_id;
-	/** @var  string */
-	private $source_language;
-	/** @var  string */
-	private $target_language;
-	/** @var  float */
-	private $progress;
-	/** @var  integer */
-	private $target_post_id;
-	/** @var  string */
-	private $document_id;
-	/** @var  string */
-	private $status;
-	/** @var  integer */
-	private $error_count = 0;
-
 
 	/**
 	 * @return array
@@ -59,11 +58,30 @@ class Statistics {
 			self::STATUS_CANCELED  => __( 'Canceled', 'translation-connectors' ),
 		];
 	}
+
+	/**
+	 * @return array
+	 */
+	public function attributes(): array {
+		return [
+			'id'             => 'id',
+			'taskId'         => 'task_id',
+			'postID'         => 'post_id',
+			'sourceLanguage' => 'source_language',
+			'targetLanguage' => 'target_language',
+			'progress'       => 'progress',
+			'targetPostID'   => 'target_post_id',
+			'documentID'     => 'document_id',
+			'status'         => 'status',
+			'errorCount'     => 'error_count',
+		];
+	}
+
 	/**
 	 * @return int
 	 */
 	public function get_id() {
-		return $this->id;
+		return intval( $this->id );
 	}
 
 	/**
@@ -72,7 +90,7 @@ class Statistics {
 	 * @return Statistics
 	 */
 	public function set_id( $id ) {
-		$this->id = $id;
+		$this->id = intval( $id );
 
 		return $this;
 	}
@@ -81,7 +99,7 @@ class Statistics {
 	 * @return int
 	 */
 	public function get_task_id() {
-		return $this->task_id;
+		return intval( $this->task_id );
 	}
 
 	/**
@@ -90,7 +108,7 @@ class Statistics {
 	 * @return Statistics
 	 */
 	public function set_task_id( $task_id ) {
-		$this->task_id = $task_id;
+		$this->task_id = intval( $task_id );
 
 		return $this;
 	}
@@ -99,7 +117,7 @@ class Statistics {
 	 * @return int
 	 */
 	public function get_post_id() {
-		return $this->post_id;
+		return intval( $this->post_id );
 	}
 
 	/**
@@ -108,7 +126,7 @@ class Statistics {
 	 * @return Statistics
 	 */
 	public function set_post_id( $post_id ) {
-		$this->post_id = $post_id;
+		$this->post_id = intval( $post_id );
 
 		return $this;
 	}
@@ -153,7 +171,7 @@ class Statistics {
 	 * @return float
 	 */
 	public function get_progress() {
-		return $this->progress;
+		return floatval( $this->progress );
 	}
 
 	/**
@@ -162,7 +180,7 @@ class Statistics {
 	 * @return Statistics
 	 */
 	public function set_progress( $progress ) {
-		$this->progress = $progress;
+		$this->progress = floatval( $progress );
 
 		return $this;
 	}
@@ -171,7 +189,7 @@ class Statistics {
 	 * @return int
 	 */
 	public function get_target_post_id() {
-		return $this->target_post_id;
+		return intval( $this->target_post_id );
 	}
 
 	/**
@@ -180,7 +198,7 @@ class Statistics {
 	 * @return Statistics
 	 */
 	public function set_target_post_id( $target_post_id ) {
-		$this->target_post_id = $target_post_id;
+		$this->target_post_id = intval( $target_post_id );
 
 		return $this;
 	}
@@ -225,7 +243,7 @@ class Statistics {
 	 * @return int
 	 */
 	public function get_error_count() {
-		return $this->error_count;
+		return intval( $this->error_count );
 	}
 
 	/**
@@ -234,7 +252,7 @@ class Statistics {
 	 * @return Statistics
 	 */
 	public function set_error_count( $error_count ) {
-		$this->error_count = $error_count;
+		$this->error_count = intval( $error_count );
 
 		return $this;
 	}

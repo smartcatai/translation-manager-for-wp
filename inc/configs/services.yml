@@ -93,6 +93,12 @@ services:
       - "%plugin.table.prefix%"
     tags: [repositories]
 
+  entity.repository.event:
+    class: SmartCAT\WP\DB\Repository\EventRepository
+    arguments:
+      - "%plugin.table.prefix%"
+    tags: [repositories]
+
   entity.repository.profile:
     class: SmartCAT\WP\DB\Repository\ProfileRepository
     arguments:
