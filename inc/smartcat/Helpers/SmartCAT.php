@@ -220,11 +220,10 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 * @throws Language\Exceptions\LanguageNotFoundException
 	 */
 	public function create_document( $file, $statistic ) {
-		$filename = self::filter_chars( self::get_task_name_from_stream( $file, false ) ) . "({$statistic->get_target_language()}).html";
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
-
-		$target_language = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
+		$target_language    = $language_converter->get_sc_code_by_wp( $statistic->get_target_language() )->get_sc_code();
+		$filename           = self::filter_chars( self::get_task_name_from_stream( $file, false ) ) . "({$target_language}).html";
 
 		$bilingual_file_import_settings = new BilingualFileImportSettingsModel();
 		$bilingual_file_import_settings
