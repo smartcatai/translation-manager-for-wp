@@ -52,7 +52,7 @@ class Callback extends QueueAbstract {
 				$statistics->set_progress( $progress )
 						   ->set_error_count( 0 );
 
-				Logger::event( "callback", "Set statistics config for '{$statistics->get_id()}'");
+				Logger::event( "callback", "Set statistics config for '{$statistics->get_document_id()}'");
 				$statistic_repository->update( $statistics );
 
 				if ( $document->getStatus() == 'completed' ) {

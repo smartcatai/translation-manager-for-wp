@@ -84,7 +84,7 @@ class Task extends EntityAbstract {
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function get_target_languages() {
 		return unserialize( $this->target_languages );

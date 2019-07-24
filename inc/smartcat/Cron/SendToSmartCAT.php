@@ -76,21 +76,24 @@ class SendToSmartCAT extends CronAbstract {
 			$file_name = $smartcat::get_task_name_from_stream( $file );
 
 			try {
+				$document_model = $smartcat->create_document( $file, $statistic );
+
 				if ( ! empty( $task->get_project_id() ) ) {
 					Logger::event( 'cron', "Sending '{$file_name}'" );
 
-					$document_model = $smartcat->create_document( $file, $statistic );
-					$document       = $smartcat->update_project( $document_model, $task );
-
+					$document = $smartcat->update_project( $document_model, $task );
 					$statistic_repository->link_to_smartcat_document( $task, $document );
+
 					Logger::event( 'cron', "File '{$file_name}' was sent" );
 				} else {
 					Logger::event( 'cron', "Creating '{$file_name}'" );
 
-					$smartcat_project = $smartcat->create_project( $task, $file );
-					$statistic_repository->link_to_smartcat_document( $task, $smartcat_project->getDocuments() );
+					$smartcat_project = $smartcat->create_project( $task );
 					$task->set_project_id( $smartcat_project->getId() );
 					$task_repository->save( $task );
+
+					$document = $smartcat->update_project( $document_model, $task );
+					$statistic_repository->link_to_smartcat_document( $task, $document );
 
 					Logger::event( 'cron', "File '{$file_name}' was created" );
 				}
