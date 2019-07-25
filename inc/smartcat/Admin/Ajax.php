@@ -56,8 +56,9 @@ final class Ajax implements HookInterface {
 		$required_parameters = [ $prefix . 'smartcat_api_login', $prefix . 'smartcat_api_password' ];
 		$parameters          = sanitize_post( $_POST );
 
-		$login    = '';
-		$password = '';
+		$login    = $parameters[ $prefix . 'smartcat_api_login' ] ?? '';
+		$password = $parameters[ $prefix . 'smartcat_api_password' ] ?? '';
+		$server   = $parameters[ $prefix . 'smartcat_api_server' ] ?? '';
 		$utils    = null;
 		$options  = null;
 
@@ -73,18 +74,8 @@ final class Ajax implements HookInterface {
 
 		if ( ! $utils->is_array_in_array( $required_parameters, array_keys( $parameters ) ) ) {
 			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
-		} elseif ( empty( $login = $parameters[ $prefix . 'smartcat_api_login' ] ) || empty( $password = $parameters[ $prefix . 'smartcat_api_password' ] ) ) {
+		} elseif ( empty( $login ) || empty( $password ) ) {
 			$ajax_response->send_error( __( 'Login and password are required', 'translation-connectors' ), $data );
-		}
-
-		$server = $parameters[ $prefix . 'smartcat_api_server' ];
-
-		$previous_login    = $options->get_and_decrypt( 'smartcat_api_login' );
-		$previous_password = $options->get_and_decrypt( 'smartcat_api_password' );
-		$previous_server   = $options->get( 'smartcat_api_server' );
-
-		if ( '******' === $password ) {
-			$password = $previous_password;
 		}
 
 		// Testing login to Smartcat.
@@ -96,52 +87,9 @@ final class Ajax implements HookInterface {
 			$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
 		}
 
-		// If callback already exists - drop needed.
-		if ( ! empty( $previous_login ) && ! empty( $previous_password ) && ! empty( $previous_server ) ) {
-			try {
-				$sc = new SmartCAT( $previous_login, $previous_password, $previous_server );
-				$sc->getCallbackManager()->callbackDelete();
-			} catch ( \Exception $e ) {
-				$data['message'] = $e->getMessage();
-
-				if ( $e instanceof ClientErrorException ) {
-					$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
-				} else {
-					$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
-				}
-
-				Logger::error( "Callback delete failed, user {$previous_login}", $message );
-
-				$ajax_response->send_error(
-					__( 'Problem with deleting of previous callback', 'translation-connectors' ),
-					$data
-				);
-			}
-		}
-
-		try {
-			Connector::set_core_parameters();
-			$callback_handler = $container->get( 'callback.handler.smartcat' );
-			$callback_handler->register_callback();
-		} catch ( \Exception $e ) {
-			$data['message'] = $e->getMessage();
-
-			if ( $e instanceof ClientErrorException ) {
-				$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
-			} else {
-				$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
-			}
-
-			Logger::error( "Callback register failed, user {$login}", $message );
-
-			$ajax_response->send_error( __( 'Problem with setting of new callback', 'translation-connectors' ), $data );
-		}
-
 		if ( $account_info && $account_info->getName() ) {
 			$options->set( 'smartcat_account_name', $account_info->getName() );
 		}
-
-		wp_cache_set( 'sc_smartcat_access', true, 'translation-connectors' );
 
 		$ajax_response->send_success( __( 'Settings successfully saved', 'translation-connectors' ), $data );
 	}

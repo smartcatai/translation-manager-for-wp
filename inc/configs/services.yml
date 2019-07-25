@@ -21,14 +21,6 @@ services:
     class: SmartCAT\WP\Cron\ClearDeletedProject
     tags: [installable, cron]
 
-  core.queue.callback:
-    class: SmartCAT\WP\Queue\Callback
-    tags: [queue]
-
-  core.queue.statistic:
-    class: SmartCAT\WP\Queue\Statistic
-    tags: [queue]
-
   core.queue.publication:
     class: SmartCAT\WP\Queue\Publication
     tags: [queue]
@@ -70,10 +62,6 @@ services:
   core.notice:
     class: SmartCAT\WP\WP\Notice
     tags: [initable]
-
-  callback.handler.smartcat:
-    class: SmartCAT\WP\Handler\SmartCATCallbackHandler
-    tags: [installable, hook]
 
   entity.repository.task:
     class: SmartCAT\WP\DB\Repository\TaskRepository

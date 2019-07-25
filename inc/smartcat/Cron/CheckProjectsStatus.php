@@ -18,6 +18,7 @@ use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
+use SmartCAT\WP\Queue\Publication;
 
 /**
  * Class CheckProjectsStatus
@@ -98,6 +99,14 @@ class CheckProjectsStatus extends CronAbstract {
 			$statistic->set_progress( $progress );
 
 			$statistic_repository->save( $statistic );
+
+			if ( $document->getStatus() === 'completed' ) {
+				/** @var Publication $queue */
+				$queue = $container->get( 'core.queue.publication' );
+				$queue->push_to_queue( $document->getId() );
+				Logger::event( 'cron', "Pushed to publication '{$document->getId()}'" );
+
+			}
 		}
 
 		Logger::event( 'cron', 'Checking documents ended' );

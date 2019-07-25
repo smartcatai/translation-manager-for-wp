@@ -15,6 +15,11 @@ use SmartCAT\WP\Connector;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\WP\Options;
 
+/**
+ * Class Utils
+ *
+ * @package SmartCAT\WP\Helpers
+ */
 class Utils {
 	use DITrait;
 

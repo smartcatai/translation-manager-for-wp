@@ -39,16 +39,14 @@ class Publication extends QueueAbstract {
 	 *
 	 * @return mixed
 	 */
-	protected function task( $item )
-	{
-		// Actions to perform
+	protected function task( $item ) {
 		if ( ! SmartCAT::is_active() ) {
 			sleep( 10 );
 
 			return $item;
 		}
 
-		Logger::event( "publication", "End queue Start queue '{$item}'");
+		Logger::event( 'publication', "End queue Start queue '{$item}'" );
 
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
@@ -61,52 +59,53 @@ class Publication extends QueueAbstract {
 
 		$statistics = $statistic_repository->get_one_by( [ 'documentID' => $item ] );
 		try {
-			if ( $statistics && $statistics->get_status() == Statistics::STATUS_SENDED ) {
-				Logger::event( "publication", "Export '{$item}'");
+			if ( $statistics && $statistics->get_status() === Statistics::STATUS_SENDED ) {
+				Logger::event( 'publication', "Export '{$item}'" );
 
 				$task = $sc->getDocumentExportManager()
 					->documentExportRequestExport( [ 'documentIds' => [ $statistics->get_document_id() ] ] );
 				if ( $task->getId() ) {
-					$statistics->set_status( Statistics::STATUS_EXPORT )
-							   ->set_error_count( 0 );
+					$statistics
+						->set_status( Statistics::STATUS_EXPORT )
+						->set_error_count( 0 );
 					$statistic_repository->update( $statistics );
 					/** @var CreatePost $queue */
 					$queue = $container->get( 'core.queue.post' );
 
-					Logger::event( "publication", "Pushing to CreatePost '{$item}'");
-					$queue->push_to_queue( [
-						'documentID' => $statistics->get_document_id(),
-						'taskID'	 => $task->getId()
-					] );
-					Logger::event( "publication", "Pushed to CreatePost '{$item}'");
+					Logger::event( 'publication', "Pushing to CreatePost '{$item}'" );
+					$queue->push_to_queue(
+						[
+							'documentID' => $statistics->get_document_id(),
+							'taskID'     => $task->getId(),
+						]
+					);
+					Logger::event( 'publication', "Pushed to CreatePost '{$item}'" );
 				}
 			}
 		} catch ( ClientErrorException $e ) {
 			$status_code = $e->getResponse()->getStatusCode();
-			if ( $status_code == 404 ) {
+			if ( 404 === $status_code ) {
 				$statistic_repository->delete( $statistics );
-				Logger::event( "publication", "Deleted '{$item}'");
+				Logger::event( 'publication', "Deleted '{$item}'" );
 			} else {
 				if ( $statistics->get_error_count() < 360 ) {
 					$statistics->inc_error_count();
 					$statistic_repository->update( $statistics );
 					sleep( 10 );
 
-					Logger::event( "publication", "New {$statistics->get_error_count()} try of '{$item}'");
+					Logger::event( 'publication', "New {$statistics->get_error_count()} try of '{$item}'" );
 					return $item;
 				}
 				Logger::error(
 					"Document $item, start download translate",
 					"API error code: {$status_code}. API error message: {$e->getResponse()->getBody()->getContents()}"
-				 );
+				);
 			}
 		} catch ( \Throwable $e ) {
-			Logger::error(
-				"Document {$item}, publication translate","Message: {$e->getMessage()}"
-			 );
+			Logger::error( "Document {$item}, publication translate", "Message: {$e->getMessage()}" );
 		}
 
-		Logger::event( "publication", "End queue '{$item}'");
+		Logger::event( 'publication', "End queue '{$item}'" );
 
 		return false;
 	}
@@ -117,14 +116,13 @@ class Publication extends QueueAbstract {
 	 * Override if applicable, but ensure that the below actions are
 	 * performed, or, call parent::complete().
 	 */
-	protected function complete()
-	{
+	protected function complete() {
 		parent::complete();
 		// Show notice to user or perform some other arbitrary task...
 		/** @var CreatePost $queue */
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
-		$queue	 = $container->get( 'core.queue.post' );
+		$queue     = $container->get( 'core.queue.post' );
 		$queue->save()->dispatch();
 	}
 }
