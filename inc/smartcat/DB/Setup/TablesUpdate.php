@@ -16,6 +16,7 @@ use SmartCAT\WP\DB\DbAbstract;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
+use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
 
 /**
@@ -31,6 +32,11 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	 */
 	private $prefix = '';
 
+	/**
+	 * Container
+	 *
+	 * @var string
+	 */
 	private $container;
 
 	/**
@@ -38,7 +44,7 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	 */
 	public function __construct() {
 		parent::__construct();
-		$this->prefix = $this->get_wp_db()->get_blog_prefix();
+		$this->prefix    = $this->get_wp_db()->get_blog_prefix();
 		$this->container = Connector::get_container();
 	}
 
@@ -52,6 +58,10 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 		if ( version_compare( Utils::get_plugin_version(), '2.0.4', '<' ) ) {
 			$this->v204();
+		}
+
+		if ( version_compare( Utils::get_plugin_version(), '2.0.5', '<' ) ) {
+			$this->v205();
 		}
 	}
 
@@ -150,6 +160,19 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 		$this->create_table( $sql );
 	}
+
+	/**
+	 * Update to version 2.0.5
+	 */
+	private function v205() {
+		/** @var SmartCAT $smartcat */
+		$smartcat = $this->container->get( 'smartcat' );
+		if ( $smartcat::check_access() ) {
+			Connector::set_core_parameters();
+			$smartcat->getCallbackManager()->callbackDelete();
+		}
+	}
+
 	/**
 	 * Main rollback function
 	 */

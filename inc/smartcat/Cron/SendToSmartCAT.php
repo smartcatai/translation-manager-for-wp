@@ -47,7 +47,7 @@ class SendToSmartCAT extends CronAbstract {
 			return;
 		}
 
-		Logger::event( 'cron', 'Sending to Smartсat started' );
+		Logger::event( 'sendCron', 'Sending to Smartсat started' );
 
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
@@ -68,7 +68,7 @@ class SendToSmartCAT extends CronAbstract {
 		$statistics = $statistic_repository->get_by_status( Statistics::STATUS_NEW );
 
 		$count = count( $statistics );
-		Logger::event( 'cron', "Find $count tasks to send" );
+		Logger::event( 'sendCron', "Find $count tasks to send" );
 
 		foreach ( $statistics as $statistic ) {
 			$task      = $task_repository->get_one_by_id( $statistic->get_task_id() );
@@ -79,14 +79,14 @@ class SendToSmartCAT extends CronAbstract {
 				$document_model = $smartcat->create_document( $file, $statistic );
 
 				if ( ! empty( $task->get_project_id() ) ) {
-					Logger::event( 'cron', "Sending '{$file_name}'" );
+					Logger::event( 'sendCron', "Sending '{$file_name}'" );
 
 					$document = $smartcat->update_project( $document_model, $task );
 					$statistic_repository->link_to_smartcat_document( $task, $document );
 
-					Logger::event( 'cron', "File '{$file_name}' was sent" );
+					Logger::event( 'sendCron', "File '{$file_name}' was sent" );
 				} else {
-					Logger::event( 'cron', "Creating '{$file_name}'" );
+					Logger::event( 'sendCron', "Creating '{$file_name}'" );
 
 					$smartcat_project = $smartcat->create_project( $task );
 					$task->set_project_id( $smartcat_project->getId() );
@@ -95,7 +95,7 @@ class SendToSmartCAT extends CronAbstract {
 					$document = $smartcat->update_project( $document_model, $task );
 					$statistic_repository->link_to_smartcat_document( $task, $document );
 
-					Logger::event( 'cron', "File '{$file_name}' was created" );
+					Logger::event( 'sendCron', "File '{$file_name}' was created" );
 				}
 			} catch ( \Throwable $e ) {
 				if ( $e instanceof HttpException ) {
@@ -110,6 +110,6 @@ class SendToSmartCAT extends CronAbstract {
 			}
 		}
 
-		Logger::event( 'cron', 'Sending to Smartсat ended' );
+		Logger::event( 'sendCron', 'Sending to Smartсat ended' );
 	}
 }

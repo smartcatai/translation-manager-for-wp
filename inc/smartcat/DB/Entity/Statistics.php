@@ -96,19 +96,19 @@ class Statistics extends EntityAbstract {
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function get_task_id() {
-		return intval( $this->task_id );
+		return $this->task_id;
 	}
 
 	/**
-	 * @param int $task_id
+	 * @param string $task_id
 	 *
 	 * @return Statistics
 	 */
 	public function set_task_id( $task_id ) {
-		$this->task_id = intval( $task_id );
+		$this->task_id = $task_id ;
 
 		return $this;
 	}

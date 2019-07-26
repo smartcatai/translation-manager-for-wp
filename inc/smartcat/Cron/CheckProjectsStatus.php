@@ -11,6 +11,7 @@
 
 namespace SmartCAT\WP\Cron;
 
+use Http\Client\Common\Exception\ClientErrorException;
 use Psr\Container\ContainerInterface;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Statistics;
@@ -18,7 +19,6 @@ use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
-use SmartCAT\WP\Queue\Publication;
 
 /**
  * Class CheckProjectsStatus
@@ -46,7 +46,7 @@ class CheckProjectsStatus extends CronAbstract {
 			return;
 		}
 
-		Logger::event( 'cron', 'Checking documents started' );
+		Logger::event( 'checkStatus', 'Checking documents started' );
 
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
@@ -63,7 +63,7 @@ class CheckProjectsStatus extends CronAbstract {
 		$statistics = $statistic_repository->get_sended();
 		$count      = count( $statistics );
 
-		Logger::event( 'cron', "Find $count documents to check" );
+		Logger::event( 'checkStatus', "Find $count documents to check" );
 
 		foreach ( $statistics as $statistic ) {
 			if ( $statistic->get_status() !== Statistics::STATUS_SENDED ) {
@@ -101,14 +101,44 @@ class CheckProjectsStatus extends CronAbstract {
 			$statistic_repository->save( $statistic );
 
 			if ( $document->getStatus() === 'completed' ) {
-				/** @var Publication $queue */
-				$queue = $container->get( 'core.queue.publication' );
-				$queue->push_to_queue( $document->getId() );
-				Logger::event( 'cron', "Pushed to publication '{$document->getId()}'" );
+				Logger::event( 'checkStatus', "Export '{$document->getId()}'" );
 
+				try {
+					$task = $smartcat->getDocumentExportManager()->documentExportRequestExport(
+						[
+							'documentIds' => [ $document->getId() ],
+						]
+					);
+
+					if ( $task->getId() ) {
+						$statistic
+							->set_task_id( $task->getId() )
+							->set_status( Statistics::STATUS_EXPORT )
+							->set_error_count( 0 );
+						$statistic_repository->save( $statistic );
+						Logger::event( 'checkStatus', "Changed status to export for '{$document->getId()}'" );
+					}
+				} catch ( ClientErrorException $e ) {
+					if ( 404 === $e->getResponse()->getStatusCode() ) {
+						$statistic_repository->delete( $statistic );
+						Logger::event( 'checkStatus', "Deleted '{$document->getId()}'" );
+					} else {
+						if ( $statistic->get_error_count() < 360 ) {
+							$statistic->inc_error_count();
+							$statistic_repository->save( $statistic );
+							Logger::event( 'checkStatus', "New {$statistic->get_error_count()} try of '{$document->getId()}'" );
+						}
+					}
+					Logger::error(
+						"Document failed {$document->getId()}, request export translate",
+						"API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}"
+					);
+				} catch ( \Throwable $e ) {
+					Logger::error( "Document {$document->getId()}, request export translate", "Message: {$e->getMessage()}" );
+				}
 			}
 		}
 
-		Logger::event( 'cron', 'Checking documents ended' );
+		Logger::event( 'checkStatus', 'Checking documents ended' );
 	}
 }
