@@ -129,12 +129,12 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	}
 
 	/**
-	 * @param $document_model CreateDocumentPropertyWithFilesModel
 	 * @param Task $task
+	 * @param $document_model CreateDocumentPropertyWithFilesModel
 	 *
-	 * @return \Psr\Http\Message\ResponseInterface|\SmartCat\Client\Model\DocumentModel
+	 * @return \SmartCat\Client\Model\DocumentModel
 	 */
-	public function update_project( $document_model, $task ) {
+	public function update_project( $task, $document_model ) {
 		/** @var ProjectModel $sc_project */
 		$sc_project = $this->getProjectManager()->projectGet( $task->get_project_id() );
 
@@ -166,10 +166,6 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			);
 		}
 
-		if ( is_array( $document ) ) {
-			$document = array_shift( $document );
-		}
-
 		if ( $sc_project->getExternalTag() !== 'source:WPPL' ) {
 			$update_model = ( new ProjectChangesModel() )
 				->setName( $sc_project->getName() )
@@ -186,7 +182,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			$this->getProjectManager()->projectUpdateProject( $task->get_project_id(), $update_model );
 		}
 
-		return $document;
+		return is_array( $document ) ? array_shift( $document ) : $document;
 	}
 
 	/**

@@ -78,25 +78,25 @@ class SendToSmartCAT extends CronAbstract {
 			try {
 				$document_model = $smartcat->create_document( $file, $statistic );
 
-				if ( ! empty( $task->get_project_id() ) ) {
-					Logger::event( 'cron', "Sending '{$file_name}'" );
-
-					$document = $smartcat->update_project( $document_model, $task );
-					$statistic_repository->link_to_smartcat_document( $task, $document );
-
-					Logger::event( 'cron', "File '{$file_name}' was sent" );
-				} else {
+				if ( empty( $task->get_project_id() ) ) {
 					Logger::event( 'cron', "Creating '{$file_name}'" );
 
 					$smartcat_project = $smartcat->create_project( $task );
 					$task->set_project_id( $smartcat_project->getId() );
 					$task_repository->save( $task );
 
-					$document = $smartcat->update_project( $document_model, $task );
-					$statistic_repository->link_to_smartcat_document( $task, $document );
-
 					Logger::event( 'cron', "File '{$file_name}' was created" );
 				}
+
+				Logger::event( 'cron', "Sending '{$file_name}'" );
+
+				$document = $smartcat->update_project( $task, $document_model );
+				$statistic->set_document_id( $document->getId() );
+				$statistic->set_status( Statistics::STATUS_SENDED );
+
+				$statistic_repository->save( $statistic );
+
+				Logger::event( 'cron', "File '{$file_name}' was sent" );
 			} catch ( \Throwable $e ) {
 				if ( $e instanceof HttpException ) {
 					$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";

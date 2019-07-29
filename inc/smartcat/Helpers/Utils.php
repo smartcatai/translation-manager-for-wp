@@ -103,19 +103,15 @@ class Utils {
 			$post_body = wpautop( $post_body );
 		}
 
-		/**
 		$replace_count = 0;
 		$iteration     = 0;
 
 		do {
 			$post_body = preg_replace_callback(
-				'%\[\s*([\w]+)\s*(\s+.+?)?\]((.*?)\[\s*\/\1\s*\])?%s',
+				'%\[([\w]+)(\s+.+?)?\]((.*?)\[\/\1\])?%s',
 				function( $matches ) {
-					if ( empty( $matches[4] ) ) {
-						return "<{$matches[1]} type=\"sc-shortcode\"{$matches[2]}>";
-					} else {
-						return "<{$matches[1]} type=\"sc-shortcode\"{$matches[2]}>{$matches[4]}</{$matches[1]}>";
-					}
+					$single = empty( $matches[4] ) ? 'true' : 'false';
+					return "<sc-shortcode type=\"{$matches[1]}\" single=\"{$single}\"{$matches[2]}>{$matches[4]}</sc-shortcode>";
 				},
 				$post_body,
 				-1,
@@ -128,8 +124,6 @@ class Utils {
 				Logger::warning( 'Limit exceeded', "Shortcodes replacing iteration limit exceeded in post '{$post->post_title}'" );
 			}
 		} while ( $replace_count && ( $iteration < 50 ) );
-
-		 */
 
 		$file_body = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><title>{$post->post_title}</title></head><body>{$post_body}</body></html>";
 		$file      = fopen( "php://temp/{$post->post_title}.html", 'r+' );
