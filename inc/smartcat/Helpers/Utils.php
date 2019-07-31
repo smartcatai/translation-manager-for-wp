@@ -112,7 +112,7 @@ class Utils {
 				function( $matches ) {
 					$single = empty( $matches[4] ) ? 'true' : 'false';
 					$unique_id = substr(preg_replace("%\d%", '', base_convert(sha1(uniqid(mt_rand(), true)), 16, 36)), 0, 7);
-					return "<sc-shortcode-{$unique_id} type=\"{$matches[1]}\" single=\"{$single}\"{$matches[2]}>{$matches[4]}</sc-shortcode-{$unique_id}>";
+					return "<sc-shortcode-{$unique_id} sc-type=\"{$matches[1]}\" sc-single=\"{$single}\"{$matches[2]}>{$matches[4]}</sc-shortcode-{$unique_id}>";
 				},
 				$post_body,
 				-1,
