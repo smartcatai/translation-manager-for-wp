@@ -108,7 +108,7 @@ class Statistics extends EntityAbstract {
 	 * @return Statistics
 	 */
 	public function set_task_id( $task_id ) {
-		$this->task_id = $task_id ;
+		$this->task_id = $task_id;
 
 		return $this;
 	}
