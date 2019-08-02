@@ -13,7 +13,7 @@ namespace SmartCAT\WP\Helpers;
 
 use SmartCat\Client\Model\BilingualFileImportSettingsModel;
 use SmartCat\Client\Model\CreateDocumentPropertyWithFilesModel;
-use SmartCat\Client\Model\CreateProjectWithFilesModel;
+use SmartCat\Client\Model\CreateProjectModel;
 use SmartCat\Client\Model\DocumentModel;
 use SmartCat\Client\Model\ProjectChangesModel;
 use SmartCat\Client\Model\ProjectModel;
@@ -95,7 +95,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 	 * @return ProjectModel
 	 * @throws \Exception
 	 */
-	public function create_project( $task, $file ) {
+	public function create_project( $task ) {
 		/** @var LanguageConverter $language_converter */
 		$language_converter = Connector::get_container()->get( 'language.converter' );
 
@@ -107,7 +107,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			$task->get_target_languages()
 		);
 
-		$project_model = new CreateProjectWithFilesModel();
+		$project_model = new CreateProjectModel();
 		$project_model->setName( $this->get_task_name( $task ) );
 		$project_model->setSourceLanguage( $source_language );
 		$project_model->setTargetLanguages( $target_languages );
@@ -122,20 +122,19 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 
 		$project_model->setDescription( 'WordPress Smartcat Connector' );
 		$project_model->setExternalTag( 'source:WPPL' );
-		$project_model->attacheFile( $file, self::filter_chars( self::get_task_name_from_stream( $file, true ) ) );
 
-		$smartcat_project = $this->getProjectManager()->projectCreateProjectWithFiles( $project_model );
+		$smartcat_project = $this->getProjectManager()->projectCreateProject( $project_model );
 
 		return $smartcat_project;
 	}
 
 	/**
-	 * @param $document_model CreateDocumentPropertyWithFilesModel
 	 * @param Task $task
+	 * @param $document_model CreateDocumentPropertyWithFilesModel
 	 *
-	 * @return \Psr\Http\Message\ResponseInterface|\SmartCat\Client\Model\DocumentModel
+	 * @return \SmartCat\Client\Model\DocumentModel
 	 */
-	public function update_project( $document_model, $task ) {
+	public function update_project( $task, $document_model ) {
 		/** @var ProjectModel $sc_project */
 		$sc_project = $this->getProjectManager()->projectGet( $task->get_project_id() );
 
@@ -167,10 +166,6 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			);
 		}
 
-		if ( is_array( $document ) ) {
-			$document = array_shift( $document );
-		}
-
 		if ( $sc_project->getExternalTag() !== 'source:WPPL' ) {
 			$update_model = ( new ProjectChangesModel() )
 				->setName( $sc_project->getName() )
@@ -187,7 +182,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			$this->getProjectManager()->projectUpdateProject( $task->get_project_id(), $update_model );
 		}
 
-		return $document;
+		return is_array( $document ) ? array_shift( $document ) : $document;
 	}
 
 	/**
@@ -206,6 +201,7 @@ class SmartCAT extends \SmartCat\Client\SmartCat {
 			$titles[] = $post->post_title;
 		}
 
+		$titles = array_unique( $titles );
 		$result = self::filter_chars( implode( ' ,', $titles ) );
 		$result = Utils::substr_unicode( $result, 0, 94 );
 

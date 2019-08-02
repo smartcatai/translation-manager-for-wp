@@ -11,12 +11,7 @@
 
 namespace SmartCAT\WP\DB\Repository;
 
-use Psr\Container\ContainerInterface;
-use SmartCat\Client\Model\DocumentModel;
-use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Statistics;
-use SmartCAT\WP\DB\Entity\Task;
-use SmartCAT\WP\Helpers\Language\LanguageConverter;
 
 /**
  * Class StatisticRepository
@@ -151,45 +146,5 @@ class StatisticRepository extends RepositoryAbstract {
 				}
 			}
 		}
-	}
-
-	/**
-	 * @param Task $task
-	 * @param DocumentModel[]|DocumentModel $document
-	 * @return false|int
-	 * @throws \SmartCAT\WP\Helpers\Language\Exceptions\LanguageNotFoundException
-	 */
-	public function link_to_smartcat_document( Task $task, $document ) {
-		/** @var ContainerInterface $container */
-		$container = Connector::get_container();
-
-		/** @var LanguageConverter $converter */
-		$converter = $container->get( 'language.converter' );
-
-		if ( is_array( $document ) ) {
-			foreach ( $document as $document_model ) {
-				if ( $document_model instanceof DocumentModel ) {
-					$this->link_to_smartcat_document( $task, $document_model );
-				}
-			}
-
-			return true;
-		}
-
-		$table_name = $this->get_table_name();
-		$wpdb       = $this->get_wp_db();
-		$data       = [
-			'documentID' => $document->getId(),
-			'status'     => Statistics::STATUS_SENDED,
-		];
-
-		return $wpdb->update(
-			$table_name,
-			$data,
-			[
-				'taskId'         => $task->get_id(),
-				'targetLanguage' => $converter->get_wp_code_by_sc( $document->getTargetLanguage() )->get_wp_code(),
-			]
-		);
 	}
 }

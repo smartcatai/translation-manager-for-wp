@@ -73,6 +73,12 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 
 == Changelog ==
 
+= 2.0.5 (2019-07-25) =
+* Fix creating project with files
+
+= 2.0.4 (2019-07-23) =
+* Bug fixes with Smartcat projects
+
 = 2.0.3 (2019-07-09) =
 * Minor bug fixes
 

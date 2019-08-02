@@ -9,7 +9,7 @@
  * @link http://smartcat.ai
  */
 
-$resDir = '../../translation-manager-for-wp-svn';
+$resDir = '/Volumes/MAC MEDIA/GitProjects/translation-manager-for-wp-svn';
 
 if ( !is_dir( "$resDir/trunk" ) || !is_dir( "$resDir/tags" ) ) {
 	die( "SVN dir not found" . PHP_EOL );
