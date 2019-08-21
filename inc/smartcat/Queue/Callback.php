@@ -62,8 +62,11 @@ class Callback extends QueueAbstract {
 					Logger::event( "callback", "Pushed to publication '{$statistics->get_document_id()}'");
 
 				}
+
+				Logger::event( "callback", "End Queue update_statistic '{$statistics->get_document_id()}'");
+			} else {
+				Logger::event( "callback", "Document '{$item}' not from WP");
 			}
-			Logger::event( "callback", "End Queue update_statistic '{$statistics->get_document_id()}'");
 		} catch ( ClientErrorException $e ) {
 			if ( $e->getResponse()->getStatusCode() == 404 ) {
 				$statistic_repository->delete( $statistics );

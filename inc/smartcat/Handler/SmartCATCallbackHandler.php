@@ -40,7 +40,7 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 		/** @noinspection PhpUnusedParameterInspection */
 		\WP_REST_Server $server
 	) {
-		register_rest_route( self::ROUTE_PREFIX, '/( ?<type>.+ )/( ?<method>.+ )', [
+		register_rest_route( self::ROUTE_PREFIX, '/(?<type>.+)/(?<method>.+)', [
 			'methods'  => \WP_REST_Server::CREATABLE,
 			'callback' => [ $this, 'handle' ],
 		] );
