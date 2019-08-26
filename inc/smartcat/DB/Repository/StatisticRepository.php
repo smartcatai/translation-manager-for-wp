@@ -76,7 +76,7 @@ class StatisticRepository extends RepositoryAbstract {
 		$wpdb       = $this->get_wp_db();
 
 		if ( is_array( $status ) ) {
-			$status = implode( "', OR status='", $status );
+			$status = implode( "' OR status='", $status );
 		}
 
 		$query = "SELECT * FROM $table_name WHERE status='$status'";
