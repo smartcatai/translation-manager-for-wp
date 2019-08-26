@@ -13,6 +13,8 @@ namespace SmartCAT\WP\Handler;
 
 use SmartCat\Client\Model\CallbackPropertyModel;
 use SmartCAT\WP\Connector;
+use SmartCAT\WP\Cron\CheckProjectsStatus;
+use SmartCAT\WP\Cron\SendToSmartCAT;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\WP\HookInterface;
@@ -40,7 +42,7 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 		/** @noinspection PhpUnusedParameterInspection */
 		\WP_REST_Server $server
 	) {
-		register_rest_route( self::ROUTE_PREFIX, '/( ?<type>.+ )/( ?<method>.+ )', [
+		register_rest_route( self::ROUTE_PREFIX, '/(?<type>.+)/(?<method>.+)', [
 			'methods'  => \WP_REST_Server::CREATABLE,
 			'callback' => [ $this, 'handle' ],
 		] );
@@ -60,27 +62,25 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 			$options = $this->container->get( 'core.options' );
 
 			if ( $request->get_header( 'authorization' ) == $options->get_and_decrypt( 'callback_authorisation_token' ) ) {
-				$body	  = $request->get_body();
-				$documents = json_decode( $body );
-				if ( is_array( $documents ) && count( $documents ) > 0 ) {
-					/** @var StatisticRepository $statistic_repository */
-					$statistic_repository = $this->container->get( 'entity.repository.statistic' );
-					$resulting_documents  = $statistic_repository->get_sended( $documents );
-
-					/** @var \SmartCAT\WP\Queue\Callback $queue */
-					$queue = $this->container->get( 'core.queue.callback' );
-
-					foreach ( $resulting_documents as $document ) {
-						if ( $document->get_error_count() > 0 ) {
-							$document->set_error_count( 0 );
-							$statistic_repository->persist( $document );
-						}
-						$queue->push_to_queue( $document->get_document_id() );
-					}
-
-					$statistic_repository->flush();
-					$queue->save()->dispatch();
+				if ( time() - $options->get( 'last_cron_check' ) > 300 ) {
+					/** @var CheckProjectsStatus $cron_checker */
+					$cron_checker = $this->container->get( 'core.cron.check' );
+					$cron_checker->run();
 				}
+
+				if ( time() - $options->get( 'last_cron_send' ) > 300 ) {
+					/** @var SendToSmartCAT $cron_checker */
+					$cron_checker = $this->container->get( 'core.cron.send' );
+					$cron_checker->run();
+				}
+
+				$response = new \WP_Error(
+					'rest_forbidden',
+					__( 'Sorry, you can not use cron so fast.', 'translation-connectors' ),
+					[ 'status' => 400 ]
+				);
+
+				return $response;
 			} else {
 				$response = new \WP_Error( 'rest_forbidden',
 					__( 'Sorry, you are not allowed to do that.', 'translation-connectors' ),
@@ -113,7 +113,7 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 			$callback_model->setAdditionalHeaders( [
 				[
 					'name'  => 'Authorization',
-					'value' => $options->get_and_decrypt( 'callback_authorisation_token' )
+					'value' => $options->get_and_decrypt( 'callback_authorisation_token' ),
 				]
 			] );
 			$sc->getCallbackManager()->callbackUpdate( $callback_model );
@@ -129,7 +129,6 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 	}
 
 	public function plugin_uninstall() {
-
 	}
 
 	public function register_hooks() {

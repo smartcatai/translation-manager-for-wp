@@ -53,6 +53,10 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 		if ( version_compare( Utils::get_plugin_version(), '2.0.4', '<' ) ) {
 			$this->v204();
 		}
+
+		if ( version_compare( Utils::get_plugin_version(), '2.1.0', '<' ) ) {
+			$this->v210();
+		}
 	}
 
 	/**
@@ -150,6 +154,16 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 		$this->create_table( $sql );
 	}
+
+	/**
+	 * Update to version 2.1.0
+	 */
+	private function v210() {
+		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
+		$this->exec( "ALTER TABLE {$statistic_table_name} ADD COLUMN exportID VARCHAR (255) DEFAULT NULL;" );
+		$this->exec( "ALTER TABLE {$statistic_table_name} DROP COLUMN errorCount;" );
+	}
+
 	/**
 	 * Main rollback function
 	 */

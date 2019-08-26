@@ -9,6 +9,8 @@ parameters:
     - "smartcat_debug_mode"
     - "smartcat_events_enabled"
     - "smartcat_regform_showed"
+    - "last_cron_send"
+    - "last_cron_check"
     #Manual update statistics switch
     - "statistic_queue_active"
     #Сallback Authorize code

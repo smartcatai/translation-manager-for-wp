@@ -15,7 +15,6 @@ use SmartCAT\WP\Cron\CronInterface;
 use SmartCAT\WP\DB\Setup\SetupInterface;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
-use SmartCAT\WP\Queue\QueueAbstract;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\InitInterface;
 use SmartCAT\WP\WP\Notice;
@@ -84,16 +83,6 @@ class Connector {
 	/**
 	 * @throws \Exception
 	 */
-	private function init_queue() {
-		$services = self::get_container()->findTaggedServiceIds( 'queue' );
-		foreach ( $services as $service => $tags ) {
-			$this->from_container( $service );
-		}
-	}
-
-	/**
-	 * @throws \Exception
-	 */
 	public function plugin_activate() {
 		if ( ! self::check_dependency() ) {
 			/** @var Notice $notice */
@@ -136,14 +125,6 @@ class Connector {
 			$object = $this->from_container( $hook );
 			if ( $object instanceof PluginInterface ) {
 				$object->plugin_deactivate();
-			}
-		}
-		// Stopping queues.
-		$hooks = self::get_container()->findTaggedServiceIds( 'queue' );
-		foreach ( $hooks as $hook => $tags ) {
-			$object = $this->from_container( $hook );
-			if ( $object instanceof QueueAbstract ) {
-				$object->cancel_process();
 			}
 		}
 	}
@@ -190,7 +171,6 @@ class Connector {
 	 * @throws \Exception
 	 */
 	public function plugin_init( $query ) {
-		$this->init_queue();
 		$hooks = self::get_container()->findTaggedServiceIds( 'initable' );
 		foreach ( $hooks as $hook => $tags ) {
 			$object = self::get_container()->get( $hook );
