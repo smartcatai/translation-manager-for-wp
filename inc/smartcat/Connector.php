@@ -11,6 +11,7 @@
 
 namespace SmartCAT\WP;
 
+use Psr\Container\ContainerInterface;
 use SmartCAT\WP\Cron\CronInterface;
 use SmartCAT\WP\DB\Setup\SetupInterface;
 use SmartCAT\WP\Helpers\SmartCAT;
@@ -200,6 +201,15 @@ class Connector {
 				if ( ! SmartCAT::check_access() ) {
 					$notice->add_error( __( 'Smartcat credentials are incorrect. Login failed.', 'translation-connectors' ), false );
 				}
+			}
+
+			/** @var  ContainerInterface */
+			$container = self::get_container();
+			/** @var Options $options */
+			$options = $container->get( 'core.options' );
+
+			if ( abs( time() - intval( $options->get( 'last_cron_send' ) ) ) > 600 || abs( time() - intval( $options->get( 'last_cron_check' ) ) ) > 600 ) {
+				$notice->add_warning( __( 'It looks like cron service is not working properly. Lag is more than 10 minutes. Please check it.', 'translation-connectors' ), false );
 			}
 		}
 	}

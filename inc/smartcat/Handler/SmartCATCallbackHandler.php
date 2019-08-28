@@ -62,13 +62,13 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 			$options = $this->container->get( 'core.options' );
 
 			if ( $request->get_header( 'authorization' ) == $options->get_and_decrypt( 'callback_authorisation_token' ) ) {
-				if ( time() - $options->get( 'last_cron_check' ) > 300 ) {
+				if ( abs( time() - intval( $options->get( 'last_cron_check' ) ) ) > 300 ) {
 					/** @var CheckProjectsStatus $cron_checker */
 					$cron_checker = $this->container->get( 'core.cron.check' );
 					$cron_checker->run();
 				}
 
-				if ( time() - $options->get( 'last_cron_send' ) > 300 ) {
+				if ( abs( time() - intval( $options->get( 'last_cron_send' ) ) ) > 300 ) {
 					/** @var SendToSmartCAT $cron_checker */
 					$cron_checker = $this->container->get( 'core.cron.send' );
 					$cron_checker->run();
