@@ -14,7 +14,6 @@ namespace SmartCAT\WP\Admin;
 use Psr\Container\ContainerInterface;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
-use SmartCAT\WP\Queue\Statistic;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\Options;
 
@@ -56,25 +55,6 @@ final class StatisticsAjax implements HookInterface {
 
 		if ( ! $options->get( 'statistic_queue_active' ) ) {
 
-			/** @var StatisticRepository $statistic_repository */
-			$statistic_repository = $container->get( 'entity.repository.statistic' );
-			$statistics           = $statistic_repository->get_sended();
-
-			if ( count( $statistics ) > 0 ) {
-				$options->set( 'statistic_queue_active', true );
-				/** @var Statistic $queue */
-				$queue = $container->get( 'core.queue.statistic' );
-				foreach ( $statistics as $statistic ) {
-					if ( $statistic->get_error_count() > 0 ) {
-						$statistic->set_error_count( 0 );
-						$statistic_repository->persist( $statistic );
-					}
-
-					$queue->push_to_queue( $statistic->get_document_id() );
-				}
-				$statistic_repository->flush();
-				$queue->save()->dispatch();
-			}
 		}
 
 		$ajax_response->send_success( 'ok' );

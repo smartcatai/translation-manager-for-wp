@@ -20,6 +20,7 @@ use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
+use SmartCAT\WP\WP\Options;
 
 /**
  * Class SendToSmartCAT
@@ -47,10 +48,15 @@ class SendToSmartCAT extends CronAbstract {
 			return;
 		}
 
-		Logger::event( 'cron', 'Sending to Smartсat started' );
-
 		/** @var ContainerInterface $container */
 		$container = Connector::get_container();
+
+		/** @var Options $options */
+		$options = $container->get( 'core.options' );
+
+		$options->set( 'last_cron_send', time() );
+
+		Logger::event( 'cron', 'Sending to Smartсat started' );
 
 		/** @var TaskRepository $task_repository */
 		$task_repository = $container->get( 'entity.repository.task' );

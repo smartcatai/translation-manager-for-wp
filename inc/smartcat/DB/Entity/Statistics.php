@@ -35,8 +35,8 @@ class Statistics extends EntityAbstract {
 	protected $document_id;
 	/** @var  string */
 	protected $status;
-	/** @var  integer */
-	protected $error_count = 0;
+	/** @var  string */
+	protected $export_id = null;
 
 	const STATUS_NEW       = 'new';
 	const STATUS_FAILED    = 'failed';
@@ -73,7 +73,7 @@ class Statistics extends EntityAbstract {
 			'targetPostID'   => 'target_post_id',
 			'documentID'     => 'document_id',
 			'status'         => 'status',
-			'errorCount'     => 'error_count',
+			'exportID'       => 'export_id',
 		];
 	}
 
@@ -240,30 +240,19 @@ class Statistics extends EntityAbstract {
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
-	public function get_error_count() {
-		return intval( $this->error_count );
+	public function get_export_id() {
+		return $this->export_id;
 	}
 
 	/**
-	 * @param int $error_count
+	 * @param string $export_id
 	 *
 	 * @return Statistics
 	 */
-	public function set_error_count( $error_count ) {
-		$this->error_count = intval( $error_count );
-
-		return $this;
-	}
-
-	/**
-	 * @param int $inc
-	 *
-	 * @return Statistics
-	 */
-	public function inc_error_count( $inc = 1 ) {
-		$this->set_error_count( $this->get_error_count() + $inc );
+	public function set_export_id( $export_id ) {
+		$this->export_id = $export_id;
 
 		return $this;
 	}

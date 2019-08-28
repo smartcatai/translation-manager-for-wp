@@ -13,7 +13,8 @@ namespace SmartCAT\WP\Handler;
 
 use SmartCat\Client\Model\CallbackPropertyModel;
 use SmartCAT\WP\Connector;
-use SmartCAT\WP\DB\Repository\StatisticRepository;
+use SmartCAT\WP\Cron\CheckProjectsStatus;
+use SmartCAT\WP\Cron\SendToSmartCAT;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\Options;
@@ -23,6 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Обработка запросов от callback smartCAT
  * Class SmartCATCallbackHandler
+ *
  * @package SmartCAT\WP\Handler
  */
 class SmartCATCallbackHandler implements PluginInterface, HookInterface {
@@ -32,19 +34,25 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 	/** @var  ContainerInterface */
 	private $container;
 
+	/**
+	 * SmartCATCallbackHandler constructor.
+	 */
 	public function __construct() {
 		$this->container = Connector::get_container();
 	}
 
-	public function register_rest_route(
-		/** @noinspection PhpUnusedParameterInspection */
-		\WP_REST_Server $server
-	) {
-		register_rest_route( self::ROUTE_PREFIX, '/(?<type>.+)/(?<method>.+)', [
-			'methods'  => \WP_REST_Server::CREATABLE,
-			'callback' => [ $this, 'handle' ],
-		] );
-
+	/**
+	 * @param \WP_REST_Server $server
+	 */
+	public function register_rest_route( \WP_REST_Server $server ) {
+		register_rest_route(
+			self::ROUTE_PREFIX,
+			'/(?<type>.+)/(?<method>.+)',
+			[
+				'methods'  => \WP_REST_Server::CREATABLE,
+				'callback' => [ $this, 'handle' ],
+			]
+		);
 	}
 
 	/**
@@ -55,36 +63,28 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 	 * @return array|\WP_Error
 	 */
 	public function handle( \WP_REST_Request $request ) {
-		if ( $request->get_param( 'type' ) == 'document' && $request->get_param( 'method' ) == 'status' ) {
+		if ( $request->get_param( 'type' ) === 'document' && $request->get_param( 'method' ) === 'status' ) {
 			/** @var Options $options */
 			$options = $this->container->get( 'core.options' );
 
-			if ( $request->get_header( 'authorization' ) == $options->get_and_decrypt( 'callback_authorisation_token' ) ) {
-				$body	  = $request->get_body();
-				$documents = json_decode( $body );
-				if ( is_array( $documents ) && count( $documents ) > 0 ) {
-					/** @var StatisticRepository $statistic_repository */
-					$statistic_repository = $this->container->get( 'entity.repository.statistic' );
-					$resulting_documents  = $statistic_repository->get_sended( $documents );
+			if ( $request->get_header( 'authorization' ) === $options->get_and_decrypt( 'callback_authorisation_token' ) ) {
+				if ( abs( time() - intval( $options->get( 'last_cron_check' ) ) ) > 300 ) {
+					/** @var CheckProjectsStatus $cron_checker */
+					$cron_checker = $this->container->get( 'core.cron.check' );
+					$cron_checker->run();
+				}
 
-					/** @var \SmartCAT\WP\Queue\Callback $queue */
-					$queue = $this->container->get( 'core.queue.callback' );
-
-					foreach ( $resulting_documents as $document ) {
-						if ( $document->get_error_count() > 0 ) {
-							$document->set_error_count( 0 );
-							$statistic_repository->persist( $document );
-						}
-						$queue->push_to_queue( $document->get_document_id() );
-					}
-
-					$statistic_repository->flush();
-					$queue->save()->dispatch();
+				if ( abs( time() - intval( $options->get( 'last_cron_send' ) ) ) > 300 ) {
+					/** @var SendToSmartCAT $cron_checker */
+					$cron_checker = $this->container->get( 'core.cron.send' );
+					$cron_checker->run();
 				}
 			} else {
-				$response = new \WP_Error( 'rest_forbidden',
+				$response = new \WP_Error(
+					'rest_forbidden',
 					__( 'Sorry, you are not allowed to do that.', 'translation-connectors' ),
-					[ 'status' => 403 ] );
+					[ 'status' => 403 ]
+				);
 
 				return $response;
 			}
@@ -93,33 +93,44 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 		return [ 'message' => 'ok' ];
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function plugin_activate() {
-		$authorisation_token = "Bearer " . base64_encode( openssl_random_pseudo_bytes( 32 ) );
+		$authorisation_token = 'Bearer ' . base64_encode( openssl_random_pseudo_bytes( 32 ) );
 		/** @var Options $options */
 		$options = $this->container->get( 'core.options' );
 		$options->set_and_encrypt( 'callback_authorisation_token', $authorisation_token );
 		$this->register_callback();
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function register_callback() {
 		if ( SmartCAT::is_active() ) {
 			/** @var Options $options */
 			$options = $this->container->get( 'core.options' );
 
 			/** @var SmartCAT $sc */
-			$sc			 = $this->container->get( 'smartcat' );
+			$sc             = $this->container->get( 'smartcat' );
 			$callback_model = new CallbackPropertyModel();
 			$callback_model->setUrl( get_site_url() . '/wp-json/' . self::ROUTE_PREFIX );
-			$callback_model->setAdditionalHeaders( [
+			$callback_model->setAdditionalHeaders(
 				[
-					'name'  => 'Authorization',
-					'value' => $options->get_and_decrypt( 'callback_authorisation_token' )
+					[
+						'name'  => 'Authorization',
+						'value' => $options->get_and_decrypt( 'callback_authorisation_token' ),
+					],
 				]
-			] );
+			);
 			$sc->getCallbackManager()->callbackUpdate( $callback_model );
 		}
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function plugin_deactivate() {
 		if ( SmartCAT::is_active() ) {
 			/** @var SmartCAT $sc */
@@ -128,10 +139,15 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 		}
 	}
 
+	/**
+	 *
+	 */
 	public function plugin_uninstall() {
-
 	}
 
+	/**
+	 * @return mixed|void
+	 */
 	public function register_hooks() {
 		add_action( 'rest_api_init', [ $this, 'register_rest_route' ] );
 	}
