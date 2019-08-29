@@ -111,11 +111,6 @@ final class Ajax implements HookInterface {
 				}
 
 				Logger::error( "Callback delete failed, user {$previous_login}", $message );
-
-				$ajax_response->send_error(
-					__( 'Problem with deleting of previous callback', 'translation-connectors' ),
-					$data
-				);
 			}
 		}
 
@@ -146,9 +141,6 @@ final class Ajax implements HookInterface {
 		$ajax_response->send_success( __( 'Settings successfully saved', 'translation-connectors' ), $data );
 	}
 
-	/**
-	 * @param Statistics $statistic
-	 */
 	public function refresh_translation() {
 		$ajax_response        = new AjaxResponse();
 		$statistic_repository = null;

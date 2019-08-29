@@ -63,34 +63,20 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 	 * @return array|\WP_Error
 	 */
 	public function handle( \WP_REST_Request $request ) {
-		if ( $request->get_param( 'type' ) === 'document' && $request->get_param( 'method' ) === 'status' ) {
-			/** @var Options $options */
-			$options = $this->container->get( 'core.options' );
+		/** @var Options $options */
+		$options = $this->container->get( 'core.options' );
 
-			if ( $request->get_header( 'authorization' ) === $options->get_and_decrypt( 'callback_authorisation_token' ) ) {
-				if ( abs( time() - intval( $options->get( 'last_cron_check' ) ) ) > 300 ) {
-					/** @var CheckProjectsStatus $cron_checker */
-					$cron_checker = $this->container->get( 'core.cron.check' );
-					$cron_checker->run();
-				}
+		if ( $request->get_header( 'authorization' ) === $options->get_and_decrypt( 'callback_authorisation_token' ) ) {
+			return ['spawn_cron' => spawn_cron()];
+		} else {
+			$response = new \WP_Error(
+				'rest_forbidden',
+				__( 'Sorry, you are not allowed to do that.', 'translation-connectors' ),
+				[ 'status' => 403 ]
+			);
 
-				if ( abs( time() - intval( $options->get( 'last_cron_send' ) ) ) > 300 ) {
-					/** @var SendToSmartCAT $cron_checker */
-					$cron_checker = $this->container->get( 'core.cron.send' );
-					$cron_checker->run();
-				}
-			} else {
-				$response = new \WP_Error(
-					'rest_forbidden',
-					__( 'Sorry, you are not allowed to do that.', 'translation-connectors' ),
-					[ 'status' => 403 ]
-				);
-
-				return $response;
-			}
+			return $response;
 		}
-
-		return [ 'message' => 'ok' ];
 	}
 
 	/**

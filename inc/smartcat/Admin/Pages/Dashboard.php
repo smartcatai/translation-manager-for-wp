@@ -46,7 +46,7 @@ class Dashboard extends PageAbstract {
 	 */
 	private static function get_texts() {
 		return [
-			'refresh' => __( 'Refresh statistics', 'translation-connectors' ),
+			'refresh' => __( 'Synchronize', 'translation-connectors' ),
 			'title'   => $GLOBALS['title'],
 		];
 	}

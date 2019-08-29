@@ -305,63 +305,6 @@ jQuery(function ($) {
         return false;
     });
 
-    /*
-     * Фронт страницы статистики
-     */
-
-    var refreshStatButton = $('#smartcat-connector-refresh-statistics');
-    var intervalTimer;
-    var isStatWasStarted = false;
-
-    function checkStatistics() {
-        $.ajax({
-            type: "POST",
-            url: ajaxurl,
-            data: {
-                action: SmartcatFrontend.smartcat_table_prefix + 'check_statistic'
-            },
-            success: function (responseText) {
-                var responseJSON = JSON.parse(responseText);
-                var isActive = responseJSON.data.statistic_queue_active;
-
-                if (! isActive) {
-                    clearInterval(intervalTimer);
-                    isStatWasStarted = false;
-                }
-            },
-            error: function (responseObject) {
-                var responseJSON = JSON.parse(responseObject.responseText);
-                printError(responseJSON.message);
-
-                if (intervalTimer) {
-                    clearInterval(intervalTimer);
-                }
-
-                refreshStatButton.prop('disabled', false);
-            }
-        });
-    }
-
-    function updateStatistics() {
-        $.ajax({
-            type: "POST",
-            url: ajaxurl,
-            data: {
-                action: SmartcatFrontend.smartcat_table_prefix + 'start_statistic'
-            },
-            success: function (responseText) {
-                var responseJSON = JSON.parse(responseText);
-                if (responseJSON.message === 'ok') {
-                    checkStatistics();
-                }
-            },
-            error: function (responseObject) {
-                var responseJSON = JSON.parse(responseObject.responseText);
-                printError(responseJSON.message);
-            }
-        });
-    }
-
     function refreshStatistics(element) {
         $.ajax({
             type: "POST",
@@ -449,47 +392,15 @@ jQuery(function ($) {
     });
 
     //проверяем на существование, что мы точно на странице статистики
+	var refreshStatButton = $('#smartcat-connector-refresh-statistics');
+
     if (refreshStatButton.length) {
-        isStatWasStarted = refreshStatButton.is(':disabled');
-
         refreshStatButton.click(function (event) {
-            //если уже получаем статистику - ничего не делать
-            if (isStatWasStarted) {
-                event.preventDefault();
-                return false;
-            }
-
-            isStatWasStarted = true;
-            var $this = $(this);
-            $this.prop('disabled', true);
-
-            updateStatistics();
-
-            location.reload();
-            event.preventDefault();
             return false;
         });
 
-        //если статистика была запущена уже в первый запуск
-        if (isStatWasStarted) {
-            intervalTimer = setInterval(checkStatistics, 1000*60);
-        }
-
-        if (!isStatWasStarted) {
-            pageIntervalReload = setInterval(function () {
-                if (isStatWasStarted) {
-                    return false;
-                }
-
-                isStatWasStarted = true;
-                var $this = $(this);
-                $this.prop('disabled', true);
-
-                updateStatistics();
-
-                location.reload();
-            }, 1000 * 60);
-        }
+		setTimeout(function () {
+			location.reload();
+		}, 1000 * 60);
     }
-
 });
