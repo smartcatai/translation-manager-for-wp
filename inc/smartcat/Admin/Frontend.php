@@ -57,7 +57,7 @@ final class Frontend implements HookInterface {
 					'author'          => __( 'Author', 'translation-connectors' ),
 					'status'          => __( 'Status', 'translation-connectors' ),
 					'select_profile'  => __( 'Select profile', 'translation-connectors' ),
-					'submit'          => __( 'Send for translation', 'translation-connectors' ),
+					'submit'          => __( 'Submit for translation', 'translation-connectors' ),
 				],
 			]
 		);
@@ -89,7 +89,7 @@ final class Frontend implements HookInterface {
 			'dialogTitle'                   => __( 'Send for translation', 'translation-connectors' ),
 			'anErrorOccurred'               => __( 'An error occurred:', 'translation-connectors' ),
 			'dismissNotice'                 => __( 'Dismiss this notice.', 'translation-connectors' ),
-			'postsAreNotChoosen'            => __( 'Please, choose posts or pages for translation', 'translation-connectors' ),
+			'postsAreNotChoosen'            => __( 'Please select posts or pages for translation', 'translation-connectors' ),
 			'postsAreAlreadyTranslated'     => __( 'Selected posts or pages have already been translated', 'translation-connectors' ),
 		];
 

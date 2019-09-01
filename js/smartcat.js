@@ -65,11 +65,15 @@ jQuery(function ($) {
         var $translation_connectors_column = $('#translation-connectors-' + postNumber);
 
         var author = $translation_connectors_column.attr('data-author');
-        var status = $inlineElement.find('._status').first().text();
+        var status = $inlineElement.find('._status').first().text().charAt(0).toUpperCase();
 
         var translation_slugs = $translation_connectors_column.attr('data-translation-slugs');
         var pll_slugs = $translation_connectors_column.attr('data-post-pll-slugs');
         var isPostHaveAllTranslates = (translation_slugs === pll_slugs);
+
+        if (status === 'Publish') {
+            status = 'Published';
+        }
 
         var $tr;
         if (!isPostHaveAllTranslates) {
