@@ -64,7 +64,8 @@ jQuery(function ($) {
         var $translation_connectors_column = $('#translation-connectors-' + postNumber);
 
         var author = $translation_connectors_column.attr('data-author');
-        var status = $inlineElement.find('._status').first().text().charAt(0).toUpperCase();
+        var status = $inlineElement.find('._status').first().text();
+        status = status.charAt(0).toUpperCase() + status.slice(1);
 
         var translation_slugs = $translation_connectors_column.attr('data-translation-slugs');
         var pll_slugs = $translation_connectors_column.attr('data-post-pll-slugs');
