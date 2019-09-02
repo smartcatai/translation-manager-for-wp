@@ -1,11 +1,12 @@
 <?php
 /**
- * @package    WP Stand LC
+ * Smartcat Translation Manager for WordPress
  *
- * @author     medic84 <medic84@example.com>
- * @copyright  (c) 2019 medic84. All Rights Reserved.
- * @license    GNU General Public License version 3 or later; see LICENSE.txt
- * @link       http://medic84.example.com
+ * @package Smartcat Translation Manager for WordPress
+ * @author Smartcat <support@smartcat.ai>
+ * @copyright (c) 2019 Smartcat. All Rights Reserved.
+ * @license GNU General Public License version 3 or later; see LICENSE.txt
+ * @link http://smartcat.ai
  */
 
 namespace SmartCAT\WP\Helpers;
@@ -18,6 +19,7 @@ use SmartCAT\WP\Helpers\Language\LanguageConverter;
 
 /**
  * Class ProjectManager
+ *
  * @package SmartCAT\WP\Helpers
  */
 class ProjectManager {

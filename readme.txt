@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 5.2.2
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl, json
-Stable tag: 2.0.4
+Stable tag: 2.1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -70,11 +70,21 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 == Screenshots ==
 
 1. Translation Connectors Settings.
+2. Translation Connectors Dashboard.
+3. Translation Connectors Profiles.
 
 == Changelog ==
 
-= 2.0.5 (2019-07-25) =
+= 2.1.0 (2019-08-28) =
+* Disable callbacks, setting up cron only
+
+= 2.0.6 (2019-08-21) =
+* Callback fix
+
+= 2.0.5 (2019-08-02) =
+* Adding shordcodes replacer
 * Fix creating project with files
+* Minor bug fixes
 
 = 2.0.4 (2019-07-23) =
 * Bug fixes with Smartcat projects

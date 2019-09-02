@@ -111,11 +111,6 @@ final class Ajax implements HookInterface {
 				}
 
 				Logger::error( "Callback delete failed, user {$previous_login}", $message );
-
-				$ajax_response->send_error(
-					__( 'Problem with deleting of previous callback', 'translation-connectors' ),
-					$data
-				);
 			}
 		}
 
@@ -146,10 +141,7 @@ final class Ajax implements HookInterface {
 		$ajax_response->send_success( __( 'Settings successfully saved', 'translation-connectors' ), $data );
 	}
 
-	/**
-	 * @param Statistics $statistic
-	 */
-	public function refresh_translation() {
+	public static function refresh_translation() {
 		$ajax_response        = new AjaxResponse();
 		$statistic_repository = null;
 
@@ -189,6 +181,26 @@ final class Ajax implements HookInterface {
 		}
 
 		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), $data );
+	}
+
+	public static function synchronize() {
+		$ajax_response        = new AjaxResponse();
+		$statistic_repository = null;
+
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ?? null ) ),
+			'bulk-statistics'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
+		}
+
+		if ( spawn_cron() ) {
+			$ajax_response->send_success( __( 'Cron successfully spawned', 'translation-connectors' ), [] );
+		}
+
+		$ajax_response->send_error( __( 'Cron can\'t spawned right now', 'translation-connectors' ), [] );
 	}
 
 	/**
@@ -519,6 +531,7 @@ final class Ajax implements HookInterface {
 			add_action( "wp_ajax_{$prefix}delete_statistics", [ self::class, 'delete_statistics' ] );
 			add_action( "wp_ajax_{$prefix}send_to_smartcat", [ self::class, 'send_to_smartcat' ] );
 			add_action( "wp_ajax_{$prefix}refresh_translation", [ self::class, 'refresh_translation' ] );
+			add_action( "wp_ajax_{$prefix}synchronize", [ self::class, 'synchronize' ] );
 		}
 	}
 

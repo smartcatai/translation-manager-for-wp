@@ -53,9 +53,8 @@ jQuery(function ($) {
     }
 
     /*
-     * Модальное окно и работа с ним
+     * Modal window
      */
-
     var addedToModal = 0;
 
     function prepareInfo(postNumber) {
@@ -65,11 +64,15 @@ jQuery(function ($) {
         var $translation_connectors_column = $('#translation-connectors-' + postNumber);
 
         var author = $translation_connectors_column.attr('data-author');
-        var status = $inlineElement.find('._status').first().text();
+        var status = $inlineElement.find('._status').first().text().charAt(0).toUpperCase();
 
         var translation_slugs = $translation_connectors_column.attr('data-translation-slugs');
         var pll_slugs = $translation_connectors_column.attr('data-post-pll-slugs');
         var isPostHaveAllTranslates = (translation_slugs === pll_slugs);
+
+        if (status === 'Publish') {
+            status = 'Published';
+        }
 
         var $tr;
         if (!isPostHaveAllTranslates) {
@@ -164,7 +167,9 @@ jQuery(function ($) {
         return false;
     });
 
-    //появление модала
+    /*
+     * Modal showing
+     */
     $("#doaction, #doaction2").click(function (event) {
         var $this = $(this);
         var butId = $this.attr("id");
@@ -179,7 +184,7 @@ jQuery(function ($) {
     var $modalWindow = $('#smartcat-modal-window');
 
     /*
-     * Часть по валидации страницы настроек на фронте
+     * Validation settings on frontend
      */
     $('.smartcat-connector form[action="options.php"]').submit(function (event) {
         var $this = $(this);
@@ -269,10 +274,6 @@ jQuery(function ($) {
         });
     });
 
-    /*
-     * Обработчик самого модала
-     */
-
     $modalWindow.find('form').first().submit(function (event) {
         var $this = $(this);
         var formData = $this.serialize();
@@ -304,63 +305,6 @@ jQuery(function ($) {
         event.preventDefault();
         return false;
     });
-
-    /*
-     * Фронт страницы статистики
-     */
-
-    var refreshStatButton = $('#smartcat-connector-refresh-statistics');
-    var intervalTimer;
-    var isStatWasStarted = false;
-
-    function checkStatistics() {
-        $.ajax({
-            type: "POST",
-            url: ajaxurl,
-            data: {
-                action: SmartcatFrontend.smartcat_table_prefix + 'check_statistic'
-            },
-            success: function (responseText) {
-                var responseJSON = JSON.parse(responseText);
-                var isActive = responseJSON.data.statistic_queue_active;
-
-                if (! isActive) {
-                    clearInterval(intervalTimer);
-                    isStatWasStarted = false;
-                }
-            },
-            error: function (responseObject) {
-                var responseJSON = JSON.parse(responseObject.responseText);
-                printError(responseJSON.message);
-
-                if (intervalTimer) {
-                    clearInterval(intervalTimer);
-                }
-
-                refreshStatButton.prop('disabled', false);
-            }
-        });
-    }
-
-    function updateStatistics() {
-        $.ajax({
-            type: "POST",
-            url: ajaxurl,
-            data: {
-                action: SmartcatFrontend.smartcat_table_prefix + 'start_statistic'
-            },
-            success: function (responseText) {
-                var responseJSON = JSON.parse(responseText);
-                if (responseJSON.message === 'ok') {
-                    checkStatistics();
-                }
-            },
-            error: function (responseObject) {
-                var responseJSON = JSON.parse(responseObject.responseText);
-                printError(responseJSON.message);
-            }
-        });
-    }
 
     function refreshStatistics(element) {
         $.ajax({
@@ -448,48 +392,35 @@ jQuery(function ($) {
         });
     });
 
-    //проверяем на существование, что мы точно на странице статистики
-    if (refreshStatButton.length) {
-        isStatWasStarted = refreshStatButton.is(':disabled');
+	var refreshStatButton = $('#smartcat-connector-synchronize');
 
-        refreshStatButton.click(function (event) {
-            //если уже получаем статистику - ничего не делать
-            if (isStatWasStarted) {
-                event.preventDefault();
-                return false;
+    function synchronize() {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                action: SmartcatFrontend.smartcat_table_prefix + 'synchronize'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                printSuccess(responseJSON.message);
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
             }
-
-            isStatWasStarted = true;
-            var $this = $(this);
-            $this.prop('disabled', true);
-
-            updateStatistics();
-
-            location.reload();
-            event.preventDefault();
-            return false;
         });
-
-        //если статистика была запущена уже в первый запуск
-        if (isStatWasStarted) {
-            intervalTimer = setInterval(checkStatistics, 1000*60);
-        }
-
-        if (!isStatWasStarted) {
-            pageIntervalReload = setInterval(function () {
-                if (isStatWasStarted) {
-                    return false;
-                }
-
-                isStatWasStarted = true;
-                var $this = $(this);
-                $this.prop('disabled', true);
-
-                updateStatistics();
-
-                location.reload();
-            }, 1000 * 60);
-        }
     }
 
+    if (refreshStatButton.length) {
+        refreshStatButton.click(function (event) {
+            synchronize();
+            return true;
+        });
+
+		setTimeout(function () {
+			location.reload();
+		}, 1000 * 60);
+    }
 });

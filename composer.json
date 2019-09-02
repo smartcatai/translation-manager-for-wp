@@ -21,7 +21,6 @@
     "php": ">=7.0.0",
     "ext-dom": "*",
     "ext-openssl": "*",
-    "a5hleyrich/wp-background-processing": "^1.0",
     "symfony/config": "^3.3",
     "symfony/dependency-injection": "^3.3",
     "mustache/mustache": "^2.12",

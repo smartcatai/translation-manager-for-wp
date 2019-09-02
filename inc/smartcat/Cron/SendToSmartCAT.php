@@ -100,8 +100,6 @@ class SendToSmartCAT extends CronAbstract {
 				$statistic->set_document_id( $document->getId() );
 				$statistic->set_status( Statistics::STATUS_SENDED );
 
-				$statistic_repository->save( $statistic );
-
 				Logger::event( 'cron', "File '{$file_name}' was sent" );
 			} catch ( \Throwable $e ) {
 				if ( $e instanceof HttpException ) {
@@ -112,6 +110,7 @@ class SendToSmartCAT extends CronAbstract {
 
 				Logger::error( "Failed send to translate '{$file_name}'", $message );
 				$statistic->set_status( Statistics::STATUS_FAILED );
+			} finally {
 				$statistic_repository->save( $statistic );
 			}
 		}
