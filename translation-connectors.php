@@ -39,8 +39,6 @@ if ( version_compare( PHP_VERSION, '7.0.0' ) < 0 ) {
 }
 
 require_once SMARTCAT_PLUGIN_DIR . 'inc/autoload.php';
-require_once SMARTCAT_PLUGIN_DIR . 'inc/vendor/a5hleyrich/wp-background-processing/classes/wp-async-request.php';
-require_once SMARTCAT_PLUGIN_DIR . 'inc/vendor/a5hleyrich/wp-background-processing/classes/wp-background-process.php';
 
 use SmartCAT\WP\Admin\Menu;
 use SmartCAT\WP\Admin\Pages\Settings;
