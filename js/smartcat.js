@@ -53,9 +53,8 @@ jQuery(function ($) {
     }
 
     /*
-     * Модальное окно и работа с ним
+     * Modal window
      */
-
     var addedToModal = 0;
 
     function prepareInfo(postNumber) {
@@ -168,7 +167,9 @@ jQuery(function ($) {
         return false;
     });
 
-    //появление модала
+    /*
+     * Modal showing
+     */
     $("#doaction, #doaction2").click(function (event) {
         var $this = $(this);
         var butId = $this.attr("id");
@@ -183,7 +184,7 @@ jQuery(function ($) {
     var $modalWindow = $('#smartcat-modal-window');
 
     /*
-     * Часть по валидации страницы настроек на фронте
+     * Validation settings on frontend
      */
     $('.smartcat-connector form[action="options.php"]').submit(function (event) {
         var $this = $(this);
@@ -272,10 +273,6 @@ jQuery(function ($) {
             deleteProfile($(this));
         });
     });
-
-    /*
-     * Обработчик самого модала
-     */
 
     $modalWindow.find('form').first().submit(function (event) {
         var $this = $(this);
@@ -395,12 +392,31 @@ jQuery(function ($) {
         });
     });
 
-    //проверяем на существование, что мы точно на странице статистики
-	var refreshStatButton = $('#smartcat-connector-refresh-statistics');
+	var refreshStatButton = $('#smartcat-connector-synchronize');
+
+    function synchronize() {
+        $.ajax({
+            type: "POST",
+            url: ajaxurl,
+            data: {
+                _wpnonce: $('input[name="_wpnonce"]').val(),
+                action: SmartcatFrontend.smartcat_table_prefix + 'synchronize'
+            },
+            success: function (responseText) {
+                var responseJSON = JSON.parse(responseText);
+                printSuccess(responseJSON.message);
+            },
+            error: function (responseObject) {
+                var responseJSON = JSON.parse(responseObject.responseText);
+                printError(SmartcatFrontend.anErrorOccurred + ' ' + responseJSON.message);
+            }
+        });
+    }
 
     if (refreshStatButton.length) {
         refreshStatButton.click(function (event) {
-            return false;
+            synchronize();
+            return true;
         });
 
 		setTimeout(function () {

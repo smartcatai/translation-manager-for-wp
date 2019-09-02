@@ -11,8 +11,6 @@ parameters:
     - "smartcat_regform_showed"
     - "last_cron_send"
     - "last_cron_check"
-    #Manual update statistics switch
-    - "statistic_queue_active"
     #Сallback Authorize code
     - "callback_authorisation_token"
     - "smartcat_account_name"

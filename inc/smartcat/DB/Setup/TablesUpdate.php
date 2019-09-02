@@ -11,6 +11,7 @@
 
 namespace SmartCAT\WP\DB\Setup;
 
+use Psr\Container\ContainerInterface;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\DbAbstract;
 use SmartCAT\WP\DB\Entity\Profile;
@@ -31,6 +32,11 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	 */
 	private $prefix = '';
 
+	/**
+	 * Container
+	 *
+	 * @var ContainerInterface
+	 */
 	private $container;
 
 	/**
@@ -38,7 +44,7 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	 */
 	public function __construct() {
 		parent::__construct();
-		$this->prefix = $this->get_wp_db()->get_blog_prefix();
+		$this->prefix    = $this->get_wp_db()->get_blog_prefix();
 		$this->container = Connector::get_container();
 	}
 
@@ -56,6 +62,10 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 		if ( version_compare( Utils::get_plugin_version(), '2.1.0', '<' ) ) {
 			$this->v210();
+		}
+
+		if ( version_compare( Utils::get_plugin_version(), '2.1.1', '<' ) ) {
+			$this->v211();
 		}
 	}
 
@@ -162,6 +172,14 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 		$statistic_table_name = $this->prefix . 'smartcat_connector_statistic';
 		$this->exec( "ALTER TABLE {$statistic_table_name} ADD COLUMN exportID VARCHAR (255) DEFAULT NULL;" );
 		$this->exec( "ALTER TABLE {$statistic_table_name} DROP COLUMN errorCount;" );
+	}
+
+	/**
+	 * Update to version 2.1.1
+	 */
+	private function v211() {
+		$param_prefix = $this->container->getParameter( 'plugin.table.prefix' );
+		delete_option( $param_prefix . 'statistic_queue_active' );
 	}
 
 	/**
