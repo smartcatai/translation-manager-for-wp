@@ -104,6 +104,11 @@ jQuery(function ($) {
         var $mwPosts = $('#smartcat-modal-window-posts');
         $mwPosts.val('');
 
+        if ($('#sc-profile option').length === 0) {
+            printError('No translation profiles found. Please create a profile <a href="admin.php?page=sc-profiles">here</a>.');
+            return false;
+        }
+
         $info.dialog({
             title: SmartcatFrontend.dialogTitle,
             dialogClass: 'wp-dialog',
