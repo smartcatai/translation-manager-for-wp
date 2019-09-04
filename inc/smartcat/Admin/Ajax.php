@@ -90,7 +90,7 @@ final class Ajax implements HookInterface {
 		// Testing login to Smartcat.
 		$account_info = null;
 		try {
-			$api          = new \SmartCat\Client\SmartCAT( $login, $password, $server );
+			$api          = new SmartCAT( $login, $password, $server );
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
 		} catch ( \Exception $e ) {
 			$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
@@ -117,7 +117,7 @@ final class Ajax implements HookInterface {
 		try {
 			Connector::set_core_parameters();
 			$callback_handler = $container->get( 'callback.handler.smartcat' );
-			$callback_handler->register_callback();
+			$callback_handler->register_callback( $api );
 		} catch ( \Exception $e ) {
 			$data['message'] = $e->getMessage();
 
@@ -128,15 +128,11 @@ final class Ajax implements HookInterface {
 			}
 
 			Logger::error( "Callback register failed, user {$login}", $message );
-
-			$ajax_response->send_error( __( 'Problem with setting of new callback', 'translation-connectors' ), $data );
 		}
 
 		if ( $account_info && $account_info->getName() ) {
 			$options->set( 'smartcat_account_name', $account_info->getName() );
 		}
-
-		wp_cache_set( 'sc_smartcat_access', true, 'translation-connectors' );
 
 		$ajax_response->send_success( __( 'Settings successfully saved', 'translation-connectors' ), $data );
 	}

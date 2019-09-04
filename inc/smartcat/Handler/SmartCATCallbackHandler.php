@@ -91,15 +91,19 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 	}
 
 	/**
+	 * @param SmartCAT $smartcat
+	 *
 	 * @throws \Exception
 	 */
-	public function register_callback() {
+	public function register_callback( $smartcat = null ) {
 		if ( SmartCAT::is_active() ) {
 			/** @var Options $options */
 			$options = $this->container->get( 'core.options' );
 
-			/** @var SmartCAT $sc */
-			$sc             = $this->container->get( 'smartcat' );
+			if ( ! $smartcat ) {
+				$smartcat = $this->container->get( 'smartcat' );
+			}
+
 			$callback_model = new CallbackPropertyModel();
 			$callback_model->setUrl( get_site_url() . '/wp-json/' . self::ROUTE_PREFIX );
 			$callback_model->setAdditionalHeaders(
@@ -110,7 +114,7 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 					],
 				]
 			);
-			$sc->getCallbackManager()->callbackUpdate( $callback_model );
+			$smartcat->getCallbackManager()->callbackUpdate( $callback_model );
 		}
 	}
 
