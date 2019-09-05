@@ -20,6 +20,7 @@ use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\DITrait;
+use SmartCAT\WP\Handler\SmartCATCallbackHandler;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
@@ -61,11 +62,15 @@ final class Ajax implements HookInterface {
 		$utils    = null;
 		$options  = null;
 
+		$callback_handler = null;
+
 		try {
 			/** @var Utils $utils */
 			$utils = $container->get( 'utils' );
 			/** @var Options $options */
 			$options = $container->get( 'core.options' );
+			/** @var SmartCATCallbackHandler $callback_handler */
+			$callback_handler = $container->get( 'callback.handler.smartcat' );
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
@@ -79,12 +84,8 @@ final class Ajax implements HookInterface {
 
 		$server = $parameters[ $prefix . 'smartcat_api_server' ];
 
-		$previous_login    = $options->get_and_decrypt( 'smartcat_api_login' );
-		$previous_password = $options->get_and_decrypt( 'smartcat_api_password' );
-		$previous_server   = $options->get( 'smartcat_api_server' );
-
 		if ( '******' === $password ) {
-			$password = $previous_password;
+			$password = $options->get_and_decrypt( 'smartcat_api_password' );
 		}
 
 		// Testing login to Smartcat.
@@ -96,27 +97,32 @@ final class Ajax implements HookInterface {
 			$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
 		}
 
+		try {
+			$utils::check_vendor_exists( $api );
+		} catch (\Exception $e) {
+			$ajax_response->send_error(
+				__( 'Vendor', 'translation-connectors' ) . ' '. $e->getMessage() . ' ' .
+				__( 'Please, add this vendor to your account, or delete this profile', 'translation-connectors' ),
+				$data
+			);
+		}
+
 		// If callback already exists - drop needed.
-		if ( ! empty( $previous_login ) && ! empty( $previous_password ) && ! empty( $previous_server ) ) {
-			try {
-				$sc = new SmartCAT( $previous_login, $previous_password, $previous_server );
-				$sc->getCallbackManager()->callbackDelete();
-			} catch ( \Exception $e ) {
-				$data['message'] = $e->getMessage();
+		try {
+			$callback_handler->delete_callback();
+		} catch ( \Exception $e ) {
+			$data['message'] = $e->getMessage();
 
-				if ( $e instanceof ClientErrorException ) {
-					$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
-				} else {
-					$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
-				}
-
-				Logger::error( "Callback delete failed, user {$previous_login}", $message );
+			if ( $e instanceof ClientErrorException ) {
+				$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
+			} else {
+				$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
 			}
+
+			Logger::error( "Callback delete failed", $message );
 		}
 
 		try {
-			Connector::set_core_parameters();
-			$callback_handler = $container->get( 'callback.handler.smartcat' );
 			$callback_handler->register_callback( $api );
 		} catch ( \Exception $e ) {
 			$data['message'] = $e->getMessage();

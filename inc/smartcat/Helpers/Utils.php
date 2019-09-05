@@ -11,7 +11,9 @@
 
 namespace SmartCAT\WP\Helpers;
 
+use SmartCat\Client\Model\DirectoryItemModel;
 use SmartCAT\WP\Connector;
+use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\WP\Options;
 
@@ -165,5 +167,31 @@ class Utils {
 			'',
 			array_slice( preg_split( '//u', $str, -1, PREG_SPLIT_NO_EMPTY ), $start, $length )
 		);
+	}
+
+	/**
+	 * @param SmartCAT $smartcat
+	 */
+	public static function check_vendor_exists( $smartcat ) {
+		try {
+			/** @var ProfileRepository $profiles_repository */
+			$profiles_repository = self::get_container()->get( 'entity.repository.profile' );
+			$profiles            = $profiles_repository->get_all();
+
+			$sc_vendors = array_map(
+				function ( DirectoryItemModel $directory ) {
+					return $directory->getId();
+				},
+				$smartcat->getDirectoriesManager()->directoriesGet( [ 'type' => 'vendor' ] )->getItems()
+			);
+		} catch (\Exception $e) {
+			throw $e;
+		}
+
+		foreach ( $profiles as $profile ) {
+			if ( ! in_array( $profile->get_vendor(), $sc_vendors, true ) ) {
+				throw new \Exception($profile->get_vendor() . ' ' .__('is not supported by this account.', 'translation-connectors'));
+			}
+		}
 	}
 }

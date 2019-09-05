@@ -121,12 +121,19 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 	/**
 	 * @throws \Exception
 	 */
-	public function plugin_deactivate() {
+	public function delete_callback() {
 		if ( SmartCAT::is_active() ) {
 			/** @var SmartCAT $sc */
 			$sc = $this->container->get( 'smartcat' );
 			$sc->getCallbackManager()->callbackDelete();
 		}
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function plugin_deactivate() {
+		$this->delete_callback();
 	}
 
 	/**
