@@ -100,11 +100,7 @@ final class Ajax implements HookInterface {
 		try {
 			$utils::check_vendor_exists( $api );
 		} catch (\Exception $e) {
-			$ajax_response->send_error(
-				__( 'Vendor', 'translation-connectors' ) . ' '. $e->getMessage() . ' ' .
-				__( 'Please, add this vendor to your account, or delete this profile', 'translation-connectors' ),
-				$data
-			);
+			$ajax_response->send_error( $e->getMessage(), $data );
 		}
 
 		// If callback already exists - drop needed.
@@ -202,7 +198,7 @@ final class Ajax implements HookInterface {
 			$ajax_response->send_success( __( 'Cron successfully spawned', 'translation-connectors' ), [] );
 		}
 
-		$ajax_response->send_error( __( 'Cron can\'t spawned right now', 'translation-connectors' ), [] );
+		$ajax_response->send_error( __( 'Cron can\'t be spawned at the moment. Cron start minimal interval exceeded.', 'translation-connectors' ), [] );
 	}
 
 	/**
