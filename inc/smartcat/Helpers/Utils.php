@@ -191,7 +191,9 @@ class Utils {
 		foreach ( $profiles as $profile ) {
 			if ( ! in_array( $profile->get_vendor(), $sc_vendors, true ) ) {
 				throw new \Exception(
-					__( 'Some of your profiles contain a vendor that is not in your Smartcat account. Please edit the profiles or add this vendor to your Smartcat account.', 'translation-connectors' )
+					__( 'The changes have not been saved.', 'translation-connectors' ) . '<br />' .
+					__( 'Some of your profiles contain a vendor that is not in your Smartcat account.', 'translation-connectors' ) . '<br />' .
+					__( 'Please edit the profile or add this vendor to your Smartcat account.', 'translation-connectors' )
 				);
 			}
 		}
