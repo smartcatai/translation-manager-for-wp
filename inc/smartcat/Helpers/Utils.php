@@ -189,6 +189,10 @@ class Utils {
 		}
 
 		foreach ( $profiles as $profile ) {
+			if ( $profile->get_vendor() == null ) {
+				continue;
+			}
+
 			if ( ! in_array( $profile->get_vendor(), $sc_vendors, true ) ) {
 				throw new \Exception(
 					__( 'The changes have not been saved.', 'translation-connectors' ) . '<br />' .

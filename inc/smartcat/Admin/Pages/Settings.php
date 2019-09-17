@@ -64,12 +64,14 @@ class Settings extends PageAbstract {
 		$password       = $prefix . 'smartcat_api_password';
 		$debug_mode     = $prefix . 'smartcat_debug_mode';
 		$events_enabled = $prefix . 'smartcat_events_enabled';
+		$external_cron  = $prefix . 'use_external_cron';
 
 		register_setting( 'smartcat', $server, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $login, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $password, [ 'type' => 'string' ] );
 		register_setting( 'smartcat', $debug_mode, [ 'type' => 'bool' ] );
 		register_setting( 'smartcat', $events_enabled, [ 'type' => 'bool' ] );
+		register_setting( 'smartcat', $external_cron, [ 'type' => 'bool' ] );
 
 		add_settings_section(
 			'smartcat_required',
@@ -151,6 +153,18 @@ class Settings extends PageAbstract {
 			[
 				'label_for'       => $events_enabled,
 				'option_name'     => $events_enabled,
+			]
+		);
+
+		add_settings_field(
+			$external_cron,
+			__( 'Use external cron', 'translation-connectors' ),
+			[ FrontendCallbacks::class, 'input_checkbox_callback' ],
+			'smartcat',
+			'smartcat_additional',
+			[
+				'label_for'       => $external_cron,
+				'option_name'     => $external_cron,
 			]
 		);
 	}

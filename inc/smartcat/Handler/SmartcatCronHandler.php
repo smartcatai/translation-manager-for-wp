@@ -11,25 +11,18 @@
 
 namespace SmartCAT\WP\Handler;
 
-use SmartCat\Client\Model\CallbackPropertyModel;
 use SmartCAT\WP\Connector;
-use SmartCAT\WP\Cron\CheckProjectsStatus;
 use SmartCAT\WP\Cron\SendToSmartCAT;
+use SmartCAT\WP\Helpers\CronHelper;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\Options;
 use SmartCAT\WP\WP\PluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Обработка запросов от callback smartCAT
- * Class SmartCATCallbackHandler
- *
- * @package SmartCAT\WP\Handler
- */
-class SmartCATCallbackHandler implements PluginInterface, HookInterface {
+class SmartcatCronHandler implements PluginInterface, HookInterface {
 
-	const ROUTE_PREFIX = 'smartcat-connector/callback';
+	const ROUTE_PREFIX = 'smartcat-connector/cron';
 
 	/** @var  ContainerInterface */
 	private $container;
@@ -66,8 +59,18 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 		/** @var Options $options */
 		$options = $this->container->get( 'core.options' );
 
-		if ( $request->get_header( 'authorization' ) === $options->get_and_decrypt( 'callback_authorisation_token' ) ) {
-			return ['spawn_cron' => spawn_cron()];
+		if ( $request->get_header( 'authorization' ) === ( 'Bearer ' . $options->get_and_decrypt( 'callback_authorisation_token' ) ) ) {
+			if ( ! get_transient( 'smartcat_cron_handler' ) ) {
+				set_transient( 'smartcat_cron_handler', true, 59 );
+
+				/** @var SendToSmartCAT $cron_check */
+				$cron_check = $this->container->get( 'core.cron.check' );
+				$cron_check->run();
+
+				/** @var SendToSmartCAT $cron_send */
+				$cron_send = $this->container->get( 'core.cron.send' );
+				$cron_send->run();
+			}
 		} else {
 			$response = new \WP_Error(
 				'rest_forbidden',
@@ -83,49 +86,17 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 	 * @throws \Exception
 	 */
 	public function plugin_activate() {
-		$authorisation_token = 'Bearer ' . base64_encode( openssl_random_pseudo_bytes( 32 ) );
-		/** @var Options $options */
-		$options = $this->container->get( 'core.options' );
-		$options->set_and_encrypt( 'callback_authorisation_token', $authorisation_token );
-		$this->register_callback();
-	}
-
-	/**
-	 * @param SmartCAT $smartcat
-	 *
-	 * @throws \Exception
-	 */
-	public function register_callback( $smartcat = null ) {
 		if ( SmartCAT::is_active() ) {
 			/** @var Options $options */
 			$options = $this->container->get( 'core.options' );
 
-			if ( ! $smartcat ) {
-				$smartcat = $this->container->get( 'smartcat' );
+			/** @var CronHelper $cron_helper */
+			$cron_helper = $this->container->get( 'cron.helper' );
+			$login       = $options->get_and_decrypt( 'smartcat_api_login' );
+
+			if ( $login ) {
+				$cron_helper->register();
 			}
-
-			$callback_model = new CallbackPropertyModel();
-			$callback_model->setUrl( get_site_url() . '/wp-json/' . self::ROUTE_PREFIX );
-			$callback_model->setAdditionalHeaders(
-				[
-					[
-						'name'  => 'Authorization',
-						'value' => $options->get_and_decrypt( 'callback_authorisation_token' ),
-					],
-				]
-			);
-			$smartcat->getCallbackManager()->callbackUpdate( $callback_model );
-		}
-	}
-
-	/**
-	 * @throws \Exception
-	 */
-	public function delete_callback() {
-		if ( SmartCAT::is_active() ) {
-			/** @var SmartCAT $sc */
-			$sc = $this->container->get( 'smartcat' );
-			$sc->getCallbackManager()->callbackDelete();
 		}
 	}
 
@@ -133,7 +104,18 @@ class SmartCATCallbackHandler implements PluginInterface, HookInterface {
 	 * @throws \Exception
 	 */
 	public function plugin_deactivate() {
-		$this->delete_callback();
+		if ( SmartCAT::is_active() ) {
+			/** @var Options $options */
+			$options = Connector::get_container()->get( 'core.options' );
+
+			/** @var CronHelper $cron_helper */
+			$cron_helper = $this->container->get( 'cron.helper' );
+			$login       = $options->get_and_decrypt( 'smartcat_api_login' );
+
+			if ( $login ) {
+				$cron_helper->unregister();
+			}
+		}
 	}
 
 	/**
