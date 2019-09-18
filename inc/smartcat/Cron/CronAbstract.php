@@ -76,7 +76,7 @@ abstract class CronAbstract implements CronInterface, PluginInterface {
 	 *
 	 */
 	public function plugin_deactivate() {
-		wp_clear_scheduled_hook( $this->get_hook_name() );
+		$this->unregister();
 	}
 
 	/**
