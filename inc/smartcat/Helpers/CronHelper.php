@@ -19,7 +19,6 @@ use Http\Client\Socket\Client as SocketHttpClient;
 use Http\Message\MessageFactory\GuzzleMessageFactory;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\Cron\CronAbstract;
-use SmartCAT\WP\Cron\CronInterface;
 use SmartCAT\WP\Handler\SmartcatCronHandler;
 use SmartCAT\WP\WP\Options;
 use SmartCAT\WP\WP\PluginInterface;
@@ -127,9 +126,10 @@ class CronHelper implements PluginInterface {
 			foreach ( $services as $service => $tags ) {
 				$object = Connector::get_container()->get( $service );
 				if ( $object instanceof CronAbstract ) {
-					$object->register();
+					$object->unregister();
 				}
 			}
+			$options->set( 'use_external_cron', true );
 			Logger::info("external cron", "External cron successfully activated");
 		}
 	}
@@ -148,9 +148,10 @@ class CronHelper implements PluginInterface {
 			foreach ( $services as $service => $tags ) {
 				$object = Connector::get_container()->get( $service );
 				if ( $object instanceof CronAbstract ) {
-					$object->unregister();
+					$object->register();
 				}
 			}
+			$options->set( 'use_external_cron', false );
 			Logger::info("external cron", "External cron successfully de-activated");
 		}
 	}
