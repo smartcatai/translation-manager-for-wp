@@ -121,7 +121,12 @@ class CronHelper implements PluginInterface {
 		$login               = $options->get_and_decrypt( 'smartcat_api_login' );
 
 		if ( $login ) {
-			$this->subscribe( $login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			try {
+				$this->subscribe( $login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			} catch ( \Exception $e ) {
+				Logger::info("external cron", "External cron activating cause error {$e->getMessage()}");
+				return;
+			}
 			$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
 			foreach ( $services as $service => $tags ) {
 				$object = Connector::get_container()->get( $service );
@@ -143,7 +148,12 @@ class CronHelper implements PluginInterface {
 		$login   = $options->get_and_decrypt( 'smartcat_api_login' );
 
 		if ( $login ) {
-			$this->unsubscribe( $login, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			try {
+				$this->unsubscribe( $login, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			} catch ( \Exception $e ) {
+				Logger::info("external cron", "External cron de-activating cause error {$e->getMessage()}");
+				return;
+			}
 			$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
 			foreach ( $services as $service => $tags ) {
 				$object = Connector::get_container()->get( $service );
