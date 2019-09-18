@@ -14,6 +14,7 @@ namespace SmartCAT\WP\Handler;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\Cron\SendToSmartCAT;
 use SmartCAT\WP\Helpers\CronHelper;
+use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\Options;
@@ -60,6 +61,7 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 		$options = $this->container->get( 'core.options' );
 
 		if ( $request->get_header( 'authorization' ) === ( 'Bearer ' . $options->get_and_decrypt( 'callback_authorisation_token' ) ) ) {
+			Logger::event( 'cron', 'Starting external cron' );
 			if ( ! get_transient( 'smartcat_cron_handler' ) ) {
 				set_transient( 'smartcat_cron_handler', true, 59 );
 

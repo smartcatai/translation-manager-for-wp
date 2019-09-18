@@ -124,7 +124,7 @@ class CronHelper implements PluginInterface {
 			try {
 				$this->subscribe( $login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
 			} catch ( \Exception $e ) {
-				Logger::info("external cron", "External cron activating cause error {$e->getMessage()}");
+				Logger::error("external cron", "External cron activating cause error: '{$e->getMessage()}'");
 				return;
 			}
 			$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
@@ -151,7 +151,7 @@ class CronHelper implements PluginInterface {
 			try {
 				$this->unsubscribe( $login, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
 			} catch ( \Exception $e ) {
-				Logger::info("external cron", "External cron de-activating cause error {$e->getMessage()}");
+				Logger::error("external cron", "External cron de-activating cause error: '{$e->getMessage()}'");
 				return;
 			}
 			$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
