@@ -17,6 +17,8 @@ use Http\Client\Common\PluginClient;
 use Http\Client\Socket\Client as SocketHttpClient;
 use Http\Message\MessageFactory\GuzzleMessageFactory;
 use SmartCAT\WP\Connector;
+use SmartCAT\WP\Cron\CronAbstract;
+use SmartCAT\WP\Cron\CronInterface;
 use SmartCAT\WP\Handler\SmartcatCronHandler;
 use SmartCAT\WP\WP\Options;
 use SmartCAT\WP\WP\PluginInterface;
@@ -120,6 +122,13 @@ class CronHelper implements PluginInterface {
 
 		if ( $login ) {
 			$this->subscribe( $login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
+			foreach ( $services as $service => $tags ) {
+				$object = Connector::get_container()->get( $service );
+				if ( $object instanceof CronAbstract ) {
+					$object->register();
+				}
+			}
 			Logger::info("external cron", "External cron successfully activated");
 		}
 	}
@@ -134,6 +143,13 @@ class CronHelper implements PluginInterface {
 
 		if ( $login ) {
 			$this->unsubscribe( $login, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
+			foreach ( $services as $service => $tags ) {
+				$object = Connector::get_container()->get( $service );
+				if ( $object instanceof CronAbstract ) {
+					$object->unregister();
+				}
+			}
 			Logger::info("external cron", "External cron successfully de-activated");
 		}
 	}
