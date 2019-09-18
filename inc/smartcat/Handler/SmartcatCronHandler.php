@@ -116,9 +116,13 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 			$cron_helper = $this->container->get( 'cron.helper' );
 			$login       = $options->get_and_decrypt( 'smartcat_api_login' );
 
-			if ( $login ) {
-				$cron_helper->unregister();
+			try {
+				if ( $login && $options->get( 'use_external_cron' ) ) {
+					$cron_helper->unregister();
+				}
+			} catch ( \Exception $e ) {
 			}
+
 		}
 	}
 
