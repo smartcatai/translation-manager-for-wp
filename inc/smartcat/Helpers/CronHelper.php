@@ -119,12 +119,10 @@ class CronHelper implements PluginInterface {
 
 		$authorisation_token = $options->get_and_decrypt( 'cron_authorisation_token' );
 		$login               = $options->get_and_decrypt( 'smartcat_api_login' );
-		$encrypted = $options->get( 'cron_authorisation_token' );
 
 		if ( $login ) {
 			try {
 				$this->subscribe( $login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
-				Logger::info('Debug', "{$authorisation_token} - {$encrypted}");
 			} catch ( \Exception $e ) {
 				Logger::error("external cron", "External cron activating cause error: '{$e->getMessage()}'");
 				return;
