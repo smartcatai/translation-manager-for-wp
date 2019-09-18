@@ -12,6 +12,7 @@
 namespace SmartCAT\WP\Helpers;
 
 use Http\Client\Common\FlexibleHttpClient;
+use Http\Client\Common\Plugin\ContentLengthPlugin;
 use Http\Client\Common\Plugin\ErrorPlugin;
 use Http\Client\Common\PluginClient;
 use Http\Client\Socket\Client as SocketHttpClient;
@@ -53,7 +54,7 @@ class CronHelper implements PluginInterface {
 		];
 
 		$socket_client = new SocketHttpClient( $this->message_factory, $options );
-		$client        = new PluginClient( $socket_client, [ new ErrorPlugin() ] );
+		$client        = new PluginClient( $socket_client, [ new ErrorPlugin(), new ContentLengthPlugin() ] );
 
 		$this->http_client = new FlexibleHttpClient( $client );
 	}
