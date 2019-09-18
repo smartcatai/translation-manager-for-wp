@@ -45,6 +45,10 @@ services:
     class: SmartCAT\WP\WP\Notice
     tags: [initable]
 
+  cron.helper:
+    class: \SmartCAT\WP\Helpers\CronHelper
+    tags: [installable]
+
   callback.handler.cron:
     class: SmartCAT\WP\Handler\SmartcatCronHandler
     tags: [installable, hook]
@@ -93,9 +97,6 @@ services:
       - "%smartcat.api.login%"
       - "%smartcat.api.password%"
       - "%smartcat.api.server%"
-
-  cron.helper:
-    class: \SmartCAT\WP\Helpers\CronHelper
 
   cryptographer:
       class: \SmartCAT\WP\Helpers\Cryptographer
