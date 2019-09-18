@@ -97,16 +97,17 @@ final class Ajax implements HookInterface {
 
 		try {
 			$utils::check_vendor_exists( $api );
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
 			$ajax_response->send_error( $e->getMessage(), $data );
 		}
 
 		try {
 			$cron = new CronHelper();
-			if ( ! ( $parameters[ $prefix . 'use_external_cron' ] && $options->get( 'use_external_cron' ) ) ) {
+			if ( ! ( boolval( $parameters[ $prefix . 'use_external_cron' ] ) && boolval( $options->get( 'use_external_cron' ) ) ) ) {
 				$parameters[ $prefix . 'use_external_cron' ] ? $cron->register() : $cron->unregister();
 			}
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
+			Logger::error("external cron", "External cron cause error: '{$e->getMessage()}'");
 			$ajax_response->send_error( $e->getMessage(), $data );
 		}
 

@@ -70,7 +70,11 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 				/** @var SendToSmartCAT $cron_send */
 				$cron_send = $this->container->get( 'core.cron.send' );
 				$cron_send->run();
+
+				return [ 'status' => 'ok' ];
 			}
+
+			return [ 'status' => 'nok' ];
 		} else {
 			$response = new \WP_Error(
 				'rest_forbidden',

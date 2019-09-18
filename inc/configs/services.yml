@@ -96,6 +96,7 @@ services:
 
   cron.helper:
     class: \SmartCAT\WP\Helpers\CronHelper
+
   cryptographer:
       class: \SmartCAT\WP\Helpers\Cryptographer
 

@@ -21,44 +21,57 @@ use SmartCAT\WP\Handler\SmartcatCronHandler;
 use SmartCAT\WP\WP\Options;
 use SmartCAT\WP\WP\PluginInterface;
 
-class CronHelper implements PluginInterface
-{
+/**
+ * Class CronHelper
+ *
+ * @package SmartCAT\WP\Helpers
+ */
+class CronHelper implements PluginInterface {
+	/**
+	 * @var string
+	 */
 	private $host = 'smartcat-cron-app.azurewebsites.net';
-	private $httpClient;
-	private $messageFactory;
+	/**
+	 * @var FlexibleHttpClient
+	 */
+	private $http_client;
+	/**
+	 * @var GuzzleMessageFactory
+	 */
+	private $message_factory;
 
-	public function __construct()
-	{
-		$this->messageFactory = new GuzzleMessageFactory();
-		$options = [
+	/**
+	 * CronHelper constructor.
+	 */
+	public function __construct() {
+		$this->message_factory = new GuzzleMessageFactory();
+		$options               = [
 			'remote_socket' => "tcp://{$this->host}:443",
-			'ssl' => true
+			'ssl'           => true,
 		];
 
-		$socketClient = new SocketHttpClient($this->messageFactory, $options);
-		$client = new PluginClient($socketClient, [
-			new ErrorPlugin()
-		]);
+		$socket_client = new SocketHttpClient( $this->message_factory, $options );
+		$client        = new PluginClient( $socket_client, [ new ErrorPlugin() ] );
 
-		$this->httpClient = new FlexibleHttpClient($client);
+		$this->http_client = new FlexibleHttpClient( $client );
 	}
 
 	/**
 	 * @param $account
 	 * @param $token
 	 * @param $url
+	 *
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
-	public function subscribe($account, $token, $url)
-	{
+	public function subscribe( $account, $token, $url ) {
 		$data = array(
 			'account' => $account,
-			'token' => $token,
-			'url' => $url
+			'token'   => $token,
+			'url'     => $url,
 		);
 
-		$request = $this->createRequest("https://{$this->host}/api/subscription", $data);
-		$response = $this->httpClient->sendRequest($request);
+		$request  = $this->createRequest( "https://{$this->host}/api/subscription", $data );
+		$response = $this->http_client->sendRequest( $request );
 
 		return $response;
 	}
@@ -66,17 +79,17 @@ class CronHelper implements PluginInterface
 	/**
 	 * @param $account
 	 * @param $url
+	 *
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
-	public function unsubscribe($account, $url)
-	{
+	public function unsubscribe( $account, $url ) {
 		$data = array(
 			'account' => $account,
-			'url' => $url
+			'url'     => $url,
 		);
 
-		$request = $this->createRequest("https://{$this->host}/api/subscription", $data, 'DELETE');
-		$response = $this->httpClient->sendRequest($request);
+		$request  = $this->createRequest( "https://{$this->host}/api/subscription", $data, 'DELETE' );
+		$response = $this->http_client->sendRequest( $request );
 
 		return $response;
 	}
@@ -85,21 +98,20 @@ class CronHelper implements PluginInterface
 	 * @param $url
 	 * @param $data
 	 * @param string $method
+	 *
 	 * @return \Psr\Http\Message\RequestInterface
 	 */
-	private function createRequest($url, $data, $method = 'POST')
-	{
-		$headers = array_merge(array('Accept' => array('application/json')));
-		$body = json_encode($data);
+	private function createRequest( $url, $data, $method = 'POST' ) {
+		$headers = array_merge( array( 'Accept' => array( 'application/json' ) ) );
+		$body    = json_encode( $data );
 
-		return $this->messageFactory->createRequest($method, $url, $headers, $body);
+		return $this->message_factory->createRequest( $method, $url, $headers, $body );
 	}
 
 	/**
 	 * @throws \Exception
 	 */
-	public function register()
-	{
+	public function register() {
 		/** @var Options $options */
 		$options = Connector::get_container()->get( 'core.options' );
 
@@ -107,29 +119,29 @@ class CronHelper implements PluginInterface
 		$login               = $options->get_and_decrypt( 'smartcat_api_login' );
 
 		if ( $login ) {
-			$this->subscribe ($login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			$this->subscribe( $login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			Logger::info("external cron", "External cron successfully activated");
 		}
 	}
 
 	/**
 	 * @throws \Exception
 	 */
-	public function unregister()
-	{
+	public function unregister() {
 		/** @var Options $options */
 		$options = Connector::get_container()->get( 'core.options' );
 		$login   = $options->get_and_decrypt( 'smartcat_api_login' );
 
 		if ( $login ) {
 			$this->unsubscribe( $login, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+			Logger::info("external cron", "External cron successfully de-activated");
 		}
 	}
 
 	/**
 	 * @throws \Exception
 	 */
-	public function plugin_activate()
-	{
+	public function plugin_activate() {
 		$authorisation_token = base64_encode( openssl_random_pseudo_bytes( 32 ) );
 		/** @var Options $options */
 		$options = Connector::get_container()->get( 'core.options' );
@@ -139,14 +151,12 @@ class CronHelper implements PluginInterface
 	/**
 	 * @throws \Exception
 	 */
-	public function plugin_deactivate()
-	{
+	public function plugin_deactivate() {
 	}
 
 	/**
 	 *
 	 */
-	public function plugin_uninstall()
-	{
+	public function plugin_uninstall() {
 	}
 }
