@@ -120,9 +120,10 @@ class CronHelper implements PluginInterface {
 		$authorisation_token = $options->get_and_decrypt( 'cron_authorisation_token' );
 		$login               = $options->get_and_decrypt( 'smartcat_api_login' );
 
-		if ( $login ) {
+		if ( SmartCAT::is_active()  ) {
 			try {
 				$this->subscribe( $login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
+				Logger::info('Key', "Key: {$authorisation_token}");
 			} catch ( \Exception $e ) {
 				Logger::error("external cron", "External cron activating cause error: '{$e->getMessage()}'");
 				return;
@@ -134,7 +135,6 @@ class CronHelper implements PluginInterface {
 					$object->unregister();
 				}
 			}
-			$options->set( 'use_external_cron', true );
 			Logger::info("external cron", "External cron successfully activated");
 		}
 	}
@@ -147,7 +147,7 @@ class CronHelper implements PluginInterface {
 		$options = Connector::get_container()->get( 'core.options' );
 		$login   = $options->get_and_decrypt( 'smartcat_api_login' );
 
-		if ( $login ) {
+		if ( SmartCAT::is_active()  ) {
 			try {
 				$this->unsubscribe( $login, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX );
 			} catch ( \Exception $e ) {
@@ -161,7 +161,6 @@ class CronHelper implements PluginInterface {
 					$object->register();
 				}
 			}
-			$options->set( 'use_external_cron', false );
 			Logger::info("external cron", "External cron successfully de-activated");
 		}
 	}
