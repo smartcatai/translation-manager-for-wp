@@ -43,7 +43,7 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 			self::ROUTE_PREFIX,
 			'/(?<type>.+)/(?<method>.+)',
 			[
-				'methods'  => \WP_REST_Server::CREATABLE,
+				'methods'  => \WP_REST_Server::READABLE,
 				'callback' => [ $this, 'handle' ],
 			]
 		);
