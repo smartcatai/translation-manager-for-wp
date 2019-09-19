@@ -13,6 +13,7 @@ namespace SmartCAT\WP\Helpers;
 
 use SmartCat\Client\Model\DirectoryItemModel;
 use SmartCAT\WP\Connector;
+use SmartCAT\WP\Cron\CronAbstract;
 use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\WP\Options;
@@ -167,6 +168,26 @@ class Utils {
 			'',
 			array_slice( preg_split( '//u', $str, -1, PREG_SPLIT_NO_EMPTY ), $start, $length )
 		);
+	}
+
+	public static function disable_system_cron() {
+		$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
+		foreach ( $services as $service => $tags ) {
+			$object = Connector::get_container()->get( $service );
+			if ( $object instanceof CronAbstract ) {
+				$object->unregister();
+			}
+		}
+	}
+
+	public static function enable_system_cron() {
+		$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
+		foreach ( $services as $service => $tags ) {
+			$object = Connector::get_container()->get( $service );
+			if ( $object instanceof CronAbstract ) {
+				$object->register();
+			}
+		}
 	}
 
 	/**

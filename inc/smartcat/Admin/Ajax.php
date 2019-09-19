@@ -11,8 +11,6 @@
 
 namespace SmartCAT\WP\Admin;
 
-use Http\Client\Common\Exception\ClientErrorException;
-use Smartcat\Client\Cron\CronClient;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Entity\Statistics;
@@ -21,7 +19,6 @@ use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\DITrait;
-use SmartCAT\WP\Handler\SmartCATCallbackHandler;
 use SmartCAT\WP\Helpers\CronHelper;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
@@ -106,8 +103,10 @@ final class Ajax implements HookInterface {
 			if ( ! ( boolval( $parameters[ $prefix . 'use_external_cron' ] ) && boolval( $options->get( 'use_external_cron' ) ) ) ) {
 				if ( $parameters[ $prefix . 'use_external_cron' ] ) {
 					$cron->register();
+					Utils::disable_system_cron();
 				} else {
 					$cron->unregister();
+					Utils::enable_system_cron();
 				}
 			}
 		} catch ( \Exception $e ) {

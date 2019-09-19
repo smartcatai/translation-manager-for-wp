@@ -16,6 +16,7 @@ use SmartCAT\WP\Cron\SendToSmartCAT;
 use SmartCAT\WP\Helpers\CronHelper;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
+use SmartCAT\WP\Helpers\Utils;
 use SmartCAT\WP\WP\HookInterface;
 use SmartCAT\WP\WP\Options;
 use SmartCAT\WP\WP\PluginInterface;
@@ -103,6 +104,7 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 
 			if ( $login && $external ) {
 				$cron_helper->register();
+				Utils::disable_system_cron();
 			}
 		}
 	}
