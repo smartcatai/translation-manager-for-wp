@@ -43,7 +43,7 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 			self::ROUTE_PREFIX,
 			'/cron',
 			[
-				'methods'  => \WP_REST_Server::ALLMETHODS,
+				'methods'  => \WP_REST_Server::READABLE,
 				'callback' => [ $this, 'handle' ],
 			]
 		);
@@ -59,10 +59,6 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 	public function handle( \WP_REST_Request $request ) {
 		/** @var Options $options */
 		$options = $this->container->get( 'core.options' );
-
-		Logger::info( 'Test', json_encode($request->get_headers()));
-
-		Logger::info( 'Test', "{$request->get_header( 'authorization' )} === " . ( 'Bearer ' . $options->get_and_decrypt( 'cron_authorisation_token' ) ));
 
 		if ( $request->get_header( 'authorization' ) === ( 'Bearer ' . $options->get_and_decrypt( 'cron_authorisation_token' ) ) ) {
 			Logger::event( 'cron', 'Starting external cron' );
