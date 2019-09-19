@@ -60,6 +60,8 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 		/** @var Options $options */
 		$options = $this->container->get( 'core.options' );
 
+		Logger::info( 'Test', "{$request->get_header( 'authorization' )} === " . ( 'Bearer ' . $options->get_and_decrypt( 'cron_authorisation_token' ) ));
+
 		if ( $request->get_header( 'authorization' ) === ( 'Bearer ' . $options->get_and_decrypt( 'cron_authorisation_token' ) ) ) {
 			Logger::event( 'cron', 'Starting external cron' );
 			if ( ! get_transient( 'smartcat_cron_handler' ) ) {
