@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SmartcatCronHandler implements PluginInterface, HookInterface {
 
-	const ROUTE_PREFIX = 'smartcat-connector/cron';
+	const ROUTE_PREFIX = 'smartcat-connector';
 
 	/** @var  ContainerInterface */
 	private $container;
@@ -41,7 +41,7 @@ class SmartcatCronHandler implements PluginInterface, HookInterface {
 	public function register_rest_route( \WP_REST_Server $server ) {
 		register_rest_route(
 			self::ROUTE_PREFIX,
-			'/(?<type>.+)/(?<method>.+)',
+			'/cron',
 			[
 				'methods'  => \WP_REST_Server::READABLE,
 				'callback' => [ $this, 'handle' ],
