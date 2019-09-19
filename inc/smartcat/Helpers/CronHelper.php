@@ -123,7 +123,6 @@ class CronHelper implements PluginInterface {
 		if ( SmartCAT::is_active() ) {
 			try {
 				$this->subscribe( $login, $authorisation_token, get_site_url() . '/wp-json/' . SmartcatCronHandler::ROUTE_PREFIX . '/cron' );
-				Logger::info('Key', "Key: {$authorisation_token}");
 			} catch ( \Exception $e ) {
 				Logger::error( "external cron", "External cron activating cause error: '{$e->getMessage()}'" );
 				return;
