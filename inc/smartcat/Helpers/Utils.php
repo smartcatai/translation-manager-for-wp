@@ -13,6 +13,7 @@ namespace SmartCAT\WP\Helpers;
 
 use SmartCat\Client\Model\DirectoryItemModel;
 use SmartCAT\WP\Connector;
+use SmartCAT\WP\Cron\CronAbstract;
 use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\WP\Options;
@@ -169,6 +170,26 @@ class Utils {
 		);
 	}
 
+	public static function disable_system_cron() {
+		$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
+		foreach ( $services as $service => $tags ) {
+			$object = Connector::get_container()->get( $service );
+			if ( $object instanceof CronAbstract ) {
+				$object->unregister();
+			}
+		}
+	}
+
+	public static function enable_system_cron() {
+		$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
+		foreach ( $services as $service => $tags ) {
+			$object = Connector::get_container()->get( $service );
+			if ( $object instanceof CronAbstract ) {
+				$object->register();
+			}
+		}
+	}
+
 	/**
 	 * @param SmartCAT $smartcat
 	 */
@@ -189,6 +210,10 @@ class Utils {
 		}
 
 		foreach ( $profiles as $profile ) {
+			if ( $profile->get_vendor() == null ) {
+				continue;
+			}
+
 			if ( ! in_array( $profile->get_vendor(), $sc_vendors, true ) ) {
 				throw new \Exception(
 					__( 'The changes have not been saved.', 'translation-connectors' ) . '<br />' .
