@@ -49,6 +49,7 @@ class CronHelper implements PluginInterface {
 		$options               = [
 			'remote_socket' => "tcp://{$this->host}:443",
 			'ssl'           => true,
+			'ssl_method'    => STREAM_CRYPTO_METHOD_SSLv23_CLIENT,
 		];
 
 		$socket_client = new SocketHttpClient( $this->message_factory, $options );
