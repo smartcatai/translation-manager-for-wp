@@ -124,10 +124,10 @@ class CronHelper implements PluginInterface {
 			try {
 				$this->subscribe( $login, $authorisation_token, get_site_url() . '/?rest_route=/' . SmartcatCronHandler::ROUTE_PREFIX . '/cron' );
 			} catch ( \Exception $e ) {
-				Logger::error( "external cron", "External cron activating cause error: '{$e->getMessage()}'" );
+				Logger::error( "External cron", "External cron activating cause error: '{$e->getMessage()}'" );
 				return;
 			}
-			Logger::info( "external cron", "External cron successfully activated" );
+			Logger::event( "External cron", "External cron successfully activated" );
 		}
 	}
 
@@ -143,10 +143,10 @@ class CronHelper implements PluginInterface {
 			try {
 				$this->unsubscribe( $login, get_site_url() . '/?rest_route=/' . SmartcatCronHandler::ROUTE_PREFIX  . '/cron' );
 			} catch ( \Exception $e ) {
-				Logger::error( "external cron", "External cron de-activating cause error: '{$e->getMessage()}'" );
+				Logger::error( "External cron", "External cron de-activating cause error: '{$e->getMessage()}'" );
 				return;
 			}
-			Logger::info( "external cron", "External cron successfully de-activated" );
+			Logger::event( "External cron", "External cron successfully de-activated" );
 		}
 	}
 
