@@ -34,7 +34,7 @@ if ( version_compare( PHP_VERSION, '7.0.0' ) < 0 ) {
 	wp_die(
 		esc_html__( 'You PHP version is incompatible. Plugin works only on PHP 7.0 or higher.', 'translation-connectors' ),
 		esc_html__( 'Smartcat Translation Manager Error', 'translation-connectors' ),
-		[ 'back_link' => true ]
+		array( 'back_link' => true ) // Backward compatibility.
 	);
 }
 
