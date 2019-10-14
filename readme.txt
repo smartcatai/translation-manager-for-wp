@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 5.2.2
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl, json
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 

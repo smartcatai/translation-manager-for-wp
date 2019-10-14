@@ -11,7 +11,6 @@
 
 namespace SmartCAT\WP\Admin;
 
-use Http\Client\Common\Exception\ClientErrorException;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Entity\Statistics;
@@ -20,6 +19,7 @@ use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\DITrait;
+use SmartCAT\WP\Helpers\CronHelper;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
@@ -79,77 +79,49 @@ final class Ajax implements HookInterface {
 
 		$server = $parameters[ $prefix . 'smartcat_api_server' ];
 
-		$previous_login    = $options->get_and_decrypt( 'smartcat_api_login' );
-		$previous_password = $options->get_and_decrypt( 'smartcat_api_password' );
-		$previous_server   = $options->get( 'smartcat_api_server' );
-
 		if ( '******' === $password ) {
-			$password = $previous_password;
+			$password = $options->get_and_decrypt( 'smartcat_api_password' );
 		}
 
 		// Testing login to Smartcat.
 		$account_info = null;
 		try {
-			$api          = new \SmartCat\Client\SmartCAT( $login, $password, $server );
+			$api          = new SmartCAT( $login, $password, $server );
 			$account_info = $api->getAccountManager()->accountGetAccountInfo();
 		} catch ( \Exception $e ) {
 			$ajax_response->send_error( __( 'Invalid username or password', 'translation-connectors' ), $data );
 		}
 
-		// If callback already exists - drop needed.
-		if ( ! empty( $previous_login ) && ! empty( $previous_password ) && ! empty( $previous_server ) ) {
-			try {
-				$sc = new SmartCAT( $previous_login, $previous_password, $previous_server );
-				$sc->getCallbackManager()->callbackDelete();
-			} catch ( \Exception $e ) {
-				$data['message'] = $e->getMessage();
-
-				if ( $e instanceof ClientErrorException ) {
-					$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
-				} else {
-					$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
-				}
-
-				Logger::error( "Callback delete failed, user {$previous_login}", $message );
-
-				$ajax_response->send_error(
-					__( 'Problem with deleting of previous callback', 'translation-connectors' ),
-					$data
-				);
-			}
+		try {
+			$utils::check_vendor_exists( $api );
+		} catch ( \Exception $e ) {
+			$ajax_response->send_error( $e->getMessage(), $data );
 		}
 
 		try {
-			Connector::set_core_parameters();
-			$callback_handler = $container->get( 'callback.handler.smartcat' );
-			$callback_handler->register_callback();
-		} catch ( \Exception $e ) {
-			$data['message'] = $e->getMessage();
-
-			if ( $e instanceof ClientErrorException ) {
-				$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
-			} else {
-				$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
+			$cron = new CronHelper();
+			if ( ! ( boolval( $parameters[ $prefix . 'use_external_cron' ] ) && boolval( $options->get( 'use_external_cron' ) ) ) ) {
+				if ( $parameters[ $prefix . 'use_external_cron' ] ) {
+					$cron->register();
+					Utils::disable_system_cron();
+				} else {
+					$cron->unregister();
+					Utils::enable_system_cron();
+				}
 			}
-
-			Logger::error( "Callback register failed, user {$login}", $message );
-
-			$ajax_response->send_error( __( 'Problem with setting of new callback', 'translation-connectors' ), $data );
+		} catch ( \Exception $e ) {
+			Logger::error("external cron", "External cron cause error: '{$e->getMessage()}'");
+			$ajax_response->send_error( $e->getMessage(), $data );
 		}
 
 		if ( $account_info && $account_info->getName() ) {
 			$options->set( 'smartcat_account_name', $account_info->getName() );
 		}
 
-		wp_cache_set( 'sc_smartcat_access', true, 'translation-connectors' );
-
 		$ajax_response->send_success( __( 'Settings successfully saved', 'translation-connectors' ), $data );
 	}
 
-	/**
-	 * @param Statistics $statistic
-	 */
-	public function refresh_translation() {
+	public static function refresh_translation() {
 		$ajax_response        = new AjaxResponse();
 		$statistic_repository = null;
 
@@ -189,6 +161,26 @@ final class Ajax implements HookInterface {
 		}
 
 		$ajax_response->send_error( __( 'Incorrect request', 'translation-connectors' ), $data );
+	}
+
+	public static function synchronize() {
+		$ajax_response        = new AjaxResponse();
+		$statistic_repository = null;
+
+		$verify_nonce = wp_verify_nonce(
+			wp_unslash( sanitize_key( $_POST['_wpnonce'] ?? null ) ),
+			'bulk-statistics'
+		);
+
+		if ( ! current_user_can( 'publish_posts' ) || ! $verify_nonce ) {
+			$ajax_response->send_error( __( 'Access denied', 'translation-connectors' ), [], 403 );
+		}
+
+		if ( spawn_cron() ) {
+			$ajax_response->send_success( __( 'Cron successfully spawned', 'translation-connectors' ), [] );
+		}
+
+		$ajax_response->send_error( __( 'Cron can\'t be spawned at the moment. Cron start minimal interval exceeded.', 'translation-connectors' ), [] );
 	}
 
 	/**
@@ -519,6 +511,7 @@ final class Ajax implements HookInterface {
 			add_action( "wp_ajax_{$prefix}delete_statistics", [ self::class, 'delete_statistics' ] );
 			add_action( "wp_ajax_{$prefix}send_to_smartcat", [ self::class, 'send_to_smartcat' ] );
 			add_action( "wp_ajax_{$prefix}refresh_translation", [ self::class, 'refresh_translation' ] );
+			add_action( "wp_ajax_{$prefix}synchronize", [ self::class, 'synchronize' ] );
 		}
 	}
 

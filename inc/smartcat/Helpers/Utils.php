@@ -11,7 +11,10 @@
 
 namespace SmartCAT\WP\Helpers;
 
+use SmartCat\Client\Model\DirectoryItemModel;
 use SmartCAT\WP\Connector;
+use SmartCAT\WP\Cron\CronAbstract;
+use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DITrait;
 use SmartCAT\WP\WP\Options;
 
@@ -165,5 +168,59 @@ class Utils {
 			'',
 			array_slice( preg_split( '//u', $str, -1, PREG_SPLIT_NO_EMPTY ), $start, $length )
 		);
+	}
+
+	public static function disable_system_cron() {
+		$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
+		foreach ( $services as $service => $tags ) {
+			$object = Connector::get_container()->get( $service );
+			if ( $object instanceof CronAbstract ) {
+				$object->unregister();
+			}
+		}
+	}
+
+	public static function enable_system_cron() {
+		$services = Connector::get_container()->findTaggedServiceIds( 'cron' );
+		foreach ( $services as $service => $tags ) {
+			$object = Connector::get_container()->get( $service );
+			if ( $object instanceof CronAbstract ) {
+				$object->register();
+			}
+		}
+	}
+
+	/**
+	 * @param SmartCAT $smartcat
+	 */
+	public static function check_vendor_exists( $smartcat ) {
+		try {
+			/** @var ProfileRepository $profiles_repository */
+			$profiles_repository = self::get_container()->get( 'entity.repository.profile' );
+			$profiles            = $profiles_repository->get_all();
+
+			$sc_vendors = array_map(
+				function ( DirectoryItemModel $directory ) {
+					return $directory->getId();
+				},
+				$smartcat->getDirectoriesManager()->directoriesGet( [ 'type' => 'vendor' ] )->getItems()
+			);
+		} catch (\Exception $e) {
+			throw $e;
+		}
+
+		foreach ( $profiles as $profile ) {
+			if ( $profile->get_vendor() == null ) {
+				continue;
+			}
+
+			if ( ! in_array( $profile->get_vendor(), $sc_vendors, true ) ) {
+				throw new \Exception(
+					__( 'The changes have not been saved.', 'translation-connectors' ) . '<br />' .
+					__( 'Some of your profiles contain a vendor that is not in your Smartcat account.', 'translation-connectors' ) . '<br />' .
+					__( 'Please edit the profile or add this vendor to your Smartcat account.', 'translation-connectors' )
+				);
+			}
+		}
 	}
 }

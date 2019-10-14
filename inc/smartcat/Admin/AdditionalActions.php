@@ -25,7 +25,7 @@ final class AdditionalActions implements HookInterface {
 	 * @return mixed
 	 */
 	public static function register_bulk_actions( $bulk_actions ) {
-		$bulk_actions['send_to_smartcat'] = __( 'Submit for translation', 'translation-connectors' );
+		$bulk_actions['send_to_smartcat'] = __( 'Translate', 'translation-connectors' );
 
 		return $bulk_actions;
 	}
@@ -37,7 +37,7 @@ final class AdditionalActions implements HookInterface {
 	 * @return mixed
 	 */
 	public static function translate_row_action( $actions, $page_object ) {
-		$link_text         = __( 'Submit for translation', 'translation-connectors' );
+		$link_text         = __( 'Translate', 'translation-connectors' );
 		$pll_slugs         = pll_languages_list( [ 'fields' => 'slug' ] );
 		$translation_posts = [];
 		$translation_slugs = [];

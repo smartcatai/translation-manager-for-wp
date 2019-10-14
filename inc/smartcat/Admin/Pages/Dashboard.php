@@ -23,15 +23,11 @@ class Dashboard extends PageAbstract {
 	 * Render dasboard page
 	 */
 	public static function render() {
-		$options = self::get_options();
-
-		$statistics_table           = new StatisticsTable();
-		$is_statistics_queue_active = boolval( $options->get( 'statistic_queue_active' ) );
+		$statistics_table = new StatisticsTable();
 
 		echo self::get_renderer()->render(
 			'dashboard',
 			[
-				'button_status'    => $is_statistics_queue_active,
 				'show_regform'     => self::is_need_show_regform(),
 				'statistic_table'  => $statistics_table->display(),
 				'texts'            => self::get_texts(),
@@ -46,7 +42,7 @@ class Dashboard extends PageAbstract {
 	 */
 	private static function get_texts() {
 		return [
-			'refresh' => __( 'Refresh statistics', 'translation-connectors' ),
+			'refresh' => __( 'Synchronize', 'translation-connectors' ),
 			'title'   => $GLOBALS['title'],
 		];
 	}

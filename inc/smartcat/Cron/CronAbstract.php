@@ -11,6 +11,8 @@
 
 namespace SmartCAT\WP\Cron;
 
+use SmartCAT\WP\Connector;
+use SmartCAT\WP\WP\Options;
 use SmartCAT\WP\WP\PluginInterface;
 
 /**
@@ -47,6 +49,18 @@ abstract class CronAbstract implements CronInterface, PluginInterface {
 	 *
 	 */
 	public function plugin_activate() {
+		/** @var Options $options */
+		$options = Connector::get_container()->get( 'core.options' );
+
+		if ( ! $options->get( 'use_external_cron' ) ) {
+			$this->register();
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function register() {
 		wp_clear_scheduled_hook( $this->get_hook_name() );
 		wp_schedule_event( time(), $this->get_interval_name(), $this->get_hook_name() );
 	}
@@ -54,8 +68,15 @@ abstract class CronAbstract implements CronInterface, PluginInterface {
 	/**
 	 *
 	 */
-	public function plugin_deactivate() {
+	public function unregister() {
 		wp_clear_scheduled_hook( $this->get_hook_name() );
+	}
+
+	/**
+	 *
+	 */
+	public function plugin_deactivate() {
+		$this->unregister();
 	}
 
 	/**

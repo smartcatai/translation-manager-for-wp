@@ -29,22 +29,12 @@ services:
     class: SmartCAT\WP\Admin\Menu
     tags: [initable]
 
-  core.admin.statistics:
-    class: SmartCAT\WP\Admin\Statistics
-    tags: [initable]
-
   core.admin.frontend:
     class: SmartCAT\WP\Admin\Frontend
     tags: [hook]
 
   core.admin.ajax:
     class: SmartCAT\WP\Admin\Ajax
-    tags: [hook]
-
-  core.admin.statistics_ajax:
-    class: SmartCAT\WP\Admin\StatisticsAjax
-    arguments:
-      - "%plugin.table.prefix%"
     tags: [hook]
 
   core.admin.events:
@@ -55,8 +45,12 @@ services:
     class: SmartCAT\WP\WP\Notice
     tags: [initable]
 
-  callback.handler.smartcat:
-    class: SmartCAT\WP\Handler\SmartCATCallbackHandler
+  cron.helper:
+    class: \SmartCAT\WP\Helpers\CronHelper
+    tags: [installable]
+
+  callback.handler.cron:
+    class: SmartCAT\WP\Handler\SmartcatCronHandler
     tags: [installable, hook]
 
   entity.repository.task:
