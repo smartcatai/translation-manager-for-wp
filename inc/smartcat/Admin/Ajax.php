@@ -11,7 +11,6 @@
 
 namespace SmartCAT\WP\Admin;
 
-use Http\Client\Common\Exception\ClientErrorException;
 use SmartCAT\WP\Connector;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Entity\Statistics;
@@ -20,7 +19,7 @@ use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\DB\Repository\StatisticRepository;
 use SmartCAT\WP\DB\Repository\TaskRepository;
 use SmartCAT\WP\DITrait;
-use SmartCAT\WP\Handler\SmartCATCallbackHandler;
+use SmartCAT\WP\Helpers\CronHelper;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
@@ -62,15 +61,11 @@ final class Ajax implements HookInterface {
 		$utils    = null;
 		$options  = null;
 
-		$callback_handler = null;
-
 		try {
 			/** @var Utils $utils */
 			$utils = $container->get( 'utils' );
 			/** @var Options $options */
 			$options = $container->get( 'core.options' );
-			/** @var SmartCATCallbackHandler $callback_handler */
-			$callback_handler = $container->get( 'callback.handler.smartcat' );
 		} catch ( \Exception $e ) {
 			Logger::error( 'Can\'t get container', "Reason: {$e->getMessage()} {$e->getTraceAsString()}" );
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
@@ -99,37 +94,24 @@ final class Ajax implements HookInterface {
 
 		try {
 			$utils::check_vendor_exists( $api );
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
 			$ajax_response->send_error( $e->getMessage(), $data );
 		}
 
-		// If callback already exists - drop needed.
 		try {
-			$callback_handler->delete_callback();
-		} catch ( \Exception $e ) {
-			$data['message'] = $e->getMessage();
-
-			if ( $e instanceof ClientErrorException ) {
-				$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
-			} else {
-				$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
+			$cron = new CronHelper();
+			if ( ! ( boolval( $parameters[ $prefix . 'use_external_cron' ] ) && boolval( $options->get( 'use_external_cron' ) ) ) ) {
+				if ( $parameters[ $prefix . 'use_external_cron' ] ) {
+					$cron->register();
+					Utils::disable_system_cron();
+				} else {
+					$cron->unregister();
+					Utils::enable_system_cron();
+				}
 			}
-
-			Logger::error( "Callback delete failed", $message );
-		}
-
-		try {
-			$callback_handler->register_callback( $api );
 		} catch ( \Exception $e ) {
-			$data['message'] = $e->getMessage();
-
-			if ( $e instanceof ClientErrorException ) {
-				$message = "API error code: {$e->getResponse()->getStatusCode()}. API error message: {$e->getResponse()->getBody()->getContents()}";
-			} else {
-				$message = "Message: {$e->getMessage()}. Trace: {$e->getTraceAsString()}";
-			}
-
-			Logger::error( "Callback register failed, user {$login}", $message );
+			Logger::error("external cron", "External cron cause error: '{$e->getMessage()}'");
+			$ajax_response->send_error( $e->getMessage(), $data );
 		}
 
 		if ( $account_info && $account_info->getName() ) {
