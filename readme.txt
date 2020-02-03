@@ -75,6 +75,9 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 
 == Changelog ==
 
+= 2.1.3 (2020-02-03) =
+* Checking the source and target languages of the profile for compliance with the settings of the Smartcat project when saving the profile
+
 = 2.1.2 (2019-10-15) =
 * Setting up external cron
 * Manual cron executing

@@ -253,7 +253,7 @@ final class Ajax implements HookInterface {
 				$sc_project = $smartcat->getProjectManager()->projectGet( $data['profile_project_id'] );
 				$projectSourceLanguage = $sc_project->getSourceLanguage();
 				$projectTargetLanguages = $sc_project->getTargetLanguages();
-				$profileSourceLanguage = $languageConverter->get_sc_code_by_wp($data['profile_source_lang'])->get_sc_code();
+				$profileSourceLanguage = $languageConverter->get_sc_code_by_wp( $data['profile_source_lang'] )->get_sc_code();
 				$profileTargetLanguages = array_map( function ( $profileTargetLanguage ) use ( $languageConverter ) {
 					return $languageConverter->get_sc_code_by_wp( $profileTargetLanguage )->get_sc_code();
 				}, $data['profile_target_langs'] );
@@ -265,7 +265,7 @@ final class Ajax implements HookInterface {
 
 				if ( $profileTranslationDirection !== $projectTranslationDirection ) {
 					$ajax_response->send_error(
-						sprintf( __( 'You cannot save the profile, because the direction of the translation in the profile (%s) is different from the direction of the translation in the project you specified (%s)', 'translation-connectors' ), $profileTranslationDirection, $projectTranslationDirection ),
+						sprintf( __( 'You cannot save the profile, because the direction of the translation in the profile (%s) is different from the direction of the translation in Smartcat project you specified (%s)', 'translation-connectors' ), $profileTranslationDirection, $projectTranslationDirection ),
 						[],
 						400
 					);
