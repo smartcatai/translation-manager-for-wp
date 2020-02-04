@@ -212,6 +212,7 @@ final class Ajax implements HookInterface {
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
 		}
 
+		$is_new = ! empty( $data['profile_id'] ) ? false : true ;
 		if ( ! empty( $data['profile_id'] ) ) {
 			$profile = $profiles_repo->get_one_by_id( $data['profile_id'] );
 		} else {
@@ -280,7 +281,7 @@ final class Ajax implements HookInterface {
 			$result = false;
 		}
 
-		if ( $result ) {
+		if ( $result || ! ( $result &&  $is_new ) ) {
 			$ajax_response->send_success( __( 'Item successfully created', 'translation-connectors' ), $data );
 		} else {
 			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
