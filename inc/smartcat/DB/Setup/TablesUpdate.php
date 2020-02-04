@@ -17,6 +17,8 @@ use SmartCAT\WP\DB\DbAbstract;
 use SmartCAT\WP\DB\Entity\Profile;
 use SmartCAT\WP\DB\Repository\ProfileRepository;
 use SmartCAT\WP\Helpers\Language\LanguageConverter;
+use SmartCAT\WP\Helpers\Logger;
+use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
 
 /**
@@ -66,6 +68,10 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 
 		if ( version_compare( Utils::get_plugin_version(), '2.1.1', '<' ) ) {
 			$this->v211();
+		}
+
+		if ( version_compare( Utils::get_plugin_version(), '2.1.2', '<' ) ) {
+			$this->v212();
 		}
 	}
 
@@ -180,6 +186,24 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 	private function v211() {
 		$param_prefix = $this->container->getParameter( 'plugin.table.prefix' );
 		delete_option( $param_prefix . 'statistic_queue_active' );
+	}
+
+	/**
+	 * Update to version 2.1.2
+	 */
+	private function v212() {
+		$param_prefix = $this->container->getParameter( 'plugin.table.prefix' );
+		delete_option( $param_prefix . 'callback_authorisation_token' );
+
+		try {
+			Connector::set_core_parameters();
+
+			/** @var SmartCAT $smartcat */
+			$smartcat = $this->container->get( 'smartcat' );
+			$smartcat->getCallbackManager()->callbackDelete();
+		} catch ( \Exception $e ) {
+			Logger::error('Migration', 'Can\'t delete callback in migration');
+		}
 	}
 
 	/**
