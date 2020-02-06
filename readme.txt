@@ -78,6 +78,7 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 = 2.1.3 (2020-02-03) =
 * Checking the source and target languages of the profile for compliance with the settings of the Smartcat project when saving the profile
 * Extension checker
+* Fixed error while trying to save profile with no changes made in it
 
 = 2.1.2 (2019-10-15) =
 * Setting up external cron
