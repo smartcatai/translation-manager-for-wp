@@ -212,6 +212,7 @@ final class Ajax implements HookInterface {
 			$ajax_response->send_error( $e->getMessage(), [], 400 );
 		}
 
+		$is_new = ! empty( $data['profile_id'] ) ? false : true ;
 		if ( ! empty( $data['profile_id'] ) ) {
 			$profile = $profiles_repo->get_one_by_id( $data['profile_id'] );
 		} else {
@@ -243,6 +244,40 @@ final class Ajax implements HookInterface {
 
 		if ( empty( $data['profile_target_langs'] ) ) {
 			$ajax_response->send_error( __( 'Source language and target language are the same. Please select different languages.', 'translation-connectors' ), [], 400 );
+		}
+
+		// Check language-pairs in project and profile
+		try {
+			$languageConverter = $container->get( 'language.converter' );
+
+			if ( ! empty( $data['profile_project_id'] ) && !empty( $languageConverter ) ) {
+				$sc_project = $smartcat->getProjectManager()->projectGet( $data['profile_project_id'] );
+				$projectSourceLanguage = $sc_project->getSourceLanguage();
+				$projectTargetLanguages = $sc_project->getTargetLanguages();
+				$profileSourceLanguage = $languageConverter->get_sc_code_by_wp( $data['profile_source_lang'] )->get_sc_code();
+				$profileTargetLanguages = array_map( function ( $profileTargetLanguage ) use ( $languageConverter ) {
+					return $languageConverter->get_sc_code_by_wp( $profileTargetLanguage )->get_sc_code();
+				}, $data['profile_target_langs'] );
+				asort( $projectTargetLanguages );
+				asort( $profileTargetLanguages );
+
+				$profileTranslationDirection = $profileSourceLanguage . ' => ' . join( ", ", $profileTargetLanguages );
+				$projectTranslationDirection = $projectSourceLanguage . ' => ' . join( ", ", $projectTargetLanguages );
+
+				if ( $profileTranslationDirection !== $projectTranslationDirection ) {
+					$ajax_response->send_error(
+						sprintf( __( 'You cannot save the profile, because the direction of the translation in the profile (%s) is different from the direction of the translation in Smartcat project you specified (%s)', 'translation-connectors' ), $profileTranslationDirection, $projectTranslationDirection ),
+						[],
+						400
+					);
+				}
+			}
+		} catch ( \Exception $e ) {
+			$ajax_response->send_error(
+				sprintf( __( 'Error while checking language-pairs: "%s"', 'translation-connectors' ), $e->getMessage() ),
+				[],
+				400
+			);
 		}
 
 		$profile
@@ -280,7 +315,7 @@ final class Ajax implements HookInterface {
 			$result = false;
 		}
 
-		if ( $result ) {
+		if ( $result || ! ( $result &&  $is_new ) ) {
 			$ajax_response->send_success( __( 'Item successfully created', 'translation-connectors' ), $data );
 		} else {
 			$ajax_response->send_error( __( 'Item was not created', 'translation-connectors' ), $data );
