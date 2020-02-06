@@ -20,6 +20,7 @@ use SmartCAT\WP\Helpers\Language\LanguageConverter;
 use SmartCAT\WP\Helpers\Logger;
 use SmartCAT\WP\Helpers\SmartCAT;
 use SmartCAT\WP\Helpers\Utils;
+use SmartCAT\WP\WP\Options;
 
 /**
  * Class TablesUpdate
@@ -203,6 +204,14 @@ class TablesUpdate extends DbAbstract implements SetupInterface {
 			$smartcat->getCallbackManager()->callbackDelete();
 		} catch ( \Exception $e ) {
 			Logger::error('Migration', 'Can\'t delete callback in migration');
+		}
+
+		/** @var Options $options */
+		$options = Connector::get_container()->get( 'core.options' );
+
+		if ( ! $options->get( 'cron_authorisation_token' ) ) {
+			$authorisation_token = base64_encode( openssl_random_pseudo_bytes( 32 ) );
+			$options->set_and_encrypt( 'cron_authorisation_token', $authorisation_token );
 		}
 	}
 
