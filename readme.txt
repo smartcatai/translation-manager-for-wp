@@ -5,7 +5,7 @@ Requires at least: 4.8
 Tested up to: 5.2.2
 Requires PHP: 7.0
 Requires PHP extensions: dom, openssl, json
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,9 @@ Please wait a few minutes. Data exchange between the plugin and the translation 
 3. Translation Connectors Profiles.
 
 == Changelog ==
+
+= 2.1.4 (2021-03-22) =
+* Fixed bug with updating documents
 
 = 2.1.3 (2020-02-03) =
 * Checking the source and target languages of the profile for compliance with the settings of the Smartcat project when saving the profile
